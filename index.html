@@ -2,582 +2,1439 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L'Artisan Imprimeur | الحرفي الطباع</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;400;700;900&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>L'Artisan Imprimeur | Premium Glass</title>
     
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 6 2 18 2 18 9'%3E%3C/polyline%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'%3E%3C/path%3E%3Crect width='12' height='8' x='6' y='14'%3E%3C/rect%3E%3C/svg%3E" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.263.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/framer-motion/10.16.4/framer-motion.umd.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#38bdf8',
+                            secondary: '#818cf8',
+                            dark: '#020617',
+                            light: '#f8fafc',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                        'slide-left': 'slide-left 0.5s ease-out forwards',
+                        'slide-up': 'slide-up 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                        'pop-in': 'pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'fadeIn': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        'fadeIn': {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 }
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        'slide-left': {
+                            '0%': { opacity: 0, transform: 'translateX(20px)' },
+                            '100%': { opacity: 1, transform: 'translateX(0)' }
+                        },
+                        'slide-up': {
+                            '0%': { opacity: 0, transform: 'translateY(20px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' }
+                        },
+                        'marquee': {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' }
+                        },
+                        'pop-in': {
+                            '0%': { opacity: 0, transform: 'scale(0.8)' },
+                            '100%': { opacity: 1, transform: 'scale(1)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        window.__app_id = "l-artisan-enterprise-v5"; 
+        window.__firebase_config = {
+            apiKey: "AIzaSyD1_yDyqs6tau59TujtrmXdnMKG3KEwt5c",
+            authDomain: "l-artisan-imprimeur.firebaseapp.com",
+            projectId: "l-artisan-imprimeur",
+            storageBucket: "l-artisan-imprimeur.firebasestorage.app",
+            messagingSenderId: "231498151789",
+            appId: "1:231498151789:web:03edf197cca734f9930c64"
+        };
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, Timestamp, increment, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const app = initializeApp(window.__firebase_config);
+        
+        window.fb = { 
+            app, initializeApp, getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, 
+            signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, getFirestore, 
+            doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, 
+            getDocs, Timestamp, increment, getDoc, writeBatch, isReady: true
+        };
+    </script>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&family=Outfit:wght@300;400;600;800&display=swap');
+        
         :root {
-            /* الألوان الأساسية - مزيج بين الفخامة (الذهب) والتكنولوجيا (النيون) */
-            --bg-color: #050505;
-            --glass-panel: rgba(255, 255, 255, 0.03);
+            --bg-body: #020617;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.7);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-gold: #d4af37;
-            --accent-neon: #3b82f6;
-            --text-primary: #ffffff;
-            --text-muted: rgba(255, 255, 255, 0.5);
-            --success: #10b981;
-            --card-radius: 24px;
+            --glass-highlight: rgba(255, 255, 255, 0.05);
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        /* الوضع الفاتح (اختياري للتوسع مستقبلاً) */
-        body.light-mode {
-            --bg-color: #f0f0f0;
-            --glass-panel: rgba(0, 0, 0, 0.05);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --text-primary: #1a1a1a;
-            --text-muted: rgba(0, 0, 0, 0.6);
+        .light-mode {
+            --bg-body: #f0f9ff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-highlight: rgba(255, 255, 255, 0.4);
+            --card-shadow: 0 20px 40px rgba(14, 165, 233, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Tajawal', sans-serif;
-            outline: none;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            transition: background 0.5s ease;
-        }
-
-        /* الطباعة الفنية */
-        .brand-font {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-        }
-
-        /* الخلفية الديناميكية */
-        .ambient-light {
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            background: 
-                radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.08), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08), transparent 40%);
-            filter: blur(80px);
-        }
-
-        /* المكونات الزجاجية */
-        .glass {
-            background: var(--glass-panel);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--card-radius);
-        }
-
-        /* الهيدر */
-        nav {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1400px;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            border-radius: 50px;
-        }
-
-        .logo {
-            font-size: 1.6rem;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo span { color: var(--accent-gold); }
-
-        .nav-links {
-            display: flex;
-            gap: 40px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            padding-bottom: 5px;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-gold);
-            transition: width 0.3s;
-        }
-
-        .nav-links a:hover::after { width: 100%; }
-
-        /* القسم الرئيسي */
-        .hero {
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 80px;
-            position: relative;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            max-width: 1400px;
-            width: 90%;
-            align-items: center;
+        body[dir="ltr"] { font-family: 'Outfit', sans-serif; }
+
+        .glass-morphism {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
         }
 
-        .hero-text h1 {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            margin-bottom: 25px;
+        .glass-card {
+            background: linear-gradient(135deg, var(--glass-highlight) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .hero-text h1 span {
-            background: linear-gradient(to right, #fff, #999);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow);
         }
 
-        .highlight-gold {
-            color: var(--accent-gold) !important;
-            -webkit-text-fill-color: var(--accent-gold) !important;
-        }
-
-        .hero-desc {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            line-height: 1.6;
-            max-width: 500px;
-        }
-
-        /* استوديو البطاقة التفاعلي */
-        .card-studio {
-            position: relative;
-            perspective: 1500px;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .interactive-card {
-            width: 340px;
-            height: 200px;
-            background: #111;
-            border-radius: 15px;
-            position: relative;
-            transform-style: preserve-3d;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.1s, background 0.5s;
-            cursor: grab;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* تأثير الخامة (Texture) */
-        .texture-overlay {
-            position: absolute;
-            inset: 0;
-            opacity: 0.3;
-            mix-blend-mode: overlay;
-            border-radius: 15px;
-            pointer-events: none;
-        }
-
-        .card-logo-preview {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #fff;
-            transform: translateZ(30px);
-            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .card-chip {
-            position: absolute;
-            left: 30px;
-            top: 50%;
-            transform: translateY(-50%) translateZ(20px);
-            width: 40px;
-            height: 30px;
-            background: linear-gradient(135deg, #d4af37, #f3e5ab);
-            border-radius: 5px;
-        }
-
-        /* لوحة التحكم */
-        .controls-panel {
-            margin-top: 100px;
-            padding: 40px;
-            max-width: 1000px;
-            margin: 50px auto;
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .control-group h3 {
-            font-size: 1rem;
-            margin-bottom: 15px;
-            color: var(--text-muted);
-        }
-
-        .color-options {
-            display: flex;
-            gap: 15px;
-        }
-
-        .color-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .color-btn.active { border-color: #fff; transform: scale(1.1); }
-
-        .range-slider {
-            width: 100%;
-            -webkit-appearance: none;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            outline: none;
-        }
-
-        .range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .price-tag {
-            font-size: 3rem;
-            font-weight: bold;
-            color: var(--accent-gold);
-            text-align: left;
-        }
-
-        /* محاكي رفع الملفات بالذكاء الاصطناعي */
-        .upload-zone {
-            border: 2px dashed var(--glass-border);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
+        .mesh-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
             overflow: hidden;
+            transition: all 1s ease;
         }
 
-        .upload-zone:hover { border-color: var(--accent-gold); background: rgba(212, 175, 55, 0.05); }
-
-        .ai-status {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .scan-line {
+        .mesh-ball {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--accent-neon);
-            box-shadow: 0 0 15px var(--accent-neon);
-            transform: translateY(-100%);
-            transition: none;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 10s infinite alternate;
+            transition: background-color 1s ease;
         }
 
-        .scanning .scan-line {
-            animation: scan 2s infinite ease-in-out;
-            opacity: 1;
-        }
+        .light-mode .mesh-ball-1 { background-color: #38bdf8; opacity: 0.2; }
+        .light-mode .mesh-ball-2 { background-color: #818cf8; opacity: 0.2; }
+        .light-mode .mesh-ball-3 { background-color: #f472b6; opacity: 0.15; }
+        .mesh-ball-1 { background-color: #0369a1; }
+        .mesh-ball-2 { background-color: #3730a3; }
+        .mesh-ball-3 { background-color: #831843; }
 
-        @keyframes scan {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(200px); } /* Assuming height */
-            100% { transform: translateY(0); }
+        .loader {
+            border-top-color: #38bdf8;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
         }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .btn-primary {
-            background: var(--text-primary);
-            color: #000;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 800;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+        .news-ticker-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+        .news-ticker-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
         }
-
-        /* Footer */
-        footer {
-            margin-top: 100px;
-            padding: 50px 0;
-            border-top: 1px solid var(--glass-border);
-            text-align: center;
-            color: var(--text-muted);
-        }
-
-        /* للموبايل */
-        @media (max-width: 900px) {
-            .hero-grid { grid-template-columns: 1fr; text-align: center; }
-            .hero-text { order: 2; }
-            .card-studio { order: 1; height: 300px; }
-            .hero-text h1 { font-size: 3rem; }
-            nav ul { display: none; }
-        }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
     </style>
 </head>
 <body>
 
-    <div class="ambient-light"></div>
+    <div class="mesh-container">
+        <div class="mesh-ball mesh-ball-1 w-[600px] h-[600px] -top-40 -left-40"></div>
+        <div class="mesh-ball mesh-ball-2 w-[500px] h-[500px] -bottom-40 -right-40 animate-delay-2000"></div>
+        <div class="mesh-ball mesh-ball-3 w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+    </div>
 
-    <nav class="glass">
-        <div class="logo">
-            <i class="fas fa-layer-group"></i>
-            <div>L'Artisan <span class="brand-font">Imprimeur</span></div>
+    <div id="root">
+        <div class="h-screen flex flex-col items-center justify-center gap-4">
+            <div class="loader h-12 w-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
         </div>
-        <ul class="nav-links">
-            <li><a href="#studio">الاستوديو</a></li>
-            <li><a href="#materials">الخامات</a></li>
-            <li><a href="#ai">التحليل الذكي</a></li>
-        </ul>
-        <button class="btn-primary" style="padding: 10px 20px; font-size: 0.9rem;">
-            تواصل معنا
-        </button>
-    </nav>
+    </div>
 
-    <section class="hero">
-        <div class="hero-grid">
-            <div class="hero-text">
-                <h1>حيث تلتقي الحرفة<br>بالتكنولوجيا <span class="brand-font highlight-gold">الذكية</span></h1>
-                <p class="hero-desc">
-                    منصة L'Artisan Imprimeur ليست مجرد مطبعة. نحن ندمج أحدث خوارزميات التصحيح اللوني مع أرقى أنواع الورق الإيطالي لإنتاج بطاقات تترك انطباعاً أبدياً.
-                </p>
-                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <button class="btn-primary" onclick="document.getElementById('studio-section').scrollIntoView({behavior: 'smooth'})">
-                        ابدأ التصميم الآن <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <div style="display: flex; align-items: center; gap: 10px; color: var(--text-muted);">
-                        <i class="fas fa-check-circle" style="color: var(--success)"></i> ضمان الجودة الذهبي
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+        // --- TRANSLATION DICTIONARY ---
+        const TRANSLATIONS = {
+            ar: {
+                appName: "الحرفي", home: "الرئيسية", shop: "المتجر", orders: "طلباتي", profile: "حسابي", cart: "السلة", admin: "الإدارة",
+                welcomeBack: "مرحباً بعودتك", newAccount: "حساب جديد", login: "تسجيل الدخول", signup: "إنشاء حساب",
+                googleLogin: "الدخول بواسطة Google", name: "الاسم الكامل", email: "البريد الإلكتروني", password: "كلمة المرور",
+                noAccount: "ليس لديك حساب؟ سجل الآن", hasAccount: "تمتلك حساباً بالفعل؟ ادخل", search: "ابحث عن منتج...",
+                addToCart: "إضافة للسلة", points: "نقطة", balance: "رصيدك", bestSeller: "الأكثر مبيعاً", viewAll: "مشاهدة الكل",
+                emptyCart: "السلة فارغة حالياً", shopNow: "تسوق الآن", total: "الإجمالي", discount: "خصم", confirmOrder: "تأكيد الطلب",
+                uploadFile: "اضغط لرفع ملف التصميم (PDF/Image)", activeOrders: "طلبات جارية", pastOrders: "سجل الطلبات", orderNum: "طلب رقم",
+                items: "عناصر", reorder: "إعادة الطلب", trackOrder: "تتبع الطلب", statusPending: "قيد الانتظار", statusProcessing: "جاري المعالجة",
+                statusShipped: "تم الشحن", statusCompleted: "مكتمل", statusCancelled: "ملغي", orderDetails: "تفاصيل الطلب", shippingInfo: "معلومات التوصيل",
+                paymentSummary: "ملخص الدفع", date: "التاريخ", close: "إغلاق", apply: "تطبيق", couponPlaceholder: "كود الخصم (اختياري)",
+                orderPlaced: "تم الطلب", settings: "الإعدادات", logout: "تسجيل خروج", wilaya: "الولاية", phone: "الهاتف",
+                limitedOffer: "عرض لفترة محدودة", startOrder: "ابدأ طلبك الآن", luckWheel: "جرب حظك",
+            },
+            fr: {
+                appName: "L'Artisan", home: "Accueil", shop: "Boutique", orders: "Commandes", profile: "Compte", cart: "Panier", admin: "Admin",
+                welcomeBack: "Bon retour", newAccount: "Nouveau compte", login: "Connexion", signup: "S'inscrire",
+                googleLogin: "Continuer avec Google", name: "Nom complet", email: "Email", password: "Mot de passe",
+                noAccount: "Pas de compte ? S'inscrire", hasAccount: "Déjà un compte ? Se connecter", search: "Rechercher un produit...",
+                addToCart: "Ajouter au panier", points: "Points", balance: "Solde", bestSeller: "Meilleures ventes", viewAll: "Voir tout",
+                emptyCart: "Votre panier est vide", shopNow: "Acheter maintenant", total: "Total", discount: "Remise", confirmOrder: "Confirmer la commande",
+                uploadFile: "Cliquez pour uploader le design (PDF/Image)", activeOrders: "En cours", pastOrders: "Historique", orderNum: "Commande #",
+                items: "articles", reorder: "Commander à nouveau", trackOrder: "Suivre", statusPending: "En attente", statusProcessing: "En traitement",
+                statusShipped: "Expédié", statusCompleted: "Terminé", statusCancelled: "Annulé", orderDetails: "Détails de la commande", shippingInfo: "Livraison",
+                paymentSummary: "Paiement", date: "Date", close: "Fermer", apply: "Appliquer", couponPlaceholder: "Code promo (optionnel)",
+                orderPlaced: "Commandé", settings: "Paramètres", logout: "Déconnexion", wilaya: "Wilaya", phone: "Téléphone",
+                limitedOffer: "Offre Limitée", startOrder: "Commander", luckWheel: "Roue de la chance",
+            }
+        };
+
+        // --- ROBUST FALLBACKS ---
+        
+        // Fix for Framer Motion
+        const getMotionFallback = () => {
+            const MotionProxy = new Proxy({}, {
+                get: (target, prop) => ({ children, ...props }) => React.createElement(prop === 'div' ? 'div' : 'span', props, children)
+            });
+            return { 
+                motion: MotionProxy, 
+                AnimatePresence: ({ children }) => React.createElement(React.Fragment, null, children) 
+            };
+        };
+        const { motion, AnimatePresence } = window.Motion || window.framerMotion || getMotionFallback();
+
+        // --- HELPER FUNCTIONS ---
+        const useRateLimit = (limit = 1000) => {
+            const [lastClick, setLastClick] = useState(0);
+            return () => {
+                const now = Date.now();
+                if (now - lastClick < limit) return false;
+                setLastClick(now);
+                return true;
+            };
+        };
+
+        const sanitizeInput = (input) => {
+            if (!input) return '';
+            if (typeof input !== 'string') return String(input);
+            return input.replace(/<[^>]*>/g, '').trim();
+        };
+
+        const validatePhone = (phone) => /^(05|06|07)[0-9]{8}$/.test(phone);
+        const formatCurrency = (val) => new Intl.NumberFormat('fr-DZ', { style: 'currency', currency: 'DZD' }).format(val).replace('DZD', 'DA');
+
+        // --- FIXED ICON COMPONENT ---
+        const Icon = ({ name, size = 20, className = "" }) => {
+            const [iconData, setIconData] = useState(null);
+
+            useEffect(() => {
+                if (window.lucide && window.lucide.icons) {
+                    // Convert kebab-case to PascalCase (e.g. shopping-cart -> ShoppingCart)
+                    const pascalName = name.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+                    const data = window.lucide.icons[pascalName] || window.lucide.icons[name];
+                    setIconData(data);
+                }
+            }, [name]);
+
+            if (!iconData) return <span style={{width: size, height: size}} className={`inline-block ${className}`} />;
+
+            // Lucide icon data is usually [tag, attrs, children]
+            // We construct the SVG manually to ensure React compatibility without strict DOM manipulation
+            return (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={size}
+                    height={size}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`lucide lucide-${name} ${className}`}
+                >
+                    {iconData.map((child, index) => {
+                        const [tag, attrs] = child;
+                        return React.createElement(tag, { ...attrs, key: index });
+                    })}
+                </svg>
+            );
+        };
+
+        const WILAYAS = [
+            { id: '16', name: 'الجزائر', nameFr: 'Alger' }, { id: '31', name: 'وهران', nameFr: 'Oran' },
+            { id: '25', name: 'قسنطينة', nameFr: 'Constantine' }, { id: '06', name: 'بجاية', nameFr: 'Bejaia' },
+            { id: '13', name: 'تلمسان', nameFr: 'Tlemcen' }, { id: '30', name: 'ورقلة', nameFr: 'Ouargla' }
+        ];
+
+        const CATEGORIES = [
+            { id: 'all', label: { ar: 'الكل', fr: 'Tout' }, icon: 'layout-grid' },
+            { id: 'flyers', label: { ar: 'فلاير', fr: 'Flyers' }, icon: 'file-text' },
+            { id: 'wedding', label: { ar: 'دعوات زفاف', fr: 'Mariage' }, icon: 'heart-handshake' },
+            { id: 'cards', label: { ar: 'بطاقات', fr: 'Cartes' }, icon: 'credit-card' },
+            { id: 'marketing', label: { ar: 'تسويق', fr: 'Marketing' }, icon: 'megaphone' },
+            { id: 'nfc', label: { ar: 'NFC', fr: 'NFC' }, icon: 'rss' },
+            { id: 'large', label: { ar: 'طباعة كبيرة', fr: 'Grand' }, icon: 'image' },
+        ];
+
+        const DEFAULT_PRODUCTS = [
+            { id: '1', cat: 'cards', name: { ar: 'بطاقات عمل فاخرة', fr: 'Cartes de visite Pro' }, price: 2500, image: 'https://img.freepik.com/psd-gratuit/modele-conception-carte-visite-professionnelle_47987-19617.jpg?semt=ais_hybrid&w=740&q=80', points: 25 },
+            { id: '2', cat: 'nfc', name: { ar: 'بطاقة NFC', fr: 'Carte NFC' }, price: 5500, image: 'https://www.rfidfuture.com/wp-content/uploads/2021/02/nfc-cards.jpg', points: 100 },
+            { id: '3', cat: 'flyers', name: { ar: 'فلاير إعلاني A5', fr: 'Flyer A5' }, price: 4000, image: 'https://cdnspecseu.bizay.com/BESTSELLERS/Flyers/flyersbs_classic_mainimg_a_rect_vert_white_f.png?v=638887908228520801', points: 40 },
+            { id: '4', cat: 'wedding', name: { ar: 'دعوة زفاف ملكية', fr: 'Carte Mariage Royale' }, price: 8500, image: 'https://my-card.one/cards/Invitation/Wedding4/index.jpg', points: 150 },
+        ];
+
+        const ADMIN_UID = "attouabdelkarim2@gmail.com";
+
+        // --- COMPONENTS ---
+
+        const OrderDetailModal = ({ order, onClose, onReorder, lang, t, isDark }) => {
+            if (!order) return null;
+
+            const steps = [
+                { id: 'Pending', label: t('statusPending'), icon: 'clock' },
+                { id: 'Processing', label: t('statusProcessing'), icon: 'cog' },
+                { id: 'Shipped', label: t('statusShipped'), icon: 'truck' },
+                { id: 'Completed', label: t('statusCompleted'), icon: 'check-circle' }
+            ];
+
+            const currentStepIndex = steps.findIndex(s => s.id === (order.status === 'Cancelled' ? 'Pending' : order.status));
+            const progress = ((currentStepIndex) / (steps.length - 1)) * 100;
+            
+            let displayDate = "";
+            try {
+                if (order.createdAt?.toDate) {
+                    displayDate = order.createdAt.toDate().toLocaleString(lang === 'ar' ? 'ar-DZ' : 'fr-FR');
+                } else if (order.createdAt?.seconds) {
+                    displayDate = new Date(order.createdAt.seconds * 1000).toLocaleString(lang === 'ar' ? 'ar-DZ' : 'fr-FR');
+                } else {
+                    displayDate = new Date().toLocaleDateString();
+                }
+            } catch(e) { displayDate = ""; }
+
+            return (
+                <div className="fixed inset-0 z-[250] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+                    <div className="glass-card w-full max-w-2xl rounded-[30px] overflow-hidden flex flex-col max-h-[90vh] bg-white dark:bg-slate-900">
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-sky-500/10">
+                            <div>
+                                <h3 className={`font-black text-xl ${isDark ? 'text-white' : 'text-slate-800'}`}>{t('orderDetails')} #{order.id.slice(0,6)}</h3>
+                                <p className="text-xs text-sky-500 font-bold">{displayDate}</p>
+                            </div>
+                            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full"><Icon name="x" /></button>
+                        </div>
+
+                        <div className="overflow-y-auto p-6 space-y-8 flex-1">
+                            {order.status !== 'Cancelled' ? (
+                                <div className="relative pt-4 pb-8">
+                                    <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 rounded-full"></div>
+                                    <div className="absolute top-1/2 left-0 h-1 bg-sky-500 -translate-y-1/2 rounded-full transition-all duration-1000" style={{width: `${progress}%`, direction: 'ltr'}}></div>
+                                    <div className="flex justify-between relative z-10" dir="ltr">
+                                        {steps.map((step, idx) => {
+                                            const isActive = idx <= currentStepIndex;
+                                            return (
+                                                <div key={step.id} className="flex flex-col items-center gap-2">
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-sky-500 text-white scale-110 shadow-lg shadow-sky-500/50' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'}`}>
+                                                        <Icon name={step.icon} size={14} />
+                                                    </div>
+                                                    <span className={`text-[10px] font-bold ${isActive ? 'text-sky-500' : 'text-slate-400'}`}>{step.label}</span>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="bg-red-500/10 text-red-500 p-4 rounded-xl text-center font-bold border border-red-500/20">
+                                    <Icon name="alert-circle" className="inline-block mr-2"/> {t('statusCancelled')}
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <h4 className={`font-bold text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{t('items')} ({order.items.length})</h4>
+                                {order.items.map((item, i) => (
+                                    <div key={i} className="flex justify-between items-center glass-morphism p-3 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-sky-500/10 rounded-lg flex items-center justify-center text-sky-500 font-bold">x{item.qty}</div>
+                                            <div>
+                                                <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{item.name[lang] || item.name.ar || item.name}</p>
+                                                <p className="text-xs text-slate-500">{formatCurrency(item.price)}</p>
+                                            </div>
+                                        </div>
+                                        <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{formatCurrency(item.price * item.qty)}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="glass-morphism p-4 rounded-2xl">
+                                    <h4 className="text-sky-500 font-bold text-xs mb-2 uppercase">{t('shippingInfo')}</h4>
+                                    <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{order.customerName}</p>
+                                    <p className="text-xs text-slate-500 mt-1">{order.phone}</p>
+                                    <p className="text-xs text-slate-500">{order.wilaya}</p>
+                                </div>
+                                <div className="glass-morphism p-4 rounded-2xl">
+                                    <h4 className="text-green-500 font-bold text-xs mb-2 uppercase">{t('paymentSummary')}</h4>
+                                    {order.discount > 0 && (
+                                        <div className="flex justify-between text-xs text-pink-500 mb-1">
+                                            <span>{t('discount')}</span><span>{order.discount}%</span>
+                                        </div>
+                                    )}
+                                    <div className={`flex justify-between font-black text-lg ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                                        <span>{t('total')}</span><span>{formatCurrency(order.total)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-white/10 bg-white/5 flex gap-4">
+                            <button onClick={() => onReorder(order)} className="flex-1 bg-sky-500 hover:bg-sky-400 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                                <Icon name="rotate-ccw" size={18}/> {t('reorder')}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            );
+        };
 
-            <div class="card-studio">
-                <div class="interactive-card" id="previewCard">
-                    <div class="texture-overlay" id="textureLayer"></div>
-                    <div class="card-chip"></div>
-                    <div class="card-logo-preview">L'Artisan</div>
-                    <div style="position: absolute; bottom: 20px; right: 20px; font-size: 0.8rem; opacity: 0.7;">Premium Member</div>
+        const PromoModal = ({ onClose, isDark, t }) => {
+            const [timeLeft, setTimeLeft] = useState(12 * 60 * 60); 
+            useEffect(() => {
+                const timer = setInterval(() => setTimeLeft(p => p > 0 ? p - 1 : 0), 1000);
+                return () => clearInterval(timer);
+            }, []);
+            const formatTime = (seconds) => {
+                const h = Math.floor(seconds / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                const s = seconds % 60;
+                return `${h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            };
+            return (
+                <div className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="glass-card w-full max-w-md rounded-[40px] overflow-hidden relative animate-pop-in border-2 border-yellow-400/30">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" /></button>
+                        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6 text-center">
+                            <h2 className="text-3xl font-black text-white mb-1">{t('limitedOffer')}!</h2>
+                        </div>
+                        <div className="p-8 text-center space-y-6">
+                            <div className="text-4xl font-black font-mono tracking-widest text-sky-500">{formatTime(timeLeft)}</div>
+                            <p className={`${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Special discount on Wedding Cards & Flyers!</p>
+                            <button onClick={onClose} className="w-full bg-sky-500 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-sky-400 transition">{t('shopNow')}</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            );
+        };
 
-    <section class="glass controls-panel" id="studio-section">
-        <div style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px;">
-            <div>
-                <h2 style="font-size: 2rem;">إعداد الطلب</h2>
-                <p style="color: var(--text-muted);">تخصيص مباشر مع تسعير لحظي</p>
-            </div>
-            <div id="totalPrice" class="price-tag">4500 <span style="font-size: 1rem; color: var(--text-muted);">د.ج</span></div>
-        </div>
+        const AuthSystem = ({ onUserLoad, lang, isDark, t }) => {
+            const [isLogin, setIsLogin] = useState(true);
+            const [loading, setLoading] = useState(false);
+            const [form, setForm] = useState({ email: '', password: '', name: '' });
+            const rateLimit = useRateLimit(2000);
 
-        <div class="controls-grid">
-            <div class="control-group">
-                <h3>لون البطاقة / الخامة</h3>
-                <div class="color-options">
-                    <div class="color-btn active" style="background: #111;" onclick="updateCardColor('#111', 'matte')"></div>
-                    <div class="color-btn" style="background: #fff;" onclick="updateCardColor('#f0f0f0', 'glossy')"></div>
-                    <div class="color-btn" style="background: #1e3a8a;" onclick="updateCardColor('#1e3a8a', 'matte')"></div>
-                    <div class="color-btn" style="background: linear-gradient(45deg, #d4af37, #f3e5ab);" onclick="updateCardColor('linear-gradient(45deg, #d4af37, #f3e5ab)', 'metallic')"></div>
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!rateLimit()) return;
+                if(e.target.honey && e.target.honey.value) return; 
+
+                setLoading(true);
+                try {
+                    const auth = window.fb.getAuth();
+                    if (isLogin) {
+                        await window.fb.signInWithEmailAndPassword(auth, form.email, form.password);
+                    } else {
+                        if(form.name.length < 3) throw new Error("Name too short");
+                        const res = await window.fb.createUserWithEmailAndPassword(auth, form.email, form.password);
+                        await window.fb.updateProfile(res.user, { displayName: sanitizeInput(form.name) });
+                        await window.fb.setDoc(window.fb.doc(window.fb.getFirestore(), `artifacts/${window.__app_id}/users/${res.user.uid}`), {
+                            name: sanitizeInput(form.name), 
+                            email: form.email, 
+                            points: 50, 
+                            createdAt: window.fb.Timestamp.now(),
+                            role: 'customer'
+                        });
+                    }
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                } finally { setLoading(false); }
+            };
+
+            const inputClass = `w-full glass-morphism border-none rounded-xl p-4 ${isDark ? 'text-white' : 'text-slate-800'} focus:ring-2 ring-sky-500 outline-none transition placeholder-slate-400`;
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+                    <div className="glass-card w-full max-w-md p-8 rounded-3xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/20 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                        <div className="text-center mb-8">
+                            <h2 className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-800'}`}>{isLogin ? t('welcomeBack') : t('newAccount')}</h2>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="hidden">
+                                <input type="text" name="honey" tabIndex="-1" autoComplete="off" />
+                            </div>
+
+                            {!isLogin && (
+                                <div>
+                                    <input required type="text" onChange={e => setForm({...form, name: e.target.value})} className={inputClass} placeholder={t('name')} />
+                                </div>
+                            )}
+                            <div>
+                                <input required type="email" onChange={e => setForm({...form, email: e.target.value})} className={inputClass} placeholder={t('email')} />
+                            </div>
+                            <div>
+                                <input required type="password" onChange={e => setForm({...form, password: e.target.value})} className={inputClass} placeholder={t('password')} />
+                            </div>
+
+                            <button disabled={loading} className="w-full bg-sky-500 hover:bg-sky-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-sky-500/20 transition transform active:scale-95 flex items-center justify-center gap-2">
+                                {loading ? <div className="loader h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : (isLogin ? t('login') : t('signup'))}
+                            </button>
+                        </form>
+                        <div className="mt-8 flex flex-col gap-3">
+                            <button onClick={() => window.fb.signInWithPopup(window.fb.getAuth(), new window.fb.GoogleAuthProvider())} className="w-full glass-morphism hover:bg-white/10 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 text-current">
+                                <Icon name="globe" size={18} /> {t('googleLogin')}
+                            </button>
+                            <button onClick={() => setIsLogin(!isLogin)} className="text-sky-500 text-sm font-bold text-center mt-2">
+                                {isLogin ? t('noAccount') : t('hasAccount')}
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            );
+        };
 
-            <div class="control-group">
-                <h3>الكمية: <span id="qtyDisplay" style="color: var(--accent-gold);">100</span> قطعة</h3>
-                <input type="range" min="50" max="1000" step="50" value="100" class="range-slider" id="qtySlider" oninput="updatePrice()">
-            </div>
-
-            <div class="control-group">
-                <h3>نوع الورق</h3>
-                <select id="paperType" onchange="updatePrice()" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 10px;">
-                    <option value="1">Standard (350g)</option>
-                    <option value="1.5">Premium Matte (400g)</option>
-                    <option value="2.5">Luxury Textured (600g)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="control-group" style="margin-top: 40px;">
-            <h3>الذكاء الاصطناعي للطباعة (AI Pre-flight)</h3>
-            <div class="upload-zone" id="dropZone">
-                <div class="scan-line"></div>
-                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; margin-bottom: 15px; color: var(--accent-gold);"></i>
-                <p>اسحب ملف التصميم هنا أو اضغط للرفع</p>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">يدعم AI: التحقق من الهوامش، دقة الصور، والألوان (CMYK)</p>
-                <div class="ai-status" id="aiStatus">
-                    <i class="fas fa-circle-notch fa-spin"></i> جاري تحليل جودة الملف...
+        const NewsTicker = ({ text, isDark }) => {
+            if (!text) return null;
+            return (
+                <div className={`w-full py-2 overflow-hidden relative z-50 ${isDark ? 'bg-indigo-900/40 text-indigo-200' : 'bg-indigo-100/80 text-indigo-800'}`}>
+                    <div className="news-ticker-container flex">
+                        <div className="news-ticker-content px-4 font-bold text-sm flex items-center gap-8">
+                             <span>{text}</span><span className="opacity-30">|</span>
+                             <span>{text}</span><span className="opacity-30">|</span>
+                             <span>{text}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            );
+        };
 
-    <footer>
-        <div class="logo" style="justify-content: center; margin-bottom: 20px;">L'Artisan Imprimeur</div>
-        <p>&copy; 2026 جميع الحقوق محفوظة. صمم في المستقبل.</p>
-    </footer>
+        const AdminDashboard = ({ isDark, products }) => {
+            const [activeTab, setActiveTab] = useState('orders'); 
+            const [orders, setOrders] = useState([]);
+            const [coupons, setCoupons] = useState([]); 
+            const [stats, setStats] = useState({ totalOrders: 0, revenue: 0, customers: 0 });
+            const [editingProduct, setEditingProduct] = useState(null); 
+            const [settings, setSettings] = useState({ newsText: '', heroTitle: '', heroSub: '', heroImage: '' });
+            const db = window.fb.getFirestore();
+            const textColor = isDark ? 'text-white' : 'text-slate-800';
 
-    <script>
-        // 1. منطق البطاقة ثلاثية الأبعاد التفاعلية
-        const card = document.getElementById('previewCard');
-        const container = document.querySelector('.card-studio');
+            useEffect(() => {
+                const qOrders = window.fb.query(window.fb.collection(db, `artifacts/${window.__app_id}/public/data/orders`), window.fb.orderBy('createdAt', 'desc'));
+                // Use a try-catch for the query in case index is missing
+                let unsub = () => {};
+                try {
+                    unsub = window.fb.onSnapshot(qOrders, (snap) => {
+                        const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        setOrders(data);
+                        setStats({ totalOrders: data.length, revenue: data.reduce((a,c) => a+(c.total||0),0), customers: [...new Set(data.map(o => o.customerUserId))].length });
+                    }, (err) => console.log("Order fetch error (likely index):", err));
+                } catch(e) { console.error(e); }
 
-        container.addEventListener('mousemove', (e) => {
-            const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
+                const qCoupons = window.fb.query(window.fb.collection(db, `artifacts/${window.__app_id}/coupons`));
+                const unsubCoupons = window.fb.onSnapshot(qCoupons, (snap) => {
+                    setCoupons(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+                });
+                return () => { unsub(); unsubCoupons(); };
+            }, []);
 
-            const rotateX = ((y - centerY) / centerY) * -20;
-            const rotateY = ((x - centerX) / centerX) * 20;
+            useEffect(() => {
+                let mounted = true;
+                 window.fb.getDoc(window.fb.doc(db, `artifacts/${window.__app_id}/public/settings`)).then(doc => {
+                     if (doc.exists() && mounted) setSettings(doc.data());
+                 });
+                 return () => { mounted = false; };
+            }, []);
 
-            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
+            const updateStatus = async (id, status) => {
+                await window.fb.updateDoc(window.fb.doc(db, `artifacts/${window.__app_id}/public/data/orders`, id), { status });
+            };
 
-        container.addEventListener('mouseleave', () => {
-            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-        });
+            const handleSaveProduct = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const prodData = {
+                    name: { ar: sanitizeInput(formData.get('nameAr')), fr: sanitizeInput(formData.get('nameFr')) },
+                    price: Number(formData.get('price')),
+                    cat: formData.get('cat'),
+                    image: sanitizeInput(formData.get('image')),
+                    points: Number(formData.get('points') || 10),
+                    rating: 5.0,
+                    isNew: formData.get('isNew') === 'on'
+                };
+                try {
+                    if (editingProduct?.id) {
+                        await window.fb.updateDoc(window.fb.doc(db, `artifacts/${window.__app_id}/public/data/products`, editingProduct.id), prodData);
+                    } else {
+                        await window.fb.addDoc(window.fb.collection(db, `artifacts/${window.__app_id}/public/data/products`), prodData);
+                    }
+                    setEditingProduct(null);
+                    alert("Saved!");
+                } catch(err) { alert(err.message); }
+            };
 
-        // 2. تحديث الألوان والخامات
-        function updateCardColor(color, texture) {
-            // تحديث الخلفية
-            card.style.background = color;
-            
-            // التعامل مع الألوان النصية
-            if (color.includes('gradient') || color === '#fff' || color === '#f0f0f0') {
-                card.style.color = '#000';
-                card.style.borderColor = 'rgba(0,0,0,0.1)';
-            } else {
-                card.style.color = '#fff';
-                card.style.borderColor = 'rgba(255,255,255,0.1)';
-            }
-
-            // تحديث الأزرار النشطة
-            const btns = document.querySelectorAll('.color-btn');
-            btns.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active'); // ملاحظة: هذا يتطلب تمرير الـ event ولكن للتبسيط هنا
-
-            // تحديث الملمس (Texture Simulation)
-            const textureLayer = document.getElementById('textureLayer');
-            if (texture === 'matte') {
-                textureLayer.style.backgroundImage = 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+")';
-            } else if (texture === 'glossy') {
-                textureLayer.style.backgroundImage = 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%)';
-            } else {
-                textureLayer.style.backgroundImage = 'none';
-            }
-        }
-
-        // 3. حاسبة الأسعار المتقدمة
-        function updatePrice() {
-            const qty = parseInt(document.getElementById('qtySlider').value);
-            const paperMultiplier = parseFloat(document.getElementById('paperType').value);
-            const basePrice = 45; // سعر الوحدة الأساسي
-
-            // معادلة تخفيض الكمية
-            let discount = 1;
-            if (qty >= 500) discount = 0.9;
-            if (qty >= 1000) discount = 0.8;
-
-            const total = Math.round(qty * basePrice * paperMultiplier * discount);
-
-            // تحديث الواجهة
-            document.getElementById('qtyDisplay').textContent = qty;
-            
-            // عداد رقمي متحرك للسعر
-            animateValue(document.getElementById('totalPrice'), parseInt(document.getElementById('totalPrice').innerText), total, 500);
-        }
-
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start) + ' <span style="font-size: 1rem; color: var(--text-muted);">د.ج</span>';
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
+            const handleDeleteProduct = async (id) => {
+                if(confirm('Delete product?')) {
+                    await window.fb.deleteDoc(window.fb.doc(db, `artifacts/${window.__app_id}/public/data/products`, id));
                 }
             };
-            window.requestAnimationFrame(step);
-        }
 
-        // 4. محاكاة الذكاء الاصطناعي (AI Analysis)
-        const dropZone = document.getElementById('dropZone');
-        const aiStatus = document.getElementById('aiStatus');
+            const handleSaveCoupon = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const code = sanitizeInput(formData.get('code')).toUpperCase();
+                const percent = Number(formData.get('percent'));
+                try {
+                    await window.fb.addDoc(window.fb.collection(db, `artifacts/${window.__app_id}/coupons`), {
+                        code, percent, active: true, createdAt: window.fb.Timestamp.now()
+                    });
+                    e.target.reset();
+                    alert("Added!");
+                } catch(err) { alert(err.message); }
+            };
 
-        dropZone.addEventListener('click', () => {
-            // محاكاة بدء العملية
-            dropZone.classList.add('scanning');
-            aiStatus.style.opacity = '1';
-            aiStatus.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري تحليل جودة الملف (DPI Check)...';
+            const deleteCoupon = async (id) => {
+                if(confirm('Delete coupon?')) await window.fb.deleteDoc(window.fb.doc(db, `artifacts/${window.__app_id}/coupons`, id));
+            };
+
+            const handleSaveSettings = async (e) => {
+                e.preventDefault();
+                await window.fb.setDoc(window.fb.doc(db, `artifacts/${window.__app_id}/public/settings`), settings, {merge: true});
+                alert("Saved!");
+            };
+
+            return (
+                <div className="animate-fadeIn space-y-8 pb-32">
+                    <div className="flex gap-4 overflow-x-auto pb-2">
+                        {['orders', 'products', 'coupons', 'settings'].map(t => (
+                            <button key={t} onClick={() => setActiveTab(t)} className={`px-6 py-3 rounded-xl font-bold transition ${activeTab === t ? 'bg-sky-500 text-white' : 'glass-morphism text-slate-500'}`}>
+                                {t.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+
+                    {activeTab === 'orders' && (
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="glass-card p-4 rounded-2xl text-center"><h3 className="text-sky-500 font-black text-xl">{stats.totalOrders}</h3><p className="text-xs text-slate-500">Orders</p></div>
+                                <div className="glass-card p-4 rounded-2xl text-center"><h3 className="text-green-500 font-black text-xl">{formatCurrency(stats.revenue)}</h3><p className="text-xs text-slate-500">Revenue</p></div>
+                            </div>
+                            <div className="space-y-3">
+                                {orders.map(o => (
+                                    <div key={o.id} className="glass-card p-4 rounded-2xl flex flex-col gap-3 border-r-4 border-sky-500">
+                                        <div className="flex justify-between">
+                                            <div><h4 className={`font-bold ${textColor}`}>{o.customerName}</h4><p className="text-xs text-slate-500">{o.phone}</p></div>
+                                            <span className="font-black text-sky-500">{formatCurrency(o.total)}</span>
+                                        </div>
+                                        <select value={o.status} onChange={(e) => updateStatus(o.id, e.target.value)} className="bg-transparent text-xs border rounded p-1 text-slate-500 outline-none">
+                                            <option value="Pending">Pending</option><option value="Processing">Processing</option><option value="Shipped">Shipped</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {activeTab === 'coupons' && (
+                        <div className="space-y-6">
+                            <form onSubmit={handleSaveCoupon} className="glass-card p-6 rounded-3xl space-y-4">
+                                <h3 className={`font-bold ${textColor}`}>New Coupon</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <input required name="code" placeholder="CODE (e.g. SALE20)" className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none uppercase" />
+                                    <input required type="number" max="100" name="percent" placeholder="Percent %" className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" />
+                                </div>
+                                <button className="w-full bg-pink-500 text-white py-3 rounded-xl font-bold">Add Coupon</button>
+                            </form>
+                            <div className="space-y-3">
+                                {coupons.map(c => (
+                                    <div key={c.id} className="glass-card p-4 rounded-2xl flex justify-between items-center">
+                                        <div>
+                                            <h4 className={`font-black text-xl text-pink-500`}>{c.code}</h4>
+                                            <p className="text-xs text-slate-500">-{c.percent}%</p>
+                                        </div>
+                                        <button onClick={() => deleteCoupon(c.id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg"><Icon name="trash" size={16}/></button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {activeTab === 'products' && (
+                         <div className="space-y-6">
+                            <button onClick={() => setEditingProduct({})} className="w-full bg-green-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"><Icon name="plus"/> Add Product</button>
+                            {editingProduct && (
+                                <form onSubmit={handleSaveProduct} className="glass-card p-6 rounded-3xl space-y-4 relative">
+                                    <button type="button" onClick={() => setEditingProduct(null)} className="absolute top-4 left-4 text-slate-500"><Icon name="x"/></button>
+                                    <h3 className={`font-bold ${textColor}`}>Product Data</h3>
+                                    {/* Added optional chaining to prevent crash on new product */}
+                                    <input required name="nameAr" defaultValue={editingProduct.name?.ar} placeholder="Name (Arabic)" className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" />
+                                    <input required name="nameFr" defaultValue={editingProduct.name?.fr} placeholder="Name (French)" className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" />
+                                    <input required type="number" name="price" defaultValue={editingProduct.price} placeholder="Price" className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" />
+                                    <input required name="image" defaultValue={editingProduct.image} placeholder="Image URL" className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" />
+                                    <select name="cat" defaultValue={editingProduct.cat} className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none">
+                                        {CATEGORIES.filter(c => c.id !== 'all').map(c => <option key={c.id} value={c.id}>{c.label.ar}</option>)}
+                                    </select>
+                                    <button className="w-full bg-sky-500 text-white py-3 rounded-xl font-bold">Save</button>
+                                </form>
+                            )}
+                             <div className="grid gap-4">
+                                {products.map(p => (
+                                    <div key={p.id} className="glass-card p-3 rounded-2xl flex items-center gap-4">
+                                        <img src={p.image} className="w-12 h-12 rounded-lg object-cover" />
+                                        <div className="flex-1">
+                                            <h4 className={`text-sm font-bold ${textColor}`}>{p.name.ar}</h4>
+                                            <p className="text-xs text-slate-500">{formatCurrency(p.price)}</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setEditingProduct(p)} className="p-2 bg-blue-500/10 text-blue-500 rounded-lg"><Icon name="edit" size={16}/></button>
+                                            <button onClick={() => handleDeleteProduct(p.id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg"><Icon name="trash" size={16}/></button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {activeTab === 'settings' && (
+                        <form onSubmit={handleSaveSettings} className="glass-card p-6 rounded-3xl space-y-6">
+                            <h3 className={`font-black text-xl ${textColor}`}>Interface</h3>
+                            <input value={settings.newsText} onChange={e => setSettings({...settings, newsText: e.target.value})} className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" placeholder="News Ticker Text" />
+                            <input value={settings.heroTitle} onChange={e => setSettings({...settings, heroTitle: e.target.value})} className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" placeholder="Hero Title" />
+                            <input value={settings.heroImage} onChange={e => setSettings({...settings, heroImage: e.target.value})} className="glass-morphism p-3 rounded-xl w-full text-slate-500 outline-none" placeholder="Hero Image URL" />
+                            <button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-xl font-black shadow-lg shadow-indigo-500/30">Save Changes</button>
+                        </form>
+                    )}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [userData, setUserData] = useState(null); 
+            const [loading, setLoading] = useState(true);
+            const [view, setView] = useState('home'); 
+            const [cart, setCart] = useState([]);
+            const [cat, setCat] = useState('all');
+            const [lang, setLang] = useState('ar');
+            const [showWheel, setShowWheel] = useState(false);
+            const [showPromo, setShowPromo] = useState(false);
+            const [points, setPoints] = useState(0);
+            const [searchQuery, setSearchQuery] = useState("");
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [selectedProduct, setSelectedProduct] = useState(null);
             
-            setTimeout(() => {
-                aiStatus.innerHTML = '<i class="fas fa-palette"></i> فحص نظام الألوان (CMYK)...';
-            }, 1500);
+            const [myOrders, setMyOrders] = useState([]);
+            const [orderFilter, setOrderFilter] = useState('active'); 
+            const [selectedOrder, setSelectedOrder] = useState(null);
 
-            setTimeout(() => {
-                dropZone.classList.remove('scanning');
-                aiStatus.style.color = 'var(--success)';
-                aiStatus.innerHTML = '<i class="fas fa-check-circle"></i> الملف مثالي للطباعة! (300 DPI)';
-            }, 3000);
-        });
+            const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+            const [uploadFile, setUploadFile] = useState(null);
+            const [uploadProgress, setUploadProgress] = useState(0);
+            
+            const [couponCode, setCouponCode] = useState("");
+            const [activeCoupon, setActiveCoupon] = useState(null);
 
+            const rateLimit = useRateLimit(2000);
+            const [products, setProducts] = useState([]);
+            const [siteSettings, setSiteSettings] = useState({
+                newsText: '',
+                heroTitle: 'جودة الطباعة التي تلهم عملائك',
+                heroSub: 'اختر الأفضل لمشروعك مع خدمات الطباعة المتكاملة',
+                heroImage: 'https://m.media-amazon.com/images/I/61UCgLyWD1L._AC_UF1000,1000_QL80_.jpg'
+            });
+
+            const [isDarkMode, setIsDarkMode] = useState(true);
+            const db = window.fb.getFirestore();
+            const t = (key) => TRANSLATIONS[lang][key] || key;
+
+            const toggleLang = () => {
+                const newLang = lang === 'ar' ? 'fr' : 'ar';
+                setLang(newLang);
+                document.documentElement.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr');
+                document.documentElement.setAttribute('lang', newLang);
+                if(newLang === 'ltr') document.body.setAttribute('dir', 'ltr');
+                else document.body.setAttribute('dir', 'rtl');
+            };
+
+            useEffect(() => {
+                window.history.replaceState({ view: 'home' }, '');
+                const handlePopState = (event) => {
+                    if (event.state && event.state.view) setView(event.state.view);
+                    else setView('home');
+                };
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, []);
+
+            const navigateTo = (newView) => {
+                if (view !== newView) {
+                    window.history.pushState({ view: newView }, '', `#${newView}`);
+                    setView(newView);
+                }
+            };
+
+            useEffect(() => {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'light') setIsDarkMode(false);
+                setTimeout(() => setShowPromo(true), 5000); 
+            }, []);
+
+            useEffect(() => {
+                if (isDarkMode) {
+                    document.body.classList.remove('light-mode');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.add('light-mode');
+                    localStorage.setItem('theme', 'light');
+                }
+            }, [isDarkMode]);
+
+            useEffect(() => {
+                const unsub = window.fb.onAuthStateChanged(window.fb.getAuth(), (u) => {
+                    setUser(u);
+                    if (u) {
+                        window.fb.onSnapshot(window.fb.doc(db, `artifacts/${window.__app_id}/users/${u.uid}`), (doc) => {
+                            if (doc.exists()) {
+                                setPoints(doc.data().points || 0);
+                                setUserData(doc.data());
+                            }
+                        });
+                        const savedCart = localStorage.getItem(`cart_${u.uid}`);
+                        if (savedCart) setCart(JSON.parse(savedCart));
+                    }
+                    setLoading(false);
+                });
+
+                const qProds = window.fb.query(window.fb.collection(db, `artifacts/${window.__app_id}/public/data/products`));
+                const unsubProds = window.fb.onSnapshot(qProds, (snap) => {
+                    const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                    setProducts(data.length ? data : DEFAULT_PRODUCTS);
+                });
+
+                const unsubSettings = window.fb.onSnapshot(window.fb.doc(db, `artifacts/${window.__app_id}/public/settings`), (doc) => {
+                    if (doc.exists()) setSiteSettings(prev => ({...prev, ...doc.data()}));
+                });
+
+                return () => { unsub(); unsubProds(); unsubSettings(); };
+            }, []);
+
+            useEffect(() => {
+                if (user && view === 'orders') {
+                    const q = window.fb.query(
+                        window.fb.collection(db, `artifacts/${window.__app_id}/public/data/orders`), 
+                        window.fb.where("customerUserId", "==", user.uid)
+                    );
+                    
+                    const unsub = window.fb.onSnapshot(q, (snap) => {
+                        const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                        // Sort locally to avoid Index requirements error in development
+                        data.sort((a, b) => {
+                            const dateA = a.createdAt?.seconds || 0;
+                            const dateB = b.createdAt?.seconds || 0;
+                            return dateB - dateA;
+                        });
+                        setMyOrders(data);
+                    });
+                    return () => unsub();
+                }
+            }, [user, view]);
+
+            useEffect(() => { if (user) localStorage.setItem(`cart_${user.uid}`, JSON.stringify(cart)); }, [cart]);
+
+            const addToCart = (product) => {
+                const exists = cart.find(i => i.id === product.id);
+                if (exists) setCart(cart.map(i => i.id === product.id ? {...i, qty: i.qty + 1} : i));
+                else setCart([...cart, {...product, qty: 1}]);
+                if (window.confetti) window.confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors: ['#38bdf8', '#818cf8'] });
+            };
+
+            const removeFromCart = (id) => setCart(cart.filter(i => i.id !== id));
+            
+            const subTotal = useMemo(() => cart.reduce((acc, item) => {
+                const originalProduct = products.find(p => p.id === item.id);
+                return acc + ((originalProduct?.price || item.price) * item.qty);
+            }, 0), [cart, products]);
+
+            const discountAmount = useMemo(() => activeCoupon ? (subTotal * activeCoupon.percent / 100) : 0, [subTotal, activeCoupon]);
+            const finalTotal = subTotal - discountAmount;
+            
+            const filteredProducts = products.filter(p => {
+                const name = p.name[lang] || p.name.ar || "";
+                return (cat === 'all' || p.cat === cat) && (name.toLowerCase().includes(searchQuery.toLowerCase()));
+            });
+
+            const handleFileSelect = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                    if (!validTypes.includes(file.type)) { alert('Unsupported file type'); return; }
+                    if(file.size > 5 * 1024 * 1024) { alert('File too large > 5MB'); return; }
+                    setUploadFile(file);
+                    setUploadProgress(0);
+                    const interval = setInterval(() => {
+                        setUploadProgress(prev => {
+                            if (prev >= 100) { clearInterval(interval); return 100; }
+                            return prev + 10;
+                        });
+                    }, 100);
+                }
+            };
+
+            const applyCoupon = async () => {
+                if(!couponCode) return;
+                setLoading(true);
+                try {
+                    const q = window.fb.query(window.fb.collection(db, `artifacts/${window.__app_id}/coupons`), window.fb.where("code", "==", couponCode.toUpperCase()));
+                    const snap = await window.fb.getDocs(q);
+                    if(snap.empty) { alert("Code invalid"); setActiveCoupon(null); }
+                    else {
+                        const data = snap.docs[0].data();
+                        setActiveCoupon({ code: data.code, percent: data.percent });
+                        alert(`${data.percent}% Discount Applied!`);
+                    }
+                } catch(e) { console.error(e); }
+                setLoading(false);
+            };
+
+            const handleOrderSubmit = async (e) => {
+                e.preventDefault();
+                if (isSubmittingOrder || !rateLimit()) return;
+                if(e.target.honey && e.target.honey.value) return;
+
+                setIsSubmittingOrder(true);
+                try {
+                    const formData = new FormData(e.target);
+                    const name = sanitizeInput(formData.get('name'));
+                    const phone = sanitizeInput(formData.get('phone'));
+                    const wilaya = sanitizeInput(formData.get('wilaya'));
+                    
+                    if (!validatePhone(phone)) throw new Error("Invalid Phone (must start with 05, 06, 07 and be 10 digits)");
+                    if (cart.length === 0) throw new Error("Cart empty");
+
+                    await window.fb.addDoc(window.fb.collection(db, `artifacts/${window.__app_id}/public/data/orders`), {
+                        customerUserId: user.uid, customerName: name, phone, wilaya,
+                        items: cart.map(i => ({id: i.id, qty: i.qty, name: i.name, price: i.price})),
+                        total: finalTotal, 
+                        status: 'Pending', 
+                        hasUpload: !!uploadFile,
+                        discount: activeCoupon ? activeCoupon.percent : 0,
+                        createdAt: window.fb.Timestamp.now()
+                    });
+                    
+                    const earnedPoints = Math.floor(finalTotal / 100);
+                    await window.fb.setDoc(window.fb.doc(db, `artifacts/${window.__app_id}/users/${user.uid}`), { points: window.fb.increment(earnedPoints) }, { merge: true });
+                    
+                    setCart([]); setUploadFile(null); setUploadProgress(0); setActiveCoupon(null); 
+                    navigateTo('orders');
+                    if(window.confetti) window.confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                } catch (err) { alert(err.message); } finally { setIsSubmittingOrder(false); }
+            };
+
+            const handleReorder = (order) => {
+                const newItems = order.items.map(item => ({...item, qty: item.qty}));
+                const currentCart = [...cart];
+                newItems.forEach(newItem => {
+                    const existing = currentCart.find(c => c.id === newItem.id);
+                    if(existing) existing.qty += newItem.qty;
+                    else currentCart.push(newItem);
+                });
+                setCart(currentCart);
+                setSelectedOrder(null);
+                navigateTo('cart');
+            };
+
+            if (loading) return (
+                <div className="h-screen flex flex-col items-center justify-center gap-4 bg-brand-dark">
+                    <div className="loader h-12 w-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+                    <p className="text-sky-500 font-bold animate-pulse tracking-widest uppercase text-xs">L'Artisan Printing</p>
+                </div>
+            );
+
+            if (!user) return <AuthSystem lang={lang} isDark={isDarkMode} t={t} />;
+            const isAdmin = user.email === ADMIN_UID;
+            const mainTextClass = isDarkMode ? 'text-white' : 'text-slate-800';
+            const subTextClass = isDarkMode ? 'text-slate-400' : 'text-slate-500';
+
+            const filteredOrders = myOrders.filter(o => {
+                const isHistory = ['Completed', 'Cancelled'].includes(o.status);
+                return orderFilter === 'history' ? isHistory : !isHistory;
+            });
+
+            return (
+                <div className="max-w-6xl mx-auto px-4 min-h-screen flex flex-col">
+                    <NewsTicker text={siteSettings.newsText} isDark={isDarkMode} />
+
+                    <nav className="flex items-center justify-between py-6 sticky top-0 z-[100] glass-morphism -mx-4 px-6 rounded-b-3xl mb-6 shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/30">
+                                <Icon name="printer" className="text-white" size={24} />
+                            </div>
+                            <div>
+                                <h1 className={`text-xl font-black ${mainTextClass} leading-none`}>{t('appName')}<span className="text-sky-500">.</span></h1>
+                            </div>
+                        </div>
+
+                        <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
+                            {['home', 'shop', 'orders', 'profile'].map(v => (
+                                <button key={v} onClick={() => navigateTo(v)} className={`hover:text-sky-500 transition ${view === v ? 'text-sky-500' : ''}`}>
+                                    {t(v)}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <button onClick={toggleLang} className="px-3 py-2 glass-morphism rounded-xl text-xs font-bold uppercase hover:bg-sky-500/10 transition text-current">
+                                {lang === 'ar' ? 'EN' : 'AR'}
+                            </button>
+                            
+                            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 glass-morphism rounded-xl text-sky-500 hover:bg-sky-500/10 transition">
+                                <Icon name={isDarkMode ? 'sun' : 'moon'} size={20} />
+                            </button>
+                            <button onClick={() => navigateTo('cart')} className="relative p-2 glass-morphism rounded-xl hover:bg-sky-500/10 transition text-current">
+                                <Icon name="shopping-bag" size={20} />
+                                {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-sky-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold animate-bounce">{cart.length}</span>}
+                            </button>
+                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 glass-morphism rounded-xl text-current"><Icon name="menu" /></button>
+                        </div>
+                    </nav>
+
+                    <AnimatePresence>
+                        {isMenuOpen && (
+                            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="fixed inset-x-4 top-24 z-[110] glass-card p-6 rounded-3xl flex flex-col gap-4 shadow-2xl">
+                                {['home', 'shop', 'orders', 'profile', ...(isAdmin?['admin']: [])].map(v => (
+                                    <button key={v} onClick={() => {navigateTo(v); setIsMenuOpen(false);}} className={`p-4 rounded-2xl flex items-center gap-4 font-bold transition ${view === v ? 'bg-sky-500 text-white' : 'bg-transparent text-current border border-slate-500/10'}`}>
+                                        <Icon name={v === 'home' ? 'home' : v === 'shop' ? 'shopping-cart' : v === 'orders' ? 'package' : v === 'admin' ? 'shield' : 'user'} />
+                                        {t(v)}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <main className="pb-24 flex-1">
+                        {view === 'home' && (
+                            <div className="space-y-12 animate-fadeIn">
+                                <section className="relative h-[450px] md:h-[600px] rounded-[50px] overflow-hidden group shadow-[0_30px_60px_-15px_rgba(56,189,248,0.3)] border border-sky-500/10">
+                                    <div className="absolute inset-0">
+                                        <img src={siteSettings.heroImage} className="w-full h-full object-cover transition duration-[3000ms] group-hover:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/80 to-transparent"></div>
+                                    </div>
+                                    
+                                    <div className="absolute inset-0 p-8 md:p-16 flex flex-col justify-end items-start z-10">
+                                        <motion.div initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{delay:0.2}}>
+                                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-sky-500/20 backdrop-blur-md border border-sky-500/30 rounded-full text-sky-400 text-xs font-bold mb-6 hover:bg-sky-500/30 transition cursor-pointer">
+                                                <span className="relative flex h-2 w-2">
+                                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                                </span>
+                                                {t('limitedOffer')}
+                                            </div>
+                                        </motion.div>
+                                        
+                                        <motion.h2 initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{delay:0.3}} className="text-4xl md:text-7xl font-black text-white leading-[1.1] max-w-3xl mb-4 drop-shadow-lg">
+                                            {siteSettings.heroTitle}
+                                        </motion.h2>
+                                        
+                                        <motion.p initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{delay:0.4}} className="text-slate-300 text-lg md:text-xl max-w-xl mb-8 leading-relaxed">
+                                            {siteSettings.heroSub}
+                                        </motion.p>
+                                        
+                                        <motion.div initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{delay:0.5}} className="flex flex-wrap gap-4">
+                                            <button onClick={() => navigateTo('shop')} className="bg-sky-500 hover:bg-sky-400 text-white px-8 py-4 rounded-2xl font-black transition transform active:scale-95 flex items-center gap-2 shadow-lg shadow-sky-500/30">
+                                                {t('startOrder')} {lang === 'ar' ? <Icon name="arrow-left"/> : <Icon name="arrow-right"/>}
+                                            </button>
+                                            <button onClick={() => setShowWheel(true)} className="glass-morphism text-white px-8 py-4 rounded-2xl font-black hover:bg-white/10 transition flex items-center gap-2 border-white/20">
+                                                {t('luckWheel')} <Icon name="gift" className="text-yellow-400"/>
+                                            </button>
+                                        </motion.div>
+                                    </div>
+                                </section>
+
+                                <div className="glass-card p-8 rounded-[35px] relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 border-sky-500/20">
+                                    <div className="relative z-10 text-center md:text-right">
+                                        <h3 className={`text-2xl font-black ${mainTextClass}`}>{t('balance')}: <span className="text-sky-500">{points} {t('points')}</span></h3>
+                                        <p className={subTextClass + " mt-2 text-sm"}>Redeem your points for great discounts.</p>
+                                    </div>
+                                    <div className="w-24 h-24 bg-sky-500/10 rounded-full flex items-center justify-center animate-pulse">
+                                        <Icon name="coins" size={48} className="text-sky-500" />
+                                    </div>
+                                </div>
+
+                                <section>
+                                    <div className="flex justify-between items-center mb-8 px-2">
+                                        <h3 className={`text-2xl font-black ${mainTextClass}`}>{t('bestSeller')}</h3>
+                                        <button onClick={() => navigateTo('shop')} className="text-sky-500 font-bold text-sm flex items-center gap-1 hover:underline">{t('viewAll')} {lang === 'ar' ? <Icon name="chevron-left" size={16}/> : <Icon name="chevron-right" size={16}/>}</button>
+                                    </div>
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {products.slice(0, 4).map(p => (
+                                            <div key={p.id} className="glass-card group p-3 rounded-3xl cursor-pointer" onClick={() => setSelectedProduct(p)}>
+                                                <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
+                                                    <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                                                </div>
+                                                <h4 className={`font-bold ${mainTextClass} px-2 truncate`}>{p.name[lang] || p.name.ar}</h4>
+                                                <div className="flex items-center justify-between p-2 mt-2">
+                                                    <span className="text-sky-500 font-black">{formatCurrency(p.price)}</span>
+                                                    <button onClick={(e) => {e.stopPropagation(); addToCart(p);}} className="w-8 h-8 rounded-full bg-sky-500/10 hover:bg-sky-500 text-sky-500 hover:text-white transition flex items-center justify-center"><Icon name="plus" size={16}/></button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+
+                        {view === 'shop' && (
+                            <div className="space-y-8 animate-fadeIn">
+                                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                                    <div className="relative w-full md:w-96">
+                                        <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t('search')} className={`w-full glass-morphism border-none rounded-2xl p-4 ${mainTextClass} ltr:pl-4 rtl:pr-12 focus:ring-2 ring-sky-500 outline-none`} />
+                                        <Icon name="search" className={`absolute ${lang==='ar'?'right-4':'left-4'} top-4 text-slate-500`} />
+                                    </div>
+                                    <div className="flex gap-2 overflow-x-auto w-full md:w-auto hide-scrollbar">
+                                        {CATEGORIES.map(c => (
+                                            <button key={c.id} onClick={() => setCat(c.id)} className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${cat === c.id ? 'bg-sky-500 text-white' : 'glass-morphism text-slate-500'}`}>
+                                                {c.label[lang]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {filteredProducts.map(p => (
+                                        <div key={p.id} className="glass-card group p-3 rounded-3xl cursor-pointer" onClick={() => setSelectedProduct(p)}>
+                                            <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
+                                                <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                                            </div>
+                                            <h4 className={`font-bold ${mainTextClass} px-2 truncate`}>{p.name[lang] || p.name.ar}</h4>
+                                            <div className="flex items-center justify-between p-2 mt-2">
+                                                <span className="text-sky-500 font-black">{formatCurrency(p.price)}</span>
+                                                <button onClick={(e) => {e.stopPropagation(); addToCart(p);}} className="w-10 h-10 rounded-xl bg-sky-500/10 hover:bg-sky-500 text-sky-500 hover:text-white transition flex items-center justify-center"><Icon name="shopping-cart" size={18}/></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'cart' && (
+                            <div className="max-w-2xl mx-auto animate-fadeIn">
+                                <h2 className={`text-3xl font-black ${mainTextClass} mb-8 flex items-center gap-3`}><Icon name="shopping-bag" size={32} /> {t('cart')}</h2>
+                                {cart.length === 0 ? (
+                                    <div className="glass-card p-12 rounded-[40px] text-center space-y-4">
+                                        <div className="w-20 h-20 bg-slate-500/10 rounded-full flex items-center justify-center mx-auto text-slate-500"><Icon name="shopping-cart" size={40}/></div>
+                                        <h3 className={`text-xl font-bold ${mainTextClass}`}>{t('emptyCart')}</h3>
+                                        <button onClick={() => navigateTo('shop')} className="bg-sky-500 text-white px-8 py-3 rounded-2xl font-bold mt-4">{t('shopNow')}</button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-6">
+                                        <div className="space-y-4">
+                                            {cart.map(item => (
+                                                <div key={item.id} className="glass-card p-4 rounded-3xl flex items-center gap-4">
+                                                    <img src={item.image} className="w-20 h-20 rounded-2xl object-cover" />
+                                                    <div className="flex-1">
+                                                        <h4 className={`font-bold ${mainTextClass}`}>{item.name[lang] || item.name.ar}</h4>
+                                                        <p className="text-sky-500 font-black text-sm">{formatCurrency(item.price)}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 glass-morphism rounded-xl px-2">
+                                                        <button onClick={() => item.qty > 1 && setCart(cart.map(i => i.id === item.id ? {...i, qty: i.qty-1}:i))} className="p-2 text-current"><Icon name="minus" size={14}/></button>
+                                                        <span className={`font-bold ${mainTextClass}`}>{item.qty}</span>
+                                                        <button onClick={() => addToCart(item)} className="p-2 text-current"><Icon name="plus" size={14}/></button>
+                                                    </div>
+                                                    <button onClick={() => removeFromCart(item.id)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl transition"><Icon name="trash-2" size={20}/></button>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* COUPON SECTION */}
+                                        <div className="glass-card p-6 rounded-3xl flex gap-3">
+                                            <input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder={t('couponPlaceholder')} className="flex-1 glass-morphism border-none rounded-xl p-3 outline-none uppercase" />
+                                            <button onClick={applyCoupon} className="bg-pink-500 text-white px-6 rounded-xl font-bold">{t('apply')}</button>
+                                        </div>
+
+                                        <div className="glass-card p-8 rounded-[40px] space-y-6 border-sky-500/20 shadow-2xl">
+                                            <div className={`border border-dashed ${isDarkMode ? 'border-white/20' : 'border-slate-300'} rounded-2xl p-6 text-center relative overflow-hidden`}>
+                                                <input type="file" onChange={handleFileSelect} className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*,.pdf" />
+                                                <div className="flex flex-col items-center gap-2 relative z-0">
+                                                    <Icon name={uploadFile ? 'check-circle' : 'upload-cloud'} className={uploadFile ? 'text-green-500' : 'text-sky-500'} size={32} />
+                                                    <p className={`font-bold text-sm ${mainTextClass}`}>{uploadFile ? uploadFile.name : t('uploadFile')}</p>
+                                                    {uploadProgress > 0 && <div className="w-full h-1 bg-slate-200 rounded-full mt-2 overflow-hidden"><div className="h-full bg-sky-500" style={{width: `${uploadProgress}%`}}></div></div>}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between text-slate-500 font-bold text-sm"><span>{t('total')}</span><span>{formatCurrency(subTotal)}</span></div>
+                                                {activeCoupon && <div className="flex justify-between text-pink-500 font-bold text-sm"><span>{t('discount')} ({activeCoupon.percent}%)</span><span>- {formatCurrency(discountAmount)}</span></div>}
+                                                <div className={`flex justify-between ${mainTextClass} font-black text-2xl`}><span>{t('total')}</span><span>{formatCurrency(finalTotal)}</span></div>
+                                            </div>
+
+                                            <form className="space-y-4" onSubmit={handleOrderSubmit}>
+                                                <div className="hidden"><input type="text" name="honey" /></div>
+                                                <div className="grid md:grid-cols-2 gap-4">
+                                                    <input required name="name" placeholder={t('name')} defaultValue={user.displayName} className={`w-full glass-morphism border-none rounded-2xl p-4 ${mainTextClass} outline-none`} />
+                                                    <input required name="phone" placeholder={t('phone')} className={`w-full glass-morphism border-none rounded-2xl p-4 ${mainTextClass} outline-none`} />
+                                                </div>
+                                                <select required name="wilaya" className={`w-full glass-morphism border-none rounded-2xl p-4 ${mainTextClass} outline-none`}>
+                                                    <option value="" className="text-black">{t('wilaya')}</option>
+                                                    {WILAYAS.map(w => <option key={w.id} value={w.name} className="text-black">{w.id} - {lang==='ar'?w.name:w.nameFr}</option>)}
+                                                </select>
+                                                <button disabled={isSubmittingOrder} className="w-full bg-sky-500 hover:bg-sky-400 text-white font-black py-5 rounded-[20px] shadow-lg shadow-sky-500/20 transition transform active:scale-95 text-lg disabled:opacity-50 flex items-center justify-center gap-2">
+                                                    {isSubmittingOrder ? <span className="loader w-5 h-5 border-white"></span> : t('confirmOrder')}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        {view === 'orders' && (
+                            <div className="max-w-2xl mx-auto animate-fadeIn">
+                                <h2 className={`text-3xl font-black ${mainTextClass} mb-8`}>{t('orders')}</h2>
+                                
+                                <div className="flex gap-2 mb-6">
+                                    <button onClick={() => setOrderFilter('active')} className={`flex-1 py-3 rounded-xl font-bold text-sm transition ${orderFilter==='active' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'glass-morphism text-slate-500'}`}>
+                                        {t('activeOrders')}
+                                    </button>
+                                    <button onClick={() => setOrderFilter('history')} className={`flex-1 py-3 rounded-xl font-bold text-sm transition ${orderFilter==='history' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'glass-morphism text-slate-500'}`}>
+                                        {t('pastOrders')}
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {filteredOrders.length === 0 && (
+                                        <div className="py-12 text-center text-slate-500 font-bold opacity-50">Nothing here yet</div>
+                                    )}
+                                    {filteredOrders.map(order => (
+                                        <div key={order.id} onClick={() => setSelectedOrder(order)} className="glass-card p-5 rounded-3xl cursor-pointer hover:bg-white/5 transition group border-l-4 border-sky-500">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${order.status==='Completed'?'bg-green-500/10 text-green-500':'bg-sky-500/10 text-sky-500'}`}>
+                                                        <Icon name={order.status==='Completed'?'check-circle':order.status==='Shipped'?'truck':'package'} size={24} />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className={`font-bold ${mainTextClass} text-lg`}>{t('orderNum')} #{order.id.slice(0,6)}</h4>
+                                                        <p className="text-xs text-slate-500">{order.items.length} {t('items')} • {order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
+                                                    </div>
+                                                </div>
+                                                <Icon name={lang==='ar'?'chevron-left':'chevron-right'} className="text-slate-600 group-hover:text-sky-500 transition"/>
+                                            </div>
+                                            
+                                            <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-4">
+                                                <div className={`h-full ${order.status==='Cancelled'?'bg-red-500':'bg-sky-500'}`} style={{width: order.status==='Completed'? '100%' : order.status==='Shipped'? '75%' : order.status==='Processing'? '50%' : '10%'}}></div>
+                                            </div>
+
+                                            <div className="flex justify-between items-center">
+                                                <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase ${order.status === 'Completed' ? 'bg-green-500/10 text-green-500' : order.status==='Cancelled' ? 'bg-red-500/10 text-red-500' : 'bg-sky-500/10 text-sky-500'}`}>
+                                                    {t(`status${order.status}`)}
+                                                </span>
+                                                <span className={`${mainTextClass} font-black`}>{formatCurrency(order.total)}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'admin' && isAdmin && <AdminDashboard isDark={isDarkMode} products={products} />}
+                    </main>
+
+                    {/* MOBILE NAV BAR */}
+                    <div className="fixed bottom-6 left-4 right-4 z-[90] md:hidden">
+                        <div className="glass-morphism rounded-[30px] p-3 flex items-center justify-between shadow-2xl safe-bottom">
+                            {[
+                                { id: 'home', icon: 'home', label: 'home' },
+                                { id: 'shop', icon: 'shopping-cart', label: 'shop' },
+                                { id: 'orders', icon: 'package', label: 'orders' },
+                                { id: 'profile', icon: 'user', label: 'profile' }
+                            ].map(tab => (
+                                <button key={tab.id} onClick={() => navigateTo(tab.id)} className={`flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition duration-300 ${view === tab.id ? 'text-sky-500 scale-110' : 'text-slate-400'}`}>
+                                    <Icon name={tab.icon} size={22} />
+                                    <span className="text-[10px] font-bold">{t(tab.label)}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {selectedProduct && (
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+                            <div className="glass-card w-full max-w-2xl rounded-[40px] overflow-hidden relative animate-slide-up bg-white dark:bg-slate-900">
+                                <button onClick={() => setSelectedProduct(null)} className="absolute top-6 left-6 z-10 w-10 h-10 bg-black/20 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/40 transition"><Icon name="x" /></button>
+                                <div className="grid md:grid-cols-2 h-full">
+                                    <div className="h-[300px] md:h-full relative">
+                                        <img src={selectedProduct.image} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="p-8 space-y-6 flex flex-col justify-center">
+                                        <div>
+                                            <h3 className={`text-3xl font-black ${mainTextClass} leading-tight`}>{selectedProduct.name[lang] || selectedProduct.name.ar}</h3>
+                                            <p className="text-2xl font-black text-sky-500 mt-2">{formatCurrency(selectedProduct.price)}</p>
+                                        </div>
+                                        <button onClick={() => {addToCart(selectedProduct); setSelectedProduct(null);}} className="flex-1 bg-sky-500 hover:bg-sky-400 text-white font-black py-4 rounded-2xl shadow-lg transition transform active:scale-95">{t('addToCart')}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {selectedOrder && (
+                        <OrderDetailModal 
+                            order={selectedOrder} 
+                            onClose={() => setSelectedOrder(null)} 
+                            onReorder={handleReorder}
+                            lang={lang}
+                            t={t}
+                            isDark={isDarkMode}
+                        />
+                    )}
+
+                    <AdBanner isDark={isDarkMode} />
+                    {showWheel && <LuckyWheel onClose={() => setShowWheel(false)} user={userData} userId={user.uid} db={db} setPoints={setPoints} isDark={isDarkMode} t={t} />}
+                    {showPromo && <PromoModal onClose={() => setShowPromo(false)} isDark={isDarkMode} t={t} />}
+                </div>
+            );
+        };
+
+        const LuckyWheel = ({ onClose, user, userId, db, setPoints, isDark, t }) => {
+            const [spinning, setSpinning] = useState(false);
+            const [win, setWin] = useState(null);
+            
+            const handleSpin = () => {
+                if (spinning) return;
+                setSpinning(true);
+                setTimeout(async () => {
+                    const won = Math.random() > 0.7 ? 10 : 0;
+                    setWin(won);
+                    if (won > 0) {
+                        try {
+                            await window.fb.setDoc(window.fb.doc(db, `artifacts/${window.__app_id}/users/${userId}`), { 
+                                points: window.fb.increment(won),
+                                lastSpin: window.fb.Timestamp.now()
+                            }, { merge: true });
+                            setPoints(prev => prev + won);
+                        } catch(e) { console.error(e); }
+                    }
+                    setSpinning(false);
+                }, 3000);
+            };
+
+            return (
+                <div className="fixed inset-0 z-[250] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="glass-card w-full max-w-sm p-8 rounded-[40px] text-center relative overflow-hidden">
+                        <button onClick={onClose} className="absolute top-6 left-6 text-slate-500 hover:text-current"><Icon name="x"/></button>
+                        <h2 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-800'} mb-2`}>{t('luckWheel')}</h2>
+                        <div className={`relative w-64 h-64 mx-auto mb-8 transition-transform duration-[3000ms] ease-out ${spinning ? 'rotate-[1440deg]' : ''}`}>
+                            <div className="absolute inset-0 flex items-center justify-center text-6xl">🎁</div>
+                        </div>
+                        {win !== null ? (
+                            <div>
+                                <h3 className="text-3xl font-black text-green-500 mb-2">{win > 0 ? 'WINNER!' : 'Try Again'}</h3>
+                                <button onClick={onClose} className="w-full bg-sky-500 text-white font-bold py-3 rounded-2xl mt-6">{t('close')}</button>
+                            </div>
+                        ) : (
+                            <button onClick={handleSpin} disabled={spinning} className="w-full bg-sky-500 text-white font-black py-4 rounded-2xl">
+                                {spinning ? '...' : 'SPIN'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const AdBanner = ({ isDark }) => {
+            const [visible, setVisible] = useState(false);
+            const [adIdx, setAdIdx] = useState(0);
+            const ads = [
+                { text: "🚚 Livraison gratuite > 20,000 DA", icon: "truck" },
+                { text: "🎁 Échangez vos points", icon: "gift" },
+                { text: "✨ Qualité Premium", icon: "star" }
+            ];
+            useEffect(() => {
+                const timer = setTimeout(() => setVisible(true), 3000);
+                const interval = setInterval(() => setAdIdx(p => (p + 1) % ads.length), 5000);
+                return () => { clearTimeout(timer); clearInterval(interval); };
+            }, []);
+            if(!visible) return null;
+            return (
+                <div className={`fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:w-96 z-[80] glass-card p-4 rounded-2xl flex items-center gap-4 animate-slide-up border-l-4 border-sky-500 shadow-2xl`}>
+                    <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center text-white shrink-0"><Icon name={ads[adIdx].icon} size={20} /></div>
+                    <div className="flex-1"><p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{ads[adIdx].text}</p></div>
+                    <button onClick={() => setVisible(false)} className="text-slate-500 hover:text-red-500"><Icon name="x" size={16}/></button>
+                </div>
+            );
+        };
+
+        const initApp = () => {
+            if (window.fb && window.fb.isReady) {
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(<App />);
+            } else {
+                setTimeout(initApp, 100);
+            }
+        };
+
+        initApp();
     </script>
 </body>
-</html>
+    </html>
