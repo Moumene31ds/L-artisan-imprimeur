@@ -82,7 +82,11 @@
         import { getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, Timestamp, increment, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         const app = initializeApp(window.__firebase_config);
-        window.fb = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, Timestamp, increment, getDoc, writeBatch };
+        window.fb = { 
+            initializeApp, getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, 
+            getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, Timestamp, increment, getDoc, writeBatch,
+            isReady: true // تم إضافة هذا العلم لتأكيد جاهزية المكتبة
+        };
     </script>
 
     <style>
@@ -919,7 +923,7 @@
                 return () => { unsub(); unsubProds(); unsubSettings(); };
             }, []);
 
-useEffect(() => {
+            useEffect(() => {
                 if (user && view === 'orders') {
                     // الحل: حذفنا orderBy من الاستعلام ونقوم بالترتيب في JavaScript
                     const q = window.fb.query(
@@ -1462,7 +1466,16 @@ useEffect(() => {
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        const initApp = () => {
+            if (window.fb && window.fb.isReady) {
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(<App />);
+            } else {
+                setTimeout(initApp, 100);
+            }
+        };
+
+        initApp();
     </script>
+</body>
 </html>
