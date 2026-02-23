@@ -11,8 +11,7 @@
     
     <title>L'Artisan Imprimeur - الحرفي للطباعة</title>
     
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-printer'%3E%3Cpolyline points='6 9 6 2 18 2 18 9'%3E%3C/polyline%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'%3E%3C/path%3E%3Crect width='12' height='8' x='6' y='14'%3E%3C/rect>
-    </svg>" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-printer'%3E%3Cpolyline points='6 9 6 2 18 2 18 9'%3E%3C/polyline%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'%3E%3C/path%3E%3Crect width='12' height='8' x='6' y='14'%3E%3C/rect></svg>" />
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -93,8 +92,8 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // مفتاح تشغيل/إيقاف وضع الصيانة (اجعله false لإلغاء الصيانة لاحقاً)
-        const UNDER_MAINTENANCE = true;
+        // تم تعطيل الصيانة ليتمكن الجميع من الدخول
+        const UNDER_MAINTENANCE = false;
 
         const Icon = ({ name, size = 20, className = "" }) => {
             const [svgHtml, setSvgHtml] = useState(null);
@@ -157,10 +156,10 @@
                 haveAccount: "Déjà un compte ?", createAccount: "S'inscrire", nameLabel: "Votre Nom", logout: "Déconnexion",
                 profile: "Profil", accountType: "Type de Compte", anonymous: "Invité (Anonyme)", standardUser: "Utilisateur Standard", 
                 updateProfile: "Mettre à jour le Profil", updateSuccess: "Profil mis à jour", updateFailed: "Échec de la mise à jour",
-                accessDenied: "Accès Refusé",
+                accessDenied: "Accès Refusé", loyaltyPoints: "Points de fidélité",
                 chat: "Discussion", chatWithUs: "Discuter avec nous", typeMessage: "Écrivez votre message...", send: "Envoyer",
                 conversations: "Conversations", noMessages: "Aucun message.", managerName: "Service Client",
-                online: "En ligne", lastMsg: "Dernier message", chatList: "Messages",
+                online: "En ligne", lastMsg: "Dernier message", chatList: "Messages", estimatedDelivery: "Livraison estimée:",
                 promoPh: "Code Promo", promoApply: "Appliquer", promoApplied: "Code promo appliqué!", promoInvalid: "Code invalide.", 
                 promoMinAmount: "Montant minimum", promoEnter: "Entrez le code", discount: "Réduction", subtotal: "Sous-total",
                 discounts: "Réductions", createCode: "Créer Code Promo", codeName: "Nom du Code", discountValue: "Valeur", minOrderAmount: "Montant Min.",
@@ -173,24 +172,20 @@
                 statusDesign: "Conception", statusPrint: "Impression", statusFinish: "Finition", statusReady: "Prêt",
                 reOrder: "Re-commander", printInvoice: "Facture", selectVariants: "Options", finalPrice: "Prix", add: "Ajouter",
                 manageContent: "Contenu", announcement: "Barre d'info", stories: "Stories", show: "Afficher", 
-                textAr: "Texte Arabe", textFr: "Texte Français", addImage: "Image (URL) (Optionnel)", storyName: "Titre Story", addStory: "Ajouter Story", delete: "Supprimer",
+                textAr: "Texte Arabe", textFr: "Texte Français", addImage: "Image (URL)", storyName: "Titre Story", addStory: "Ajouter", delete: "Supprimer",
                 wilaya: "Wilaya", selectWilaya: "Sélectionnez votre Wilaya", orderDetails: "Détails de la commande (Infos sur la carte, Logo, etc...)",
-                deliveryFee: "Frais de livraison", search: "Rechercher un produit...", favorites: "Favoris", noFavorites: "Aucun favori pour le moment.",
+                deliveryFee: "Frais de livraison", search: "Rechercher...", favorites: "Favoris", noFavorites: "Aucun favori pour le moment.",
                 addToFav: "Ajouté aux favoris", removeFromFav: "Retiré des favoris", all: "Tout",
                 exportCSV: "Exporter CSV", details: "Détails", cancelOrder: "Annuler", showDetails: "Voir détails",
-                offers: "Offres Spéciales", addOffer: "Ajouter Offre", offerTitle: "Titre Offre", offerDesc: "Description", offerPrice: "Prix/Promo",
-                manageOffers: "Gérer Offres", specialOffers: "Offres Spéciales", endsIn: "Se termine dans", offerEndDate: "Date fin (Optionnel)",
+                offers: "Offres", addOffer: "Ajouter Offre", offerTitle: "Titre Offre", offerDesc: "Description", offerPrice: "Prix",
+                manageOffers: "Gérer Offres", specialOffers: "Offres Spéciales", endsIn: "Se termine dans", offerEndDate: "Date fin",
                 edit: "Modifier", updateOffer: "Mettre à jour l'offre", cancel: "Annuler", getOffer: "Obtenir l'offre",
-                associatedPromo: "Code Promo Associé (ex: EID20)", printReceipt: "Imprimer Reçu", fileUpload: "Fichier Design (Optionnel)", uploading: "Téléchargement...",
-                voiceSearch: "Recherche vocale", listening: "Écoute...", qualityCheck: "Analyse IA de la résolution...", 
-                qualityGood: "Excellente qualité pour l'impression", qualityBad: "Basse résolution, risque de flou", uploadDesign: "Vérifier le design",
-                qrTool: "Générateur QR", qrText: "Lien ou Texte pour le QR", generateQR: "Générer", downloadQR: "Télécharger", qrDesc: "Créez un code QR pour vos cartes de visite!",
-                categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Accessoires", share: "Partager", clearCart: "Vider le panier",
-                // Maintenance Texts
-                maintenanceTitle: "Site en Maintenance",
-                maintenanceDesc: "Nous mettons actuellement à niveau notre plateforme pour vous offrir une expérience d'achat de classe mondiale. Nous serons de retour très bientôt !",
-                maintenanceAdminLogin: "Accès Administration",
-                contactUsMsg: "Nous contacter"
+                associatedPromo: "Code Promo Associé (ex: EID20)", printReceipt: "Imprimer", fileUpload: "Fichier Design", uploading: "Téléchargement...",
+                voiceSearch: "Recherche vocale", listening: "Écoute...", qualityCheck: "Analyse IA...", 
+                qualityGood: "Excellente qualité", qualityBad: "Basse résolution", uploadDesign: "Vérifier design",
+                qrTool: "QR Code", qrText: "Lien/Texte", generateQR: "Générer", downloadQR: "Télécharger", qrDesc: "Créez votre QR Code",
+                categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Goodies", share: "Partager", clearCart: "Vider",
+                maintenanceTitle: "Site en Maintenance", maintenanceDesc: "Nous mettons à niveau notre plateforme.", maintenanceAdminLogin: "Admin", contactUsMsg: "Nous contacter"
             },
             ar: {
                 appTitle: "الحرفي", appSubtitle: "للطباعة", home: "الرئيسية", cart: "السلة", orders: "طلباتي", admin: "الإدارة",
@@ -207,10 +202,10 @@
                 haveAccount: "لديك حساب بالفعل؟", createAccount: "إنشاء حساب", nameLabel: "الاسم الكريم", logout: "تسجيل الخروج",
                 profile: "الملف الشخصي", accountType: "نوع الحساب", anonymous: "ضيف (بدون تسجيل)", standardUser: "مستخدم مسجل",
                 updateProfile: "تحديث الملف الشخصي", updateSuccess: "تم تحديث البيانات", updateFailed: "فشل التحديث",
-                accessDenied: "الوصول مرفوض",
+                accessDenied: "الوصول مرفوض", loyaltyPoints: "نقاط الولاء",
                 chat: "المحادثة", chatWithUs: "تحدث مع المدير", typeMessage: "اكتب رسالتك هنا...", send: "إرسال",
                 conversations: "المحادثات الجارية", noMessages: "لا توجد رسائل.", managerName: "خدمة الزبائن",
-                online: "متصل الآن", lastMsg: "آخر رسالة", chatList: "الرسائل",
+                online: "متصل الآن", lastMsg: "آخر رسالة", chatList: "الرسائل", estimatedDelivery: "التوصيل المتوقع:",
                 promoPh: "كود الخصم", promoApply: "تطبيق", promoApplied: "تم تطبيق الخصم!", promoInvalid: "كود غير صحيح.",
                 promoMinAmount: "الحد الأدنى", promoEnter: "أدخل الكود", discount: "الخصم", subtotal: "المجموع الفرعي",
                 discounts: "خصومات", createCode: "إنشاء كود خصم", codeName: "اسم الكود", discountValue: "قيمة الخصم", minOrderAmount: "الحد الأدنى",
@@ -224,23 +219,19 @@
                 reOrder: "إعادة الطلب", printInvoice: "طباعة الفاتورة", selectVariants: "تخصيص", finalPrice: "السعر", add: "إضافة",
                 manageContent: "إدارة المحتوى", announcement: "شريط الأخبار", stories: "القصص (ستوري)", show: "إظهار", 
                 textAr: "النص بالعربية", textFr: "النص بالفرنسية", addImage: "رابط الصورة (اختياري)", storyName: "عنوان العرض", addStory: "إضافة عرض", delete: "حذف",
-                wilaya: "الولاية", selectWilaya: "اختر الولاية", orderDetails: "معلومات الطلب (الاسم على البطاقة، الشعار...)",
-                deliveryFee: "سعر التوصيل", search: "ابحث عن منتج...", favorites: "المفضلة", noFavorites: "قائمة المفضلة فارغة.",
+                wilaya: "الولاية", selectWilaya: "اختر الولاية", orderDetails: "ملاحظات الطلب (الاسم على البطاقة...)",
+                deliveryFee: "سعر التوصيل", search: "بحث عن منتج...", favorites: "المفضلة", noFavorites: "قائمة المفضلة فارغة.",
                 addToFav: "تمت الإضافة للمفضلة", removeFromFav: "تم الحذف من المفضلة", all: "الكل",
                 exportCSV: "تصدير Excel", details: "التفاصيل", cancelOrder: "إلغاء الطلب", showDetails: "عرض التفاصيل",
                 offers: "العروض الخاصة", addOffer: "إضافة عرض", offerTitle: "عنوان العرض", offerDesc: "وصف العرض", offerPrice: "السعر/الخصم",
-                manageOffers: "إدارة العروض", specialOffers: "عروض حصرية", endsIn: "ينتهي خلال", offerEndDate: "تاريخ الانتهاء (اختياري)",
+                manageOffers: "إدارة العروض", specialOffers: "عروض حصرية", endsIn: "ينتهي خلال", offerEndDate: "تاريخ الانتهاء",
                 edit: "تعديل", updateOffer: "تحديث العرض", cancel: "إلغاء", getOffer: "أطلب العرض",
                 associatedPromo: "كود الخصم المرتبط (اختياري)", printReceipt: "طباعة الوصل", fileUpload: "ملف التصميم (اختياري)", uploading: "جاري الرفع...",
                 voiceSearch: "بحث صوتي", listening: "جاري الاستماع...", qualityCheck: "جاري الفحص بالذكاء الاصطناعي...", 
                 qualityGood: "جودة ممتازة للطباعة", qualityBad: "دقة ضعيفة، قد تظهر ضبابية", uploadDesign: "افحص جودة تصميمك",
-                qrTool: "صانع QR الذكي", qrText: "أدخل رابط أو نص", generateQR: "توليد الكود", downloadQR: "تحميل الصورة", qrDesc: "قم بإنشاء كود QR مجاني لتضعه في تصميم بطاقتك!",
+                qrTool: "صانع QR الذكي", qrText: "أدخل رابط أو نص", generateQR: "توليد الكود", downloadQR: "تحميل الصورة", qrDesc: "أنشئ كود QR مجاني",
                 categories: "التصنيفات", catCards: "بطاقات", catFlyers: "مطويات", catGoodies: "إكسسوارات", share: "مشاركة", clearCart: "تفريغ السلة",
-                // Maintenance Texts
-                maintenanceTitle: "الموقع تحت الصيانة والتحديث",
-                maintenanceDesc: "نقوم حالياً بترقية منصتنا لتتماشى مع أحدث المعايير العالمية لنقدم لكم تجربة تسوق استثنائية. سنعود للعمل في أقرب وقت!",
-                maintenanceAdminLogin: "دخول الإدارة",
-                contactUsMsg: "تواصل معنا"
+                maintenanceTitle: "الموقع تحت الصيانة", maintenanceDesc: "نقوم بتحديث المنصة لخدمتكم بشكل أفضل.", maintenanceAdminLogin: "دخول الإدارة", contactUsMsg: "تواصل معنا"
             }
         };
         
@@ -264,7 +255,7 @@
             { id: 1, category: 'cards', name: { fr: "Cartes de Visite", ar: "بطاقات زيارة" }, basePrice: 2000, image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400", badge: 'bestSeller', rating: 4.8, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '250', price: 1500 }, { value: '500', price: 3000 }]}, { id: 'paper', label: { fr: "Type de Papier", ar: "نوع الورق" }, type: 'radio', options: [{ value: 'Matte (300g)', price: 0 }, { value: 'Brillant (350g)', price: 500 }]}, { id: 'finition', label: { fr: "Finition", ar: "التغليف" }, type: 'radio', options: [{ value: 'Standard', price: 0 }, { value: 'Pelliculage Mat', price: 800 }]}]},
             { id: 2, category: 'flyers', name: { fr: "Flyers A5 (Publicité)", ar: "فلاير إعلاني A5" }, basePrice: 1500, image: "https://images.unsplash.com/photo-1562564055-71e051d33c19?w=400", badge: 'new', rating: 4.5, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '500', price: 4000 }]}, { id: 'format', label: { fr: "Format", ar: "الشكل" }, type: 'radio', options: [{ value: 'A5', price: 0 }, { value: 'A4', price: 1500 }]}]},
             { id: 3, category: 'cards', name: { fr: "Invitations Mariage", ar: "دعوات زفاف فاخرة" }, basePrice: 5000, image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400", rating: 5.0, variants: [] },
-            { id: 5, category: 'goodies', name: { fr: "Tampon Encreur", ar: "ختم آلي (Cachet)" }, basePrice: 1200, image: "uploaded:2741.jpg-fb5cf534-1f75-408a-9617-7073d9db1056", variants: [], badge: 'soon', comingSoon: true },
+            { id: 5, category: 'goodies', name: { fr: "Tampon Encreur", ar: "ختم آلي (Cachet)" }, basePrice: 1200, image: "https://images.unsplash.com/photo-1590494165264-1ebe3602eb80?w=400", variants: [], badge: 'soon', comingSoon: true },
             { id: 6, category: 'goodies', name: { fr: "Bloc-notes Personnalisé", ar: "مفكرة مخصصة" }, basePrice: 450, image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400", rating: 4.2, variants: [] }
         ];
         
@@ -630,11 +621,12 @@
             );
         };
 
-        const ProfileScreen = ({ user, t, navigate, showToast, setView, ADMIN_EMAIL, setUser }) => {
+        const ProfileScreen = ({ user, t, navigate, showToast, setView, ADMIN_EMAIL, setUser, totalSpent }) => {
             const [displayName, setDisplayName] = useState(user.displayName || '');
             const [loading, setLoading] = useState(false);
             const isAnonymous = user.isAnonymous;
             const isAdmin = user.email === ADMIN_EMAIL;
+            const loyaltyPoints = Math.floor((totalSpent || 0) / 100);
             
             const handleUpdateProfile = async (e) => {
                 e.preventDefault(); 
@@ -677,6 +669,13 @@
                         <h3 className="text-xl font-bold text-slate-900 mb-1">{user.displayName || (isAnonymous ? t.anonymous : t.email)}</h3>
                         <p className="text-sm text-slate-500 dir-ltr font-mono">{user.email || '—'}</p>
                         <div className={`mt-3 text-xs font-bold px-3 py-1 rounded-full ${isAnonymous ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'} inline-block`}>{isAnonymous ? t.anonymous : t.standardUser}</div>
+                        
+                        {!isAnonymous && loyaltyPoints > 0 && (
+                            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-orange-500">
+                                <Icon name="star" size={20} className="fill-orange-400" />
+                                <span className="font-bold text-sm">{t.loyaltyPoints}: {loyaltyPoints}</span>
+                            </div>
+                        )}
                     </div>
                     {!isAnonymous && (
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 mb-6">
@@ -1283,7 +1282,15 @@
             const [isListening, setIsListening] = useState(false);
             const [activeCategory, setActiveCategory] = useState('all');
             
-            const [selectedWilayaZone, setSelectedWilayaZone] = useState(null);
+            const [selectedWilayaZone, setSelectedWilayaZone] = useState(() => {
+                const savedW = localStorage.getItem('saved_wilaya');
+                if (savedW) {
+                    const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === savedW);
+                    return w ? w.zone : null;
+                }
+                return null;
+            });
+
             const [expandedOrderId, setExpandedOrderId] = useState(null);
 
             const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'l-artisan-imprimeur';
@@ -1453,7 +1460,8 @@
                 const unsubNotif = window.firebase.onSnapshot(window.firebase.query(notifRef, window.firebase.orderBy('date', 'desc')), (snap) => {
                     const list = snap.docs.map(d => ({id: d.id, ...d.data()}));
                     setNotifications(list);
-                    const fresh = list.find(n => !n.read && (Date.now() - (n.date?.toMillis?.() || 0)) < 5000);
+                    // Fixed Notification Timestamp Issue
+                    const fresh = list.find(n => !n.read && n.date && n.date.toMillis && (Date.now() - n.date.toMillis()) < 5000);
                     if (fresh) showToast(fresh.message[lang] || fresh.message, 'success');
                 });
                 const ordersRef = window.firebase.collection(db, `artifacts/${appId}/public/data/orders`);
@@ -1486,17 +1494,52 @@
             };
 
             const submitOrder = async (e) => {
-                e.preventDefault(); if (!user || !db) return showToast(t.conn, "error");
+                e.preventDefault(); 
+                if (!user || !db) return showToast(t.conn, "error");
+                
                 const formData = new FormData(e.target);
                 const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, selectedWilayaZone); 
+                
                 try {
-                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`), {
-                        customerUserId: user.uid, customerName: formData.get('name'), phone: formData.get('phone'), wilaya: formData.get('wilaya'), orderDetails: formData.get('orderDetails'), items: cart.map(i => ({ id: i.id, name: i.name, basePrice: i.basePrice, price: i.price, qty: i.qty, image: i.image, selectedVariants: i.selectedVariants || [] })), subtotal, total: finalTotal, discount, deliveryFee: delivery, promoCode: appliedPromo ? { code: appliedPromo.code, value: discount, type: appliedPromo.discountType } : null, status: 'En attente', createdAt: window.firebase.Timestamp.now()
-                    });
+                    // Fix Confirmation Bug: Strict Sanitization to prevent Firebase undefined errors
+                    const orderData = {
+                        customerUserId: user.uid,
+                        customerName: formData.get('name') || '',
+                        phone: formData.get('phone') || '',
+                        wilaya: formData.get('wilaya') || '',
+                        orderDetails: formData.get('orderDetails') || '',
+                        items: cart.map(i => ({ 
+                            id: i.id || '', 
+                            name: i.name || '', 
+                            basePrice: i.basePrice || 0, 
+                            price: i.price || 0, 
+                            qty: i.qty || 1, 
+                            image: i.image || '', 
+                            selectedVariants: i.selectedVariants || [] 
+                        })),
+                        subtotal: subtotal || 0,
+                        total: finalTotal || 0,
+                        discount: discount || 0,
+                        deliveryFee: delivery || 0,
+                        promoCode: appliedPromo ? { code: appliedPromo.code, value: discount, type: appliedPromo.discountType } : null,
+                        status: 'En attente',
+                        createdAt: window.firebase.Timestamp.now()
+                    };
+
+                    // Save last used information for better UX
+                    localStorage.setItem('saved_phone', formData.get('phone') || '');
+                    localStorage.setItem('saved_wilaya', formData.get('wilaya') || '');
+
+                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`), orderData);
+                    
                     let msg = { fr: "Commande reçue!", ar: "تم استلام الطلب!" };
                     await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { message: msg, date: window.firebase.Timestamp.now(), read: false, type: 'info' });
-                    setCart([]); setAppliedPromo(null); setPromoCodeInput(''); navigate('orders'); showToast(t.orderSent);
-                } catch (e) { showToast(t.err, "error"); }
+                    
+                    setCart([]); setAppliedPromo(null); setPromoCodeInput(''); navigate('orders'); showToast(t.orderSent, "success");
+                } catch (e) { 
+                    console.error("Order Submit Error", e); 
+                    showToast(t.err, "error"); 
+                }
             };
 
             const updateOrderStatus = async (orderId, newStatus, customerId) => {
@@ -1515,7 +1558,6 @@
             
             if (authLoading) return <div className="h-screen flex items-center justify-center bg-slate-50"><div className="loader"></div></div>;
 
-            // --- Maintenance Mode Logic ---
             if (UNDER_MAINTENANCE && !bypassMaintenance && (!user || user.email !== ADMIN_EMAIL)) {
                 return <MaintenanceScreen t={t} lang={lang} onAdminClick={() => setBypassMaintenance(true)} />;
             }
@@ -1653,7 +1695,18 @@
                                     {filteredProducts.map(p => (
                                         <div key={p.id} className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex flex-col hover:shadow-lg transition-all group relative">
                                             <button aria-label="Add to Favorites" onClick={(e) => { e.stopPropagation(); toggleFavorite(p); }} className="absolute top-2 right-2 z-10 p-1.5 bg-white/80 rounded-full shadow-sm hover:scale-110 transition-transform"><Icon name="heart" size={16} className={favorites.some(f=>f.id===p.id) ? "text-red-500 fill-red-500" : "text-slate-400"}/></button>
-                                            <div className="relative overflow-hidden rounded-xl mb-3"><ImageWithSkeleton src={p.image} className={`w-full h-32 group-hover:scale-105 transition-transform duration-300 bg-slate-100 ${p.comingSoon ? 'grayscale' : ''}`}/>{p.badge && <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full text-white shadow-sm ${p.badge === 'bestSeller' ? 'bg-orange-500' : p.badge === 'soon' ? 'bg-slate-500' : 'bg-blue-500'}`}>{t[p.badge]}</span>}</div>
+                                            <div className="relative overflow-hidden rounded-xl mb-3">
+                                                <ImageWithSkeleton src={p.image} className={`w-full h-32 group-hover:scale-105 transition-transform duration-300 bg-slate-100 ${p.comingSoon ? 'grayscale' : ''}`}/>
+                                                {p.badge && <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full text-white shadow-sm ${p.badge === 'bestSeller' ? 'bg-orange-500' : p.badge === 'soon' ? 'bg-slate-500' : 'bg-blue-500'}`}>{t[p.badge]}</span>}
+                                            </div>
+                                            
+                                            {p.rating && (
+                                                <div className="flex items-center gap-1 mb-1 text-yellow-400">
+                                                    <Icon name="star" size={12} className="fill-current" />
+                                                    <span className="text-[10px] font-bold text-slate-600">{p.rating}</span>
+                                                </div>
+                                            )}
+                                            
                                             <h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight group-hover:text-blue-600 transition-colors">{p.name[lang]}</h3>
                                             <div className="mt-auto flex justify-between items-center pt-2"><span className={`text-blue-700 font-black text-sm ${p.comingSoon ? 'opacity-50' : ''}`}>{p.comingSoon ? '---' : `${p.basePrice} ${t.currency} +`}</span><button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2 rounded-xl shadow-sm transition ${p.comingSoon ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-100 text-slate-700 hover:bg-blue-600 hover:text-white hover:shadow-blue-600/30'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button></div>
                                         </div>
@@ -1711,6 +1764,9 @@
                                         
                                         {(() => {
                                             const { subtotal, discount, finalTotal, delivery } = calculateTotal(cart, appliedPromo, selectedWilayaZone); 
+                                            const savedPhone = localStorage.getItem('saved_phone') || '';
+                                            const savedWilaya = localStorage.getItem('saved_wilaya') || '';
+
                                             return (
                                                 <div className="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 mt-4">
                                                     <div className="space-y-3 pb-4 border-b border-slate-100 mb-4">
@@ -1737,9 +1793,9 @@
                                                     
                                                     <form onSubmit={submitOrder} className="space-y-3 mt-5">
                                                         <input aria-label="Name" required name="name" defaultValue={user.displayName || ''} placeholder={t.namePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"/>
-                                                        <input aria-label="Phone" required name="phone" type="tel" placeholder={t.phonePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition dir-ltr"/>
+                                                        <input aria-label="Phone" required name="phone" type="tel" defaultValue={savedPhone} placeholder={t.phonePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition dir-ltr"/>
                                                         <div className="relative">
-                                                            <select aria-label="Wilaya" name="wilaya" required onChange={(e) => {
+                                                            <select aria-label="Wilaya" name="wilaya" required defaultValue={savedWilaya} onChange={(e) => {
                                                                 const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === e.target.value);
                                                                 setSelectedWilayaZone(w ? w.zone : null);
                                                             }} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none text-slate-800">
@@ -1749,7 +1805,7 @@
                                                             <Icon name="chevron-down" className="absolute left-3 top-3.5 text-slate-400 pointer-events-none" size={16}/>
                                                         </div>
                                                         <textarea aria-label="Order Details" required name="orderDetails" placeholder={t.orderDetails} rows="3" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"></textarea>
-                                                        <button className="w-full bg-green-600 hover:bg-green-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-green-600/30 transition flex justify-center gap-2 active:scale-95" disabled={cart.length === 0}><Icon name="check" size={18}/> {t.confirm}</button>
+                                                        <button type="submit" className="w-full bg-green-600 hover:bg-green-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-green-600/30 transition flex justify-center gap-2 active:scale-95" disabled={cart.length === 0}><Icon name="check" size={18}/> {t.confirm}</button>
                                                     </form>
                                                 </div>
                                             );
@@ -1765,6 +1821,11 @@
                                     const statusObj = STATUS_OPTIONS.find(s => s.key === o.status) || STATUS_OPTIONS[0];
                                     const isExpanded = expandedOrderId === o.id;
                                     const currentStatusIndex = STATUS_OPTIONS.findIndex(s => s.key === o.status);
+                                    
+                                    // Estimate delivery date (+3 days for simplicity)
+                                    const orderDate = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
+                                    const estDelivery = new Date(orderDate);
+                                    estDelivery.setDate(estDelivery.getDate() + 3);
                                     
                                     return (
                                         <div key={o.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition">
@@ -1796,6 +1857,12 @@
                                                         );
                                                     })}
                                                 </div>
+                                                {o.status !== 'Prêt' && (
+                                                    <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                                                        <Icon name="truck" size={14} className="text-blue-500" />
+                                                        {t.estimatedDelivery} <span className="text-slate-700">{estDelivery.toLocaleDateString()}</span>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="px-4 pb-4 flex justify-between items-center pt-2 border-t border-slate-50">
@@ -1820,7 +1887,7 @@
                                                     <ul className="space-y-2 mb-3">
                                                         {o.items.map((item, idx) => (
                                                             <li key={idx} className="flex justify-between border-b border-slate-200 pb-1 last:border-0">
-                                                                <span>{item.qty}x {item.name[lang]}</span>
+                                                                <span>{item.qty}x {item.name[lang] || item.name}</span>
                                                                 <span className="font-mono">{item.price * item.qty} {t.currency}</span>
                                                             </li>
                                                         ))}
@@ -1837,7 +1904,7 @@
                         {view === 'notifications' && (
                             <div className="animate-fadeIn max-w-md mx-auto pb-10"><h2 className="font-bold text-xl mb-4">{t.notifications}</h2>{notifications.length === 0 ? <p className="text-center text-gray-400 py-10">{t.noNotifs}</p> : (<div className="space-y-3">{notifications.map(n => (<div key={n.id} onClick={()=>markRead(n.id)} className={`p-4 rounded-xl border cursor-pointer transition ${n.read ? 'bg-white border-slate-100' : 'bg-blue-50 border-blue-100 shadow-sm'}`}><div className="flex gap-3"><div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read ? 'bg-slate-300' : 'bg-blue-500'}`}></div><div><p className={`text-sm ${!n.read ? 'font-bold text-slate-900' : 'text-slate-600'}`}>{typeof n.message === 'object' ? n.message[lang] : n.message}</p><span className="text-[10px] text-slate-400 mt-1 block dir-ltr text-right">{n.date?.toDate ? n.date.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span></div></div></div>))}</div>)}</div>
                         )}
-                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} />}
+                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} totalSpent={myOrders.filter(o => o.status === 'Prêt').reduce((sum, o) => sum + o.total, 0)} />}
                         {view === 'admin' && (isAdmin ? <AdminDashboard db={db} appId={appId} updateOrderStatus={updateOrderStatus} lang={lang} t={t} onOpenChat={openChat} showToast={showToast} /> : <div className="text-center py-20 text-red-500 font-bold">{t.accessDenied}</div>)}
                     </main>
 
@@ -1867,4 +1934,4 @@
         root.render(<App />);
     </script>
 </body>
-</html>
+    </html>
