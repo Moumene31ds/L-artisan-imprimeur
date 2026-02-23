@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Permissions-Policy" content="camera=*, geolocation=(), microphone=()">
+    <meta name="description" content="L'Artisan Imprimeur - خدمات طباعة احترافية بجودة عالية. منصتك الأولى للطباعة السريعة والمتقنة.">
+    <meta name="theme-color" content="#0f172a">
+    <meta property="og:title" content="L'Artisan Imprimeur - الحرفي للطباعة">
+    <meta property="og:description" content="خدمات طباعة احترافية بجودة عالية، والتزام تام بالمواعيد.">
+    <meta property="og:type" content="website">
     
     <title>L'Artisan Imprimeur - الحرفي للطباعة</title>
     
@@ -41,8 +41,6 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <script>
         if (typeof window.__app_id === 'undefined') window.__app_id = "l-artisan-imprimeur";
@@ -62,12 +60,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         window.firebase = { 
             initializeApp, getAuth, signInAnonymously, onAuthStateChanged, 
             GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, signInWithCustomToken,
-            getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp
+            getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp
         };
         window.isFirebaseReady = true;
     </script>
@@ -95,7 +93,10 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const Icon = ({ name, size = 20, className = "", fill = "none" }) => {
+        // مفتاح تشغيل/إيقاف وضع الصيانة (اجعله false لإلغاء الصيانة لاحقاً)
+        const UNDER_MAINTENANCE = true;
+
+        const Icon = ({ name, size = 20, className = "" }) => {
             const [svgHtml, setSvgHtml] = useState(null);
             useEffect(() => {
                 if (window.lucide && window.lucide.icons) {
@@ -106,12 +107,11 @@
                         const svg = window.lucide.createElement(iconDef);
                         svg.setAttribute('width', size);
                         svg.setAttribute('height', size);
-                        svg.setAttribute('fill', fill);
                         if (className) svg.setAttribute('class', className);
                         setSvgHtml(svg.outerHTML);
                     }
                 }
-            }, [name, size, className, fill]);
+            }, [name, size, className]);
             if (!svgHtml) return <div style={{width: size, height: size}} className={`bg-transparent ${className}`}></div>;
             return <div dangerouslySetInnerHTML={{ __html: svgHtml }} className={`flex items-center justify-center ${className}`} style={{display: 'inline-flex'}} />;
         };
@@ -174,7 +174,7 @@
                 reOrder: "Re-commander", printInvoice: "Facture", selectVariants: "Options", finalPrice: "Prix", add: "Ajouter",
                 manageContent: "Contenu", announcement: "Barre d'info", stories: "Stories", show: "Afficher", 
                 textAr: "Texte Arabe", textFr: "Texte Français", addImage: "Image (URL) (Optionnel)", storyName: "Titre Story", addStory: "Ajouter Story", delete: "Supprimer",
-                wilaya: "Wilaya", selectWilaya: "Sélectionnez votre Wilaya", orderDetails: "Détails (Infos carte, Logo, etc...)",
+                wilaya: "Wilaya", selectWilaya: "Sélectionnez votre Wilaya", orderDetails: "Détails de la commande (Infos sur la carte, Logo, etc...)",
                 deliveryFee: "Frais de livraison", search: "Rechercher un produit...", favorites: "Favoris", noFavorites: "Aucun favori pour le moment.",
                 addToFav: "Ajouté aux favoris", removeFromFav: "Retiré des favoris", all: "Tout",
                 exportCSV: "Exporter CSV", details: "Détails", cancelOrder: "Annuler", showDetails: "Voir détails",
@@ -183,17 +183,14 @@
                 edit: "Modifier", updateOffer: "Mettre à jour l'offre", cancel: "Annuler", getOffer: "Obtenir l'offre",
                 associatedPromo: "Code Promo Associé (ex: EID20)", printReceipt: "Imprimer Reçu", fileUpload: "Fichier Design (Optionnel)", uploading: "Téléchargement...",
                 voiceSearch: "Recherche vocale", listening: "Écoute...", qualityCheck: "Analyse IA de la résolution...", 
-                qualityGood: "Excellente qualité", qualityBad: "Basse résolution", uploadDesign: "Vérifier le design",
-                qrTool: "Générateur QR", qrText: "Lien ou Texte", generateQR: "Générer", downloadQR: "Télécharger", qrDesc: "Créez un code QR!",
-                trackOrder: "Suivre Commande", scanQRToTrack: "Scanner QR Facture", enterOrderId: "Ou Entrez l'ID", 
-                orderNotFound: "Commande introuvable", loyaltyPoints: "Points Fidélité", pointsEarned: "Points Gagnés", points: "Pts",
-                shareOrder: "Partager", estDelivery: "Livraison estimée",
-                privacyPolicy: "Politique de confidentialité", security: "Sécurité",
-                privacyTitle: "Protection et Sécurité", 
-                privacyDesc1: "Vos données personnelles (nom, téléphone) sont chiffrées et stockées de manière sécurisée par l'infrastructure mondiale de Google (Firebase).",
-                privacyDesc2: "Nous ne partageons ni ne vendons jamais vos données à des tiers.",
-                privacyDesc3: "Les mots de passe sont hachés (cryptés). Ni notre équipe, ni personne ne peut les voir.",
-                back: "Retour"
+                qualityGood: "Excellente qualité pour l'impression", qualityBad: "Basse résolution, risque de flou", uploadDesign: "Vérifier le design",
+                qrTool: "Générateur QR", qrText: "Lien ou Texte pour le QR", generateQR: "Générer", downloadQR: "Télécharger", qrDesc: "Créez un code QR pour vos cartes de visite!",
+                categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Accessoires", share: "Partager", clearCart: "Vider le panier",
+                // Maintenance Texts
+                maintenanceTitle: "Site en Maintenance",
+                maintenanceDesc: "Nous mettons actuellement à niveau notre plateforme pour vous offrir une expérience d'achat de classe mondiale. Nous serons de retour très bientôt !",
+                maintenanceAdminLogin: "Accès Administration",
+                contactUsMsg: "Nous contacter"
             },
             ar: {
                 appTitle: "الحرفي", appSubtitle: "للطباعة", home: "الرئيسية", cart: "السلة", orders: "طلباتي", admin: "الإدارة",
@@ -227,26 +224,23 @@
                 reOrder: "إعادة الطلب", printInvoice: "طباعة الفاتورة", selectVariants: "تخصيص", finalPrice: "السعر", add: "إضافة",
                 manageContent: "إدارة المحتوى", announcement: "شريط الأخبار", stories: "القصص (ستوري)", show: "إظهار", 
                 textAr: "النص بالعربية", textFr: "النص بالفرنسية", addImage: "رابط الصورة (اختياري)", storyName: "عنوان العرض", addStory: "إضافة عرض", delete: "حذف",
-                wilaya: "الولاية", selectWilaya: "اختر الولاية", orderDetails: "معلومات الطلب (الاسم على البطاقة...)",
+                wilaya: "الولاية", selectWilaya: "اختر الولاية", orderDetails: "معلومات الطلب (الاسم على البطاقة، الشعار...)",
                 deliveryFee: "سعر التوصيل", search: "ابحث عن منتج...", favorites: "المفضلة", noFavorites: "قائمة المفضلة فارغة.",
                 addToFav: "تمت الإضافة للمفضلة", removeFromFav: "تم الحذف من المفضلة", all: "الكل",
                 exportCSV: "تصدير Excel", details: "التفاصيل", cancelOrder: "إلغاء الطلب", showDetails: "عرض التفاصيل",
                 offers: "العروض الخاصة", addOffer: "إضافة عرض", offerTitle: "عنوان العرض", offerDesc: "وصف العرض", offerPrice: "السعر/الخصم",
                 manageOffers: "إدارة العروض", specialOffers: "عروض حصرية", endsIn: "ينتهي خلال", offerEndDate: "تاريخ الانتهاء (اختياري)",
                 edit: "تعديل", updateOffer: "تحديث العرض", cancel: "إلغاء", getOffer: "أطلب العرض",
-                associatedPromo: "كود الخصم المرتبط", printReceipt: "طباعة الوصل", fileUpload: "ملف التصميم (اختياري)", uploading: "جاري الرفع...",
+                associatedPromo: "كود الخصم المرتبط (اختياري)", printReceipt: "طباعة الوصل", fileUpload: "ملف التصميم (اختياري)", uploading: "جاري الرفع...",
                 voiceSearch: "بحث صوتي", listening: "جاري الاستماع...", qualityCheck: "جاري الفحص بالذكاء الاصطناعي...", 
-                qualityGood: "جودة ممتازة للطباعة", qualityBad: "دقة ضعيفة", uploadDesign: "افحص جودة تصميمك",
-                qrTool: "صانع QR الذكي", qrText: "أدخل رابط أو نص", generateQR: "توليد الكود", downloadQR: "تحميل", qrDesc: "أنشئ كود QR مجاني!",
-                trackOrder: "تتبع الطلب", scanQRToTrack: "امسح كود QR من الفاتورة", enterOrderId: "أو أدخل رقم الطلب", 
-                orderNotFound: "لم يتم العثور على الطلب", loyaltyPoints: "نقاط الولاء", pointsEarned: "مجموع النقاط", points: "نقطة",
-                shareOrder: "مشاركة الطلب", estDelivery: "التسليم المتوقع",
-                privacyPolicy: "سياسة الخصوصية", security: "الأمان",
-                privacyTitle: "حماية البيانات والأمان", 
-                privacyDesc1: "نحن نأخذ خصوصيتك بجدية. جميع بياناتك الشخصية (الاسم، الهاتف) يتم تشفيرها وحفظها في خوادم Google (Firebase) الآمنة عالمياً.",
-                privacyDesc2: "لا نقوم بمشاركة أو بيع بياناتك لأي أطراف ثالثة إطلاقاً. تُستخدم بياناتك فقط لتوصيل طلباتك.",
-                privacyDesc3: "كلمات المرور مشفرة كلياً (Hashed) ولا يمكن لأي شخص في فريقنا أو خارجه الاطلاع عليها.",
-                back: "رجوع"
+                qualityGood: "جودة ممتازة للطباعة", qualityBad: "دقة ضعيفة، قد تظهر ضبابية", uploadDesign: "افحص جودة تصميمك",
+                qrTool: "صانع QR الذكي", qrText: "أدخل رابط أو نص", generateQR: "توليد الكود", downloadQR: "تحميل الصورة", qrDesc: "قم بإنشاء كود QR مجاني لتضعه في تصميم بطاقتك!",
+                categories: "التصنيفات", catCards: "بطاقات", catFlyers: "مطويات", catGoodies: "إكسسوارات", share: "مشاركة", clearCart: "تفريغ السلة",
+                // Maintenance Texts
+                maintenanceTitle: "الموقع تحت الصيانة والتحديث",
+                maintenanceDesc: "نقوم حالياً بترقية منصتنا لتتماشى مع أحدث المعايير العالمية لنقدم لكم تجربة تسوق استثنائية. سنعود للعمل في أقرب وقت!",
+                maintenanceAdminLogin: "دخول الإدارة",
+                contactUsMsg: "تواصل معنا"
             }
         };
         
@@ -267,11 +261,11 @@
         };
 
         const PRODUCTS_DATA = [
-            { id: 1, name: { fr: "Cartes de Visite", ar: "بطاقات زيارة" }, basePrice: 2000, image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400", badge: 'bestSeller', rating: 4.8, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '250', price: 1500 }, { value: '500', price: 3000 }]}, { id: 'paper', label: { fr: "Type de Papier", ar: "نوع الورق" }, type: 'radio', options: [{ value: 'Matte (300g)', price: 0 }, { value: 'Brillant (350g)', price: 500 }]}, { id: 'finition', label: { fr: "Finition", ar: "التغليف" }, type: 'radio', options: [{ value: 'Standard', price: 0 }, { value: 'Pelliculage Mat', price: 800 }]}]},
-            { id: 2, name: { fr: "Flyers A5 (Publicité)", ar: "فلاير إعلاني A5" }, basePrice: 1500, image: "https://images.unsplash.com/photo-1562564055-71e051d33c19?w=400", badge: 'new', rating: 4.5, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '500', price: 4000 }]}, { id: 'format', label: { fr: "Format", ar: "الشكل" }, type: 'radio', options: [{ value: 'A5', price: 0 }, { value: 'A4', price: 1500 }]}]},
-            { id: 3, name: { fr: "Invitations Mariage", ar: "دعوات زفاف فاخرة" }, basePrice: 5000, image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400", rating: 5.0, variants: [] },
-            { id: 5, name: { fr: "Tampon Encreur", ar: "ختم آلي (Cachet)" }, basePrice: 1200, image: "uploaded:2741.jpg-fb5cf534-1f75-408a-9617-7073d9db1056", variants: [], badge: 'soon', comingSoon: true },
-            { id: 6, name: { fr: "Bloc-notes Personnalisé", ar: "مفكرة مخصصة" }, basePrice: 450, image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400", rating: 4.2, variants: [] }
+            { id: 1, category: 'cards', name: { fr: "Cartes de Visite", ar: "بطاقات زيارة" }, basePrice: 2000, image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400", badge: 'bestSeller', rating: 4.8, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '250', price: 1500 }, { value: '500', price: 3000 }]}, { id: 'paper', label: { fr: "Type de Papier", ar: "نوع الورق" }, type: 'radio', options: [{ value: 'Matte (300g)', price: 0 }, { value: 'Brillant (350g)', price: 500 }]}, { id: 'finition', label: { fr: "Finition", ar: "التغليف" }, type: 'radio', options: [{ value: 'Standard', price: 0 }, { value: 'Pelliculage Mat', price: 800 }]}]},
+            { id: 2, category: 'flyers', name: { fr: "Flyers A5 (Publicité)", ar: "فلاير إعلاني A5" }, basePrice: 1500, image: "https://images.unsplash.com/photo-1562564055-71e051d33c19?w=400", badge: 'new', rating: 4.5, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '500', price: 4000 }]}, { id: 'format', label: { fr: "Format", ar: "الشكل" }, type: 'radio', options: [{ value: 'A5', price: 0 }, { value: 'A4', price: 1500 }]}]},
+            { id: 3, category: 'cards', name: { fr: "Invitations Mariage", ar: "دعوات زفاف فاخرة" }, basePrice: 5000, image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400", rating: 5.0, variants: [] },
+            { id: 5, category: 'goodies', name: { fr: "Tampon Encreur", ar: "ختم آلي (Cachet)" }, basePrice: 1200, image: "uploaded:2741.jpg-fb5cf534-1f75-408a-9617-7073d9db1056", variants: [], badge: 'soon', comingSoon: true },
+            { id: 6, category: 'goodies', name: { fr: "Bloc-notes Personnalisé", ar: "مفكرة مخصصة" }, basePrice: 450, image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400", rating: 4.2, variants: [] }
         ];
         
         const FEATURED_PRODUCTS = [
@@ -299,16 +293,19 @@
                 const timer = setInterval(() => {
                     const diff = new Date(targetDate) - new Date();
                     if (diff <= 0) { clearInterval(timer); setTimeLeft({}); return; }
+                    
                     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
                     const minutes = Math.floor((diff / 1000 / 60) % 60);
                     const seconds = Math.floor((diff / 1000) % 60);
+                    
                     setTimeLeft({ days, hours, minutes, seconds });
                 }, 1000);
                 return () => clearInterval(timer);
             }, [targetDate]);
 
             if (Object.keys(timeLeft).length === 0) return null;
+
             return (
                 <div className="flex gap-1 text-[10px] font-bold text-white bg-red-600 px-2 py-1 rounded-full items-center">
                     <Icon name="clock" size={10} className="mr-1" />
@@ -347,135 +344,33 @@
             );
         };
 
-        const TrackOrderModal = ({ db, appId, t, lang, onClose }) => {
-            const [orderId, setOrderId] = useState("");
-            const [order, setOrder] = useState(null);
-            const [error, setError] = useState("");
-            const [scanning, setScanning] = useState(false);
-            const [loading, setLoading] = useState(false);
-
-            useEffect(() => {
-                if (!scanning) return;
-                const html5QrCode = new window.Html5Qrcode("reader");
-                html5QrCode.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    (decodedText) => {
-                        // Sanitization of QR input
-                        const cleanText = decodedText.trim().replace(/[^a-zA-Z0-9-]/g, '');
-                        setOrderId(cleanText);
-                        setScanning(false);
-                        html5QrCode.stop().then(() => handleSearch(cleanText));
-                    },
-                    (err) => {}
-                ).catch(err => { console.error(err); setError("Camera Error"); setScanning(false); });
-
-                return () => {
-                    if (html5QrCode.isScanning) html5QrCode.stop().catch(console.error);
-                };
-            }, [scanning]);
-
-            const handleSearch = async (idToSearch) => {
-                const id = idToSearch || orderId;
-                const cleanId = id.trim().replace(/[^a-zA-Z0-9-]/g, ''); // Simple sanitization
-                if (!cleanId) return;
-                setLoading(true); setError(""); setOrder(null);
-                try {
-                    const docRef = window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${cleanId}`);
-                    const docSnap = await window.firebase.getDoc(docRef);
-                    if (docSnap.exists()) {
-                        setOrder({ id: docSnap.id, ...docSnap.data() });
-                    } else {
-                        setError(t.orderNotFound);
-                    }
-                } catch (e) {
-                    setError(t.err);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            return (
-                <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-                    <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 relative animate-slideUp">
-                        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-50 p-2 rounded-full"><Icon name="x" size={20}/></button>
-                        <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3"><Icon name="scan" size={32}/></div>
-                            <h3 className="text-xl font-black text-slate-800">{t.trackOrder}</h3>
-                        </div>
-                        
-                        {!order ? (
-                            <div className="space-y-4">
-                                {scanning ? (
-                                    <div className="rounded-xl overflow-hidden shadow-inner border border-slate-200">
-                                        <div id="reader" width="100%"></div>
-                                        <button onClick={()=>setScanning(false)} className="w-full bg-red-50 text-red-500 py-2 font-bold text-sm">Cancel Scan</button>
-                                    </div>
-                                ) : (
-                                    <button onClick={()=>setScanning(true)} className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition">
-                                        <Icon name="qr-code" size={18}/> {t.scanQRToTrack}
-                                    </button>
-                                )}
-                                
-                                <div className="relative my-4"><div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div><div className="relative flex justify-center"><span className="bg-white px-2 text-xs text-slate-400">{t.or}</span></div></div>
-                                
-                                <div className="flex gap-2">
-                                    <input type="text" value={orderId} onChange={(e)=>setOrderId(e.target.value)} placeholder={t.enterOrderId} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr"/>
-                                    <button onClick={()=>handleSearch()} disabled={loading || !orderId.trim()} className="bg-blue-600 text-white px-4 rounded-xl font-bold hover:bg-blue-500 transition disabled:opacity-50">
-                                        {loading ? <div className="loader w-5 h-5 border-white/30 border-t-white mx-auto"></div> : <Icon name="search" size={20}/>}
-                                    </button>
-                                </div>
-                                {error && <p className="text-red-500 text-xs font-bold text-center bg-red-50 p-2 rounded-lg">{error}</p>}
-                            </div>
-                        ) : (
-                            <div className="animate-fadeIn">
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="font-bold text-slate-800">#{order.id.slice(-4)}</span>
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${STATUS_COLORS[order.status]}`}>
-                                            {STATUS_OPTIONS.find(s=>s.key===order.status)?.label[lang] || order.status}
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-slate-600">{order.customerName} - {order.total} {t.currency}</p>
-                                </div>
-                                
-                                <div className="relative border-l-2 border-slate-200 space-y-6 ml-4 my-6">
-                                    {STATUS_OPTIONS.map((step, idx) => {
-                                        const currentStatusIndex = STATUS_OPTIONS.findIndex(s => s.key === order.status);
-                                        const isCompleted = idx <= currentStatusIndex;
-                                        const isCurrent = idx === currentStatusIndex;
-                                        return (
-                                            <div key={step.key} className="relative pl-6">
-                                                <div className={`absolute -left-[11px] top-0 w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center ${isCompleted ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'}`}>
-                                                    {isCompleted && <Icon name="check" size={12} className="text-white"/>}
-                                                </div>
-                                                <p className={`text-sm font-bold transition-all ${isCurrent ? 'text-blue-700' : isCompleted ? 'text-slate-700' : 'text-slate-300'}`}>
-                                                    {step.label[lang]}
-                                                </p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <button onClick={()=>setOrder(null)} className="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-200 transition">Back</button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
         const QrGeneratorModal = ({ t, lang, onClose }) => {
             const [text, setText] = useState("");
             const [qrUrl, setQrUrl] = useState("");
-            const handleGenerate = (e) => { e.preventDefault(); if(text.trim()) setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(text.trim())}`); };
+
+            const handleGenerate = (e) => {
+                e.preventDefault();
+                if(text.trim()) {
+                    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(text)}`);
+                }
+            };
+
             const downloadQr = () => {
                 if(!qrUrl) return;
-                fetch(qrUrl).then(res => res.blob()).then(blob => {
-                    const url = window.URL.createObjectURL(blob); const a = document.createElement('a');
-                    a.style.display = 'none'; a.href = url; a.download = 'artisan_qrcode.png';
-                    document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
-                });
+                fetch(qrUrl)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = 'artisan_qrcode.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    });
             };
+
             return (
                 <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
                     <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 relative animate-slideUp">
@@ -485,14 +380,26 @@
                             <h3 className="text-xl font-black text-slate-800">{t.qrTool}</h3>
                             <p className="text-xs text-slate-500 mt-1">{t.qrDesc}</p>
                         </div>
+                        
                         <form onSubmit={handleGenerate} className="space-y-3 mb-6">
-                            <input type="text" value={text} onChange={(e)=>setText(e.target.value)} placeholder={t.qrText} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all dir-ltr"/>
-                            <button type="submit" disabled={!text.trim()} className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 transition disabled:opacity-50 flex items-center justify-center gap-2"><Icon name="refresh-cw" size={18}/> {t.generateQR}</button>
+                            <input 
+                                type="text" 
+                                value={text} 
+                                onChange={(e)=>setText(e.target.value)} 
+                                placeholder={t.qrText} 
+                                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all dir-ltr"
+                            />
+                            <button type="submit" disabled={!text.trim()} className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                                <Icon name="refresh-cw" size={18}/> {t.generateQR}
+                            </button>
                         </form>
+
                         {qrUrl && (
                             <div className="flex flex-col items-center bg-slate-50 p-4 rounded-xl border border-slate-200 animate-fadeIn">
                                 <img src={qrUrl} alt="QR Code" className="w-40 h-40 object-contain rounded-lg shadow-sm mb-4 bg-white p-2" />
-                                <button onClick={downloadQr} className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-green-500 transition flex items-center gap-2"><Icon name="download" size={16}/> {t.downloadQR}</button>
+                                <button onClick={downloadQr} className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-green-500 transition flex items-center gap-2">
+                                    <Icon name="download" size={16}/> {t.downloadQR}
+                                </button>
                             </div>
                         )}
                     </div>
@@ -504,6 +411,7 @@
             const initialSelections = product.variants.reduce((acc, v) => ({ ...acc, [v.id]: v.options.length > 0 ? v.options[0].value : null }), {});
             const [selections, setSelections] = useState(initialSelections);
             const [qty, setQty] = useState(1);
+            
             const [uploadQuality, setUploadQuality] = useState(null); 
             const imageRef = useRef(null);
 
@@ -519,7 +427,9 @@
                 const rotateY = ((x - centerX) / centerX) * 12;
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
             };
-            const handleMouseLeave = () => { if (imageRef.current) imageRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`; };
+            const handleMouseLeave = () => {
+                if (imageRef.current) imageRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            };
 
             const handleFileUpload = (e) => {
                 const file = e.target.files[0];
@@ -528,7 +438,12 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new window.Image();
-                    img.onload = () => { setTimeout(() => { if(img.width >= 800 && img.height >= 800) setUploadQuality('good'); else setUploadQuality('bad'); }, 1200); };
+                    img.onload = () => {
+                        setTimeout(() => { 
+                            if(img.width >= 800 && img.height >= 800) setUploadQuality('good');
+                            else setUploadQuality('bad');
+                        }, 1200); 
+                    };
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
@@ -543,6 +458,19 @@
                 onAdd({ ...product, price: unitPrice, qty: qty, totalPrice: finalTotal, selectedVariants: selectedVariants });
                 onClose();
             };
+            
+            const handleShare = async () => {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: product.name[lang],
+                            text: t.heroSubtitle,
+                            url: window.location.href
+                        });
+                    } catch (error) { console.log('Error sharing', error); }
+                }
+            };
+            
             const isFormComplete = product.variants.every(v => selections[v.id]);
 
             return (
@@ -550,15 +478,22 @@
                     <div className="bg-white w-full max-w-md rounded-t-3xl shadow-2xl p-6 animate-slideUp safe-bottom relative overflow-hidden">
                         <div className="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
                             <h3 className="text-xl font-bold text-slate-900">{product.name[lang]}</h3>
-                            <button onClick={onClose} className="text-slate-400 hover:text-red-500 p-2 bg-slate-50 rounded-full transition"><Icon name="x" size={20}/></button>
+                            <div className="flex gap-2">
+                                <button onClick={handleShare} className="text-slate-400 hover:text-blue-500 p-2 bg-slate-50 rounded-full transition"><Icon name="share-2" size={20}/></button>
+                                <button onClick={onClose} className="text-slate-400 hover:text-red-500 p-2 bg-slate-50 rounded-full transition"><Icon name="x" size={20}/></button>
+                            </div>
                         </div>
+
                         <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 hide-scrollbar">
                             <div ref={imageRef} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className="w-full h-48 rounded-2xl overflow-hidden mb-4 shadow-lg transition-transform duration-200 ease-out cursor-crosshair border border-slate-100 tilt-card">
                                 <img src={product.image} className="w-full h-full object-cover pointer-events-none" alt="Product Preview" />
                             </div>
+
                             <div className="mb-4 bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300 hover:bg-slate-100 transition">
                                 <label className="flex items-center justify-between cursor-pointer">
-                                    <span className="font-bold text-sm text-slate-700 flex items-center gap-2"><Icon name="upload-cloud" size={18} className="text-blue-500"/> {t.uploadDesign}</span>
+                                    <span className="font-bold text-sm text-slate-700 flex items-center gap-2">
+                                        <Icon name="upload-cloud" size={18} className="text-blue-500"/> {t.uploadDesign}
+                                    </span>
                                     <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload}/>
                                     <span className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md cursor-pointer">Upload</span>
                                 </label>
@@ -566,6 +501,7 @@
                                 {uploadQuality === 'good' && <div className="mt-3 text-xs text-green-600 flex items-center gap-2"><Icon name="check-circle" size={14}/> {t.qualityGood}</div>}
                                 {uploadQuality === 'bad' && <div className="mt-3 text-xs text-red-500 flex items-center gap-2"><Icon name="alert-triangle" size={14}/> {t.qualityBad}</div>}
                             </div>
+
                             {product.variants.map(v => (
                                 <div key={v.id} className="pb-3 border-b border-slate-50">
                                     <h4 className="font-bold text-slate-700 mb-2">{v.label[lang]}</h4>
@@ -585,6 +521,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="mt-6 pt-4 border-t border-slate-100 bg-white relative z-10">
                             <div className="flex justify-between items-center mb-3"><span className="text-lg font-bold text-slate-600">{t.finalPrice}:</span><span className="text-2xl font-black text-blue-700">{finalTotal} {t.currency}</span></div>
                             <button onClick={handleAdd} disabled={!isFormComplete || qty < 1} className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-600/30 transition flex justify-center gap-2 disabled:opacity-50 active:scale-95"><Icon name="shopping-cart" size={18}/> {t.add} ({qty})</button>
@@ -614,17 +551,16 @@
             }, [chatId]);
             const sendMessage = async (e) => {
                 e.preventDefault();
-                const safeText = text.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Sanitization
-                if(!safeText) return;
-                const msgData = { content: safeText, senderId: user.uid, createdAt: window.firebase.Timestamp.now(), read: false };
+                if(!text.trim()) return;
+                const msgData = { content: text, senderId: user.uid, createdAt: window.firebase.Timestamp.now(), read: false };
                 await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/chats/${chatId}/messages`), msgData);
-                await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/chats/${chatId}`), { lastMessage: safeText, lastMessageTime: window.firebase.Timestamp.now(), userName: isAdmin ? targetUserName : (user.displayName || 'Guest'), userId: chatId }, { merge: true });
+                await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/chats/${chatId}`), { lastMessage: text, lastMessageTime: window.firebase.Timestamp.now(), userName: isAdmin ? targetUserName : (user.displayName || 'Guest'), userId: chatId }, { merge: true });
                 setText("");
             };
             return (
                 <div className="fixed inset-0 z-[100] bg-slate-50 flex flex-col h-full animate-fadeIn">
                     <div className="bg-white/90 backdrop-blur-md p-3 px-4 shadow-sm border-b border-slate-200 flex items-center gap-3 sticky top-0 z-10 safe-top">
-                        <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 rounded-full transition"><Icon name={lang==='ar'?"arrow-right":"arrow-left"} /></button>
+                        <button aria-label="Back" onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 rounded-full transition"><Icon name={lang==='ar'?"arrow-right":"arrow-left"} /></button>
                         <div className="relative">
                             <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">{isAdmin ? <Icon name="user" size={20}/> : <Icon name="headset" size={20}/>}</div>
                             {!isAdmin && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>}
@@ -639,49 +575,20 @@
                     <div className="bg-white p-3 border-t border-slate-200 safe-bottom">
                         <form onSubmit={sendMessage} className="flex items-end gap-2 max-w-4xl mx-auto">
                             <input value={text} onChange={e => setText(e.target.value)} placeholder={t.typeMessage} className="flex-1 bg-slate-100 border-0 rounded-2xl px-5 py-3.5 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none resize-none" />
-                            <button disabled={!text.trim()} type="submit" className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white p-3.5 rounded-full shadow-lg shadow-blue-600/20 transition-all transform active:scale-95"><Icon name={lang === 'ar' ? "send-horizontal" : "send"} className={lang === 'ar' ? "rotate-180" : ""} /></button>
+                            <button aria-label="Send" disabled={!text.trim()} type="submit" className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white p-3.5 rounded-full shadow-lg shadow-blue-600/20 transition-all transform active:scale-95"><Icon name={lang === 'ar' ? "send-horizontal" : "send"} className={lang === 'ar' ? "rotate-180" : ""} /></button>
                         </form>
                     </div>
                 </div>
             );
         };
 
-        const PrivacyScreen = ({ t, navigate }) => {
-            return (
-                <div className="animate-fadeIn max-w-md mx-auto pb-10">
-                    <div className="flex items-center gap-3 mb-6">
-                        <button onClick={() => navigate('home')} className="p-2 bg-slate-200 rounded-full hover:bg-slate-300 transition"><Icon name="arrow-right" size={20}/></button>
-                        <h2 className="font-bold text-xl flex items-center gap-2"><Icon name="shield-check" className="text-green-600" size={24}/> {t.privacyTitle}</h2>
-                    </div>
-                    <div className="space-y-4">
-                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-3"><Icon name="server" size={24}/></div>
-                            <h3 className="font-bold text-slate-800 mb-2">{t.security} Firebase</h3>
-                            <p className="text-sm text-slate-600 leading-relaxed">{t.privacyDesc1}</p>
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                            <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-3"><Icon name="eye-off" size={24}/></div>
-                            <h3 className="font-bold text-slate-800 mb-2">السرية التامة</h3>
-                            <p className="text-sm text-slate-600 leading-relaxed">{t.privacyDesc2}</p>
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-3"><Icon name="key" size={24}/></div>
-                            <h3 className="font-bold text-slate-800 mb-2">تشفير كلمات المرور</h3>
-                            <p className="text-sm text-slate-600 leading-relaxed">{t.privacyDesc3}</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const AuthScreen = ({ t, lang, toggleLang, navigate }) => {
+        const AuthScreen = ({ t, lang, toggleLang }) => {
             const [isLoginView, setIsLoginView] = useState(true);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState("");
             const [email, setEmail] = useState("");
             const [password, setPassword] = useState("");
             const [name, setName] = useState("");
-            
             const handleGoogleLogin = async () => {
                 setLoading(true); setError("");
                 try {
@@ -690,28 +597,24 @@
                 } catch (e) { setError(lang === 'ar' ? 'فشل الاتصال بجوجل.' : 'Échec de connexion Google.'); setLoading(false); }
             };
             const handleEmailAuth = async (e) => {
-                e.preventDefault(); setLoading(true); setError("");
+                e.preventDefault();
+                setLoading(true); setError("");
                 const auth = window.firebase.getAuth();
                 try {
                     if (isLoginView) await window.firebase.signInWithEmailAndPassword(auth, email, password);
-                    else { 
-                        const safeName = name.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                        const res = await window.firebase.createUserWithEmailAndPassword(auth, email, password); 
-                        await window.firebase.updateProfile(res.user, { displayName: safeName }); 
-                    }
+                    else { const res = await window.firebase.createUserWithEmailAndPassword(auth, email, password); await window.firebase.updateProfile(res.user, { displayName: name }); }
                 } catch (e) { setError(e.message); setLoading(false); }
             };
             const handleGuest = async () => { setLoading(true); try { await window.firebase.signInAnonymously(window.firebase.getAuth()); } catch(e) { setError("Guest login failed"); setLoading(false); } };
-            
             return (
-                <div className="min-h-screen login-bg flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                <div className="min-h-screen login-bg flex items-center justify-center p-4 relative overflow-hidden">
                     <div className="glass-card w-full max-w-md rounded-3xl p-8 relative z-10 animate-slideUp">
                         <div className="text-center mb-8">
                             <div className="bg-slate-900 text-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl transform rotate-3 hover:rotate-0 transition-all"><Icon name="printer" size={32} /></div>
                             <h1 className="text-3xl font-black text-slate-800 mb-1 tracking-tight">{t.appTitle} <span className="text-blue-600 text-lg">{t.appSubtitle}</span></h1>
                             <p className="text-slate-500 text-sm">{isLoginView ? t.welcomeBack : t.signup}</p>
                         </div>
-                        <div className="absolute top-4 right-4"><button onClick={toggleLang} className="text-slate-400 hover:text-slate-800 transition"><span className="text-xs font-bold uppercase">{lang === 'ar' ? 'EN' : 'عربي'}</span></button></div>
+                        <div className="absolute top-4 right-4"><button aria-label="Language Toggle" onClick={toggleLang} className="text-slate-400 hover:text-slate-800 transition"><span className="text-xs font-bold uppercase">{lang === 'ar' ? 'EN' : 'عربي'}</span></button></div>
                         <form onSubmit={handleEmailAuth} className="space-y-4">
                             {!isLoginView && (<div className="space-y-1"><label className="text-xs font-bold text-slate-600 ml-1">{t.nameLabel}</label><input type="text" value={name} onChange={e=>setName(e.target.value)} required placeholder={t.nameLabel} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"/></div>)}
                             <div className="space-y-1"><label className="text-xs font-bold text-slate-600 ml-1">{t.email}</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} required placeholder="name@example.com" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm dir-ltr"/></div>
@@ -723,40 +626,48 @@
                         <div className="space-y-3"><button onClick={handleGoogleLogin} type="button" className="w-full bg-white border border-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-50 transition flex items-center justify-center gap-2 text-sm"><Icon name="globe" size={16}/> {t.googleLogin}</button><button onClick={handleGuest} type="button" className="w-full text-slate-400 py-2 text-xs hover:text-slate-600 transition underline decoration-dotted">{t.guestLogin}</button></div>
                         <div className="mt-8 text-center"><p className="text-slate-500 text-sm">{isLoginView ? t.dontHaveAccount : t.haveAccount} <button onClick={() => { setIsLoginView(!isLoginView); setError(""); }} className="text-blue-600 font-bold hover:underline mx-1">{isLoginView ? t.createAccount : t.login}</button></p></div>
                     </div>
-                    
-                    <button onClick={() => navigate('privacy')} className="mt-6 text-slate-400 hover:text-slate-300 text-xs font-bold flex items-center gap-1 transition"><Icon name="shield" size={14}/> {t.privacyPolicy}</button>
                 </div>
             );
         };
 
-        const ProfileScreen = ({ user, t, navigate, showToast, ADMIN_EMAIL, setUser, myOrders }) => {
+        const ProfileScreen = ({ user, t, navigate, showToast, setView, ADMIN_EMAIL, setUser }) => {
             const [displayName, setDisplayName] = useState(user.displayName || '');
             const [loading, setLoading] = useState(false);
             const isAnonymous = user.isAnonymous;
             const isAdmin = user.email === ADMIN_EMAIL;
             
-            const totalSpent = myOrders?.reduce((sum, order) => sum + (order.status !== 'En attente' ? order.total : 0), 0) || 0;
-            const points = Math.floor(totalSpent / 100);
-            
-            let rank = { name: 'Bronze', color: 'text-amber-600', bg: 'bg-amber-100', icon: 'award' };
-            if (points >= 1000) rank = { name: 'Platinum', color: 'text-slate-600', bg: 'bg-slate-200', icon: 'gem' };
-            else if (points >= 500) rank = { name: 'Gold', color: 'text-yellow-600', bg: 'bg-yellow-100', icon: 'star' };
-            else if (points >= 100) rank = { name: 'Silver', color: 'text-gray-500', bg: 'bg-gray-100', icon: 'shield' };
-
             const handleUpdateProfile = async (e) => {
                 e.preventDefault(); 
-                const trimmedName = displayName.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;"); // Sanitization
+                const trimmedName = displayName.trim();
                 if (!trimmedName) return showToast(t.updateFailed, 'error');
+                
                 setLoading(true);
                 try { 
                     const auth = window.firebase.getAuth();
                     await window.firebase.updateProfile(auth.currentUser, { displayName: trimmedName }); 
-                    setUser({ uid: auth.currentUser.uid, email: auth.currentUser.email, displayName: trimmedName, isAnonymous: auth.currentUser.isAnonymous, photoURL: auth.currentUser.photoURL });
-                    showToast(t.updateSuccess, 'success'); setTimeout(() => window.location.reload(), 1000); 
-                } catch(e) { showToast(t.updateFailed, 'error'); } finally { setLoading(false); }
+                    const currentUser = window.firebase.getAuth().currentUser;
+                    setUser({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        displayName: trimmedName,
+                        isAnonymous: currentUser.isAnonymous,
+                        photoURL: currentUser.photoURL
+                    });
+                    showToast(t.updateSuccess, 'success');
+                    setTimeout(() => window.location.reload(), 1000); 
+                } 
+                catch(e) { 
+                    console.error(e);
+                    showToast(t.updateFailed, 'error'); 
+                } finally { 
+                    setLoading(false); 
+                }
             };
             
-            const handleLogout = async () => { await window.firebase.signOut(window.firebase.getAuth()); navigate('home', true); };
+            const handleLogout = async () => {
+                await window.firebase.signOut(window.firebase.getAuth());
+                navigate('home', true);
+            };
 
             return (
                 <div className="animate-fadeIn max-w-md mx-auto pb-10">
@@ -767,38 +678,15 @@
                         <p className="text-sm text-slate-500 dir-ltr font-mono">{user.email || '—'}</p>
                         <div className={`mt-3 text-xs font-bold px-3 py-1 rounded-full ${isAnonymous ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'} inline-block`}>{isAnonymous ? t.anonymous : t.standardUser}</div>
                     </div>
-                    
-                    {!isAnonymous && (
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 mb-6 flex items-center justify-between">
-                            <div>
-                                <h4 className="font-bold text-slate-700 flex items-center gap-2 mb-1"><Icon name="gift" size={18} className="text-purple-500"/> {t.loyaltyPoints}</h4>
-                                <p className="text-xs text-slate-500">{t.pointsEarned}</p>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-black text-slate-900">{points} <span className="text-sm font-normal text-slate-500">{t.points}</span></div>
-                                <div className={`mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${rank.bg} ${rank.color}`}><Icon name={rank.icon} size={10}/> {rank.name}</div>
-                            </div>
-                        </div>
-                    )}
-
                     {!isAnonymous && (
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 mb-6">
                             <h4 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><Icon name="edit" size={18}/> {t.updateProfile}</h4>
                             <form onSubmit={handleUpdateProfile} className="space-y-4">
-                                <input type="text" value={displayName} onChange={e=>setDisplayName(e.target.value)} required placeholder={t.nameLabel} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500"/>
+                                <input aria-label="Name" type="text" value={displayName} onChange={e=>setDisplayName(e.target.value)} required placeholder={t.nameLabel} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500"/>
                                 <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition flex items-center justify-center gap-2">{loading ? <div className="loader w-5 h-5 border-white/30 border-t-white"></div> : <><Icon name="save" size={18}/> {t.updateProfile}</>}</button>
                             </form>
                         </div>
                     )}
-                    
-                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition" onClick={() => navigate('privacy')}>
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center"><Icon name="shield-check" size={20}/></div>
-                            <span className="font-bold text-slate-700">{t.privacyPolicy}</span>
-                        </div>
-                        <Icon name="chevron-left" className="text-slate-400"/>
-                    </div>
-
                     {isAdmin && <div className="text-center mb-6"><button onClick={() => navigate('admin')} className="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-2 mx-auto transition border border-blue-600 rounded-full px-4 py-2 bg-blue-50"><Icon name="shield" size={18}/> {t.adminPanel}</button></div>}
                     <div className="text-center mt-8"><button onClick={handleLogout} className="text-red-500 hover:text-red-700 font-bold flex items-center gap-2 mx-auto transition"><Icon name="log-out" size={20}/> {t.logout}</button></div>
                 </div>
@@ -809,40 +697,95 @@
             const printWindow = window.open('', '_blank');
             const totalDiscount = order.discount || 0;
             const subtotal = order.subtotal || 0;
+
             const htmlContent = `
-                <html><head><title>${t.printInvoice} - #${order.id.slice(-4)}</title>
+                <html>
+                <head>
+                    <title>${t.printInvoice} - #${order.id.slice(-4)}</title>
                     <style>
                         body { font-family: 'Cairo', sans-serif; direction: rtl; margin: 0; padding: 20px; font-size: 12px; }
                         h1 { font-size: 18px; text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 20px; color: #0f172a; }
-                        .info { display: flex; justify-content: space-between; margin-bottom: 15px; } .info div { flex-basis: 48%; }
-                        .info p { margin: 2px 0; font-weight: 600; } table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; } th { background-color: #f2f2f2; font-weight: bold; }
-                        .total-row td { font-size: 14px; font-weight: bold; background-color: #e0f2f1; } .total-cell { text-align: left; }
+                        .info { display: flex; justify-content: space-between; margin-bottom: 15px; }
+                        .info div { flex-basis: 48%; }
+                        .info p { margin: 2px 0; font-weight: 600; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        .total-row td { font-size: 14px; font-weight: bold; background-color: #e0f2f1; }
+                        .total-cell { text-align: left; }
                         .status { font-weight: bold; color: ${order.status === 'Prêt' ? '#10b981' : '#f59e0b'}; }
                         .variants ul { list-style: none; padding: 0; margin: 0; font-size: 11px; color: #64748b; }
-                        @media print { .no-print { display: none; } }
+                        .variants li { margin-top: 2px; }
+                        @media print {
+                            .no-print { display: none; }
+                        }
                     </style>
-                </head><body>
+                </head>
+                <body>
                     <div style="text-align: left; margin-bottom: -50px;">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${order.id}" alt="Order QR" style="border: 1px solid #ddd; padding: 4px; border-radius: 4px;" />
-                        <p style="font-size:9px; margin:2px 0; color:#666;">Scan for Status</p>
                     </div>
+
                     <h1>${t.appTitle} ${t.appSubtitle} - ${t.printInvoice}</h1>
                     <div class="info">
-                        <div><p>${t.namePh}: ${order.customerName}</p><p>${t.phonePh}: ${order.phone}</p><p>${t.wilaya}: ${order.wilaya}</p></div>
-                        <div><p># ${t.orders}: #${order.id.slice(-6)}</p><p>التاريخ: ${order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : '—'}</p><p>الحالة: <span class="status">${STATUS_OPTIONS.find(s=>s.key===order.status)?.label[t.langName] || order.status}</span></p></div>
+                        <div>
+                            <p>${t.namePh}: ${order.customerName}</p>
+                            <p>${t.phonePh}: ${order.phone}</p>
+                            <p>${t.wilaya}: ${order.wilaya}</p>
+                            <p style="margin-top:5px; font-weight:normal;"><b>${t.orderDetails}:</b><br/>${order.orderDetails || '-'}</p>
+                        </div>
+                        <div>
+                            <p># ${t.orders}: #${order.id.slice(-6)}</p>
+                            <p>التاريخ: ${order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : '—'}</p>
+                            <p>الحالة: <span class="status">${STATUS_OPTIONS.find(s=>s.key===order.status)?.label[t.langName] || order.status}</span></p>
+                        </div>
                     </div>
-                    <table><thead><tr><th>${t.items}</th><th>${t.qty}</th><th>سعر الوحدة</th><th>المجموع</th></tr></thead>
-                        <tbody>${order.items.map(item => `<tr><td>${item.name[t.langName] || item.name}${item.selectedVariants?.length ? `<div class="variants"><ul>${item.selectedVariants.map(v => `<li>${v.label}: ${v.value}</li>`).join('')}</ul></div>` : ''}</td><td style="text-align: center;">${item.qty}</td><td>${item.price}</td><td>${item.price * item.qty}</td></tr>`).join('')}</tbody>
-                        <tfoot><tr><td colspan="3">${t.subtotal}</td><td class="total-cell">${subtotal} ${t.currency}</td></tr>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>${t.items}</th>
+                                <th>${t.qty}</th>
+                                <th>سعر الوحدة (${t.currency})</th>
+                                <th>المجموع (${t.currency})</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${order.items.map(item => `
+                                <tr>
+                                    <td>
+                                        ${item.name[t.langName] || item.name}
+                                        ${item.selectedVariants && item.selectedVariants.length > 0 ? `
+                                            <div class="variants">
+                                                <ul>
+                                                    ${item.selectedVariants.map(v => `<li>${v.label}: ${v.value}</li>`).join('')}
+                                                </ul>
+                                            </div>
+                                        ` : ''}
+                                    </td>
+                                    <td style="text-align: center;">${item.qty}</td>
+                                    <td>${item.price}</td>
+                                    <td>${item.price * item.qty}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="3">${t.subtotal}</td><td class="total-cell">${subtotal} ${t.currency}</td></tr>
                             <tr><td colspan="3">${t.deliveryFee}</td><td class="total-cell">${order.deliveryFee || 0} ${t.currency}</td></tr>
                             ${totalDiscount > 0 ? `<tr><td colspan="3">${t.discount}</td><td class="total-cell" style="color: #ef4444;">- ${totalDiscount} ${t.currency}</td></tr>` : ''}
                             <tr class="total-row"><td colspan="3">${t.total}</td><td class="total-cell">${order.total} ${t.currency}</td></tr>
                         </tfoot>
                     </table>
-                    <div class="no-print" style="text-align: center; margin-top: 30px;"><button onclick="window.print()" style="padding: 10px 20px; background-color: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">${t.printInvoice}</button></div>
-                </body></html>`;
-            printWindow.document.write(htmlContent); printWindow.document.close();
+                    
+                    <div class="no-print" style="text-align: center; margin-top: 30px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background-color: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">${t.printInvoice}</button>
+                    </div>
+
+                </body>
+                </html>
+            `;
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
         };
 
         const AdminDashboard = ({ db, appId, updateOrderStatus, lang, t, onOpenChat, showToast }) => {
@@ -853,100 +796,391 @@
             const [tab, setTab] = useState('orders');
             const [searchTerm, setSearchTerm] = useState("");
             const [filterStatus, setFilterStatus] = useState("All");
+            
             const [editingOffer, setEditingOffer] = useState(null);
 
             useEffect(() => {
                 if (!db || !appId) return;
-                const unsub = window.firebase.onSnapshot(window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`)), (snap) => {
+                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`));
+                const unsub = window.firebase.onSnapshot(q, (snap) => {
                     const fetchedOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     fetchedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
-                    setOrders(fetchedOrders); setLoading(false);
+                    setOrders(fetchedOrders);
+                    setLoading(false);
                 });
                 return () => unsub();
             }, [db, appId]);
 
             useEffect(() => {
                 if (!db || !appId) return;
-                const unsub = window.firebase.onSnapshot(window.firebase.collection(db, `artifacts/${appId}/public/data/promoCodes`), (snap) => setPromoCodes(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
-                const unsubUi = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (doc) => { if (doc.exists()) setUiConfig(doc.data()); });
-                return () => { unsub(); unsubUi(); };
+                const codesRef = window.firebase.collection(db, `artifacts/${appId}/public/data/promoCodes`);
+                const unsub = window.firebase.onSnapshot(codesRef, (snap) => {
+                    setPromoCodes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+                });
+                return () => unsub();
+            }, [db, appId]);
+            
+            useEffect(() => {
+                if (!db || !appId) return;
+                const unsubUi = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (doc) => {
+                    if (doc.exists()) setUiConfig(doc.data());
+                });
+                return () => unsubUi();
             }, [db, appId]);
 
             const addPromoCode = async (e) => {
-                e.preventDefault(); const data = new FormData(e.target); const code = data.get('code').toUpperCase().trim().replace(/[^A-Z0-9]/g, ''); const discountValue = parseFloat(data.get('discountValue')); const minAmount = parseFloat(data.get('minAmount')) || 0;
+                e.preventDefault();
+                const data = new FormData(e.target);
+                const code = data.get('code').toUpperCase();
+                const discountValue = parseFloat(data.get('discountValue'));
+                const minAmount = parseFloat(data.get('minAmount')) || 0;
                 if (!code || isNaN(discountValue)) return;
-                try { await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, code), { code: code, discountType: data.get('discountType'), discountValue: discountValue, minAmount: minAmount, active: true, createdAt: window.firebase.Timestamp.now() }); e.target.reset(); showToast(t.codeAdded, 'success'); } catch (e) { showToast(t.err, 'error'); }
+                try {
+                    await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, code), {
+                        code: code, discountType: data.get('discountType'), discountValue: discountValue, minAmount: minAmount, active: true, createdAt: window.firebase.Timestamp.now()
+                    });
+                    e.target.reset(); showToast(t.codeAdded, 'success');
+                } catch (e) { showToast(t.err, 'error'); }
             };
 
-            const deletePromoCode = async (codeId) => { if (!confirm(t.confirmDeleteCode)) return; try { await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, codeId)); showToast(t.codeDeleted, 'success'); } catch (e) { showToast(t.err, 'error'); } };
-            const deleteOrder = async (orderId) => { if (!confirm(t.confirmDeleteOrder)) return; try { await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders`, orderId)); showToast(t.orderDeleted, 'success'); } catch (e) { showToast(t.err, 'error'); } };
+            const deletePromoCode = async (codeId) => {
+                if (!confirm(t.confirmDeleteCode)) return;
+                try { await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, codeId)); showToast(t.codeDeleted, 'success'); } catch (e) { showToast(t.err, 'error'); }
+            };
             
-            const saveConfig = async (e) => { e.preventDefault(); const formData = new FormData(e.target); try { await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { ...uiConfig, announcementAr: formData.get('announcementAr'), announcementFr: formData.get('announcementFr'), showAnnouncement: formData.get('showAnnouncement') === 'on' }, { merge: true }); showToast(t.statusUpdate, 'success'); } catch (e) { showToast(t.err, 'error'); } };
-            const addStory = async (e) => { e.preventDefault(); const formData = new FormData(e.target); try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { stories: [...(uiConfig.stories || []), { id: Date.now(), name: formData.get('name'), img: formData.get('img') }] }); e.target.reset(); } catch (e) { showToast(t.err, 'error'); } };
-            const deleteStory = async (storyId) => { try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { stories: uiConfig.stories.filter(s => s.id !== storyId) }); } catch (e) { showToast(t.err, 'error'); } };
+            const deleteOrder = async (orderId) => {
+                if (!confirm(t.confirmDeleteOrder)) return;
+                try { await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders`, orderId)); showToast(t.orderDeleted, 'success'); } catch (e) { showToast(t.err, 'error'); }
+            };
+            
+            const saveConfig = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                try {
+                    await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), {
+                        ...uiConfig,
+                        announcementAr: formData.get('announcementAr'),
+                        announcementFr: formData.get('announcementFr'),
+                        showAnnouncement: formData.get('showAnnouncement') === 'on'
+                    }, { merge: true });
+                    showToast(t.statusUpdate, 'success');
+                } catch (e) { showToast(t.err, 'error'); }
+            };
+
+            const addStory = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const newStory = {
+                    id: Date.now(),
+                    name: formData.get('name'),
+                    img: formData.get('img')
+                };
+                try {
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), {
+                        stories: [...(uiConfig.stories || []), newStory]
+                    });
+                    e.target.reset();
+                } catch (e) { showToast(t.err, 'error'); }
+            };
+
+            const deleteStory = async (storyId) => {
+                try {
+                    const newStories = uiConfig.stories.filter(s => s.id !== storyId);
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { stories: newStories });
+                } catch (e) { showToast(t.err, 'error'); }
+            };
 
             const addOrUpdateOffer = async (e) => {
-                e.preventDefault(); const formData = new FormData(e.target);
-                const offerData = { title: formData.get('title'), description: formData.get('description'), price: formData.get('price'), image: formData.get('image'), endDate: formData.get('endDate'), promoCode: formData.get('promoCode') };
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                const offerData = {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    price: formData.get('price'),
+                    image: formData.get('image'),
+                    endDate: formData.get('endDate'),
+                    promoCode: formData.get('promoCode') 
+                };
+
                 let updatedOffers = [...(uiConfig.offers || [])];
-                if (editingOffer) updatedOffers = updatedOffers.map(o => o.id === editingOffer.id ? { ...o, ...offerData } : o); else updatedOffers.push({ id: Date.now(), ...offerData });
-                try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { offers: updatedOffers }); e.target.reset(); setEditingOffer(null); showToast(t.statusUpdate, 'success'); } catch (e) { showToast(t.err, 'error'); }
+
+                if (editingOffer) {
+                    updatedOffers = updatedOffers.map(o => o.id === editingOffer.id ? { ...o, ...offerData } : o);
+                } else {
+                    updatedOffers.push({ id: Date.now(), ...offerData });
+                }
+
+                try {
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), {
+                        offers: updatedOffers
+                    });
+                    e.target.reset();
+                    setEditingOffer(null);
+                    showToast(t.statusUpdate, 'success');
+                } catch (e) { showToast(t.err, 'error'); }
             };
 
-            const deleteOffer = async (offerId) => { try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { offers: uiConfig.offers.filter(o => o.id !== offerId) }); if (editingOffer && editingOffer.id === offerId) setEditingOffer(null); } catch (e) { showToast(t.err, 'error'); } };
-            const exportToCSV = () => { const rows = orders.map(o => [o.id, o.customerName, o.phone, o.wilaya, o.status, o.total, o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : '']); const csvContent = "\uFEFF" + [["Order ID", "Customer Name", "Phone", "Wilaya", "Status", "Total", "Date"], ...rows].map(e => e.join(",")).join("\n"); const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })); link.download = `orders_export.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); };
+            const handleEditOffer = (offer) => {
+                setEditingOffer(offer);
+                document.querySelector('form[name="offerForm"]').scrollIntoView({ behavior: 'smooth' });
+            };
+
+            const cancelEdit = () => {
+                setEditingOffer(null);
+                document.querySelector('form[name="offerForm"]').reset();
+            };
+
+            const deleteOffer = async (offerId) => {
+                try {
+                    const newOffers = uiConfig.offers.filter(o => o.id !== offerId);
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { offers: newOffers });
+                    if (editingOffer && editingOffer.id === offerId) cancelEdit();
+                } catch (e) { showToast(t.err, 'error'); }
+            };
+
+            const exportToCSV = () => {
+                const header = ["Order ID", "Customer Name", "Phone", "Wilaya", "Status", "Total", "Date"];
+                const rows = orders.map(o => [
+                    o.id, 
+                    o.customerName, 
+                    o.phone, 
+                    o.wilaya, 
+                    o.status, 
+                    o.total, 
+                    o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : ''
+                ]);
+                const csvContent = "\uFEFF" + [header, ...rows].map(e => e.join(",")).join("\n");
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `orders_export_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
 
             const revenue = orders.reduce((sum, o) => sum + (o.status !== 'En attente' ? (o.total || 0) : 0), 0);
-            const filteredOrders = orders.filter(o => (filterStatus === "All" || o.status === filterStatus) && (o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || o.phone.includes(searchTerm) || o.id.includes(searchTerm)));
+            
+            const filteredOrders = orders.filter(o => 
+                (filterStatus === "All" || o.status === filterStatus) &&
+                (o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || o.phone.includes(searchTerm) || o.id.includes(searchTerm))
+            );
 
             return (
                 <div className="animate-fadeIn space-y-4 pt-4">
                     <div className="bg-slate-900 text-white p-4 rounded-xl shadow-lg">
-                        <div className="flex justify-between items-center mb-4"><h2 className="font-bold flex items-center gap-2"><Icon name="layout-dashboard" /> {t.adminPanel}</h2><span className="text-xs bg-slate-700 px-2 py-1 rounded">Admin</span></div>
-                        <div className="flex gap-4"><div className="flex-1 bg-slate-800 p-3 rounded-lg"><p className="text-xs text-slate-400 mb-1">{t.revenue}</p><p className="text-xl font-bold text-green-400">{revenue} {t.currency}</p></div><div className="flex-1 bg-slate-800 p-3 rounded-lg"><p className="text-xs text-slate-400 mb-1">{t.orders}</p><p className="text-xl font-bold">{orders.length}</p></div></div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="font-bold flex items-center gap-2"><Icon name="layout-dashboard" /> {t.adminPanel}</h2>
+                            <span className="text-xs bg-slate-700 px-2 py-1 rounded">Admin</span>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex-1 bg-slate-800 p-3 rounded-lg">
+                                <p className="text-xs text-slate-400 mb-1">{t.revenue}</p>
+                                <p className="text-xl font-bold text-green-400">{revenue} {t.currency}</p>
+                            </div>
+                            <div className="flex-1 bg-slate-800 p-3 rounded-lg">
+                                <p className="text-xs text-slate-400 mb-1">{t.orders}</p>
+                                <p className="text-xl font-bold">{orders.length}</p>
+                            </div>
+                        </div>
                     </div>
                     
                     <div className="flex gap-2 bg-white p-1 rounded-xl shadow-sm border border-slate-100 overflow-x-auto">
-                        {['orders', 'chats', 'codes', 'content', 'offers'].map(tabName => (
-                            <button key={tabName} onClick={()=>setTab(tabName)} className={`flex-1 min-w-[80px] py-2 rounded-lg font-bold text-xs transition ${tab===tabName ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}><span className="flex items-center justify-center gap-1"><Icon name={tabName==='orders'?'shopping-bag':tabName==='chats'?'message-circle':tabName==='codes'?'percent':tabName==='content'?'edit-3':'tag'} size={14}/> {t[tabName === 'chats' ? 'chatList' : tabName === 'codes' ? 'discounts' : tabName === 'content' ? 'manageContent' : tabName]}</span></button>
-                        ))}
+                        <button onClick={()=>setTab('orders')} className={`flex-1 min-w-[80px] py-2 rounded-lg font-bold text-xs transition ${tab==='orders' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="shopping-bag" size={14}/> {t.orders}</span>
+                        </button>
+                        <button onClick={()=>setTab('chats')} className={`flex-1 min-w-[80px] py-2 rounded-lg font-bold text-xs transition ${tab==='chats' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="message-circle" size={14}/> {t.chatList}</span>
+                        </button>
+                        <button onClick={()=>setTab('codes')} className={`flex-1 min-w-[80px] py-2 rounded-lg font-bold text-xs transition ${tab==='codes' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="percent" size={14}/> {t.discounts}</span>
+                        </button>
+                        <button onClick={()=>setTab('content')} className={`flex-1 min-w-[80px] py-2 rounded-lg font-bold text-xs transition ${tab==='content' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="edit-3" size={14}/> {t.manageContent}</span>
+                        </button>
+                        <button onClick={()=>setTab('offers')} className={`flex-1 min-w-[80px] py-2 rounded-lg font-bold text-xs transition ${tab==='offers' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="tag" size={14}/> {t.offers}</span>
+                        </button>
                     </div>
 
-                    {tab === 'orders' && (
+                    {tab === 'orders' ? (
                         loading ? <div className="flex justify-center py-10"><div className="loader"></div></div> : (
                             <div className="space-y-3 pb-24">
-                                <div className="flex gap-2 mb-2"><input type="text" placeholder={t.search} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-1 p-2 rounded-lg border border-slate-200 text-sm outline-none"/><button onClick={exportToCSV} className="bg-green-600 text-white px-3 rounded-lg text-xs font-bold whitespace-nowrap">{t.exportCSV}</button></div>
-                                <div className="flex gap-2 overflow-x-auto pb-2"><button onClick={() => setFilterStatus("All")} className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${filterStatus === "All" ? "bg-slate-800 text-white" : "bg-white border text-slate-600"}`}>{t.all}</button>{STATUS_OPTIONS.map(s => (<button key={s.key} onClick={() => setFilterStatus(s.key)} className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${filterStatus === s.key ? "bg-blue-600 text-white" : "bg-white border text-slate-600"}`}>{s.label[lang]}</button>))}</div>
+                                <div className="flex gap-2 mb-2">
+                                    <input type="text" placeholder={t.search} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-1 p-2 rounded-lg border border-slate-200 text-sm outline-none"/>
+                                    <button onClick={exportToCSV} className="bg-green-600 text-white px-3 rounded-lg text-xs font-bold whitespace-nowrap">{t.exportCSV}</button>
+                                </div>
+                                <div className="flex gap-2 overflow-x-auto pb-2">
+                                    <button onClick={() => setFilterStatus("All")} className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${filterStatus === "All" ? "bg-slate-800 text-white" : "bg-white border text-slate-600"}`}>{t.all}</button>
+                                    {STATUS_OPTIONS.map(s => (
+                                        <button key={s.key} onClick={() => setFilterStatus(s.key)} className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${filterStatus === s.key ? "bg-blue-600 text-white" : "bg-white border text-slate-600"}`}>{s.label[lang]}</button>
+                                    ))}
+                                </div>
+
                                 {filteredOrders.length === 0 && <div className="text-center py-10 text-gray-400">No orders found.</div>}
+
                                 {filteredOrders.map(order => (
                                     <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                        <div className="flex justify-between items-start border-b border-gray-50 pb-2 mb-2"><div><div className="font-bold text-slate-800">{order.customerName}</div><div className="text-xs text-slate-500 dir-ltr text-right font-mono">{order.phone}</div><div className="text-[10px] text-gray-500 mt-1">{order.wilaya}</div></div><div className="text-right"><div className="font-bold text-slate-900">{order.total} {t.currency}</div><div className="text-[10px] text-gray-400">#{order.id.slice(-4)}</div></div></div>
-                                        <div className="bg-slate-50 p-2 rounded-lg text-xs text-slate-600 mb-2 border border-slate-100"><span className="font-bold block mb-1">{t.details}:</span>{order.orderDetails || "—"}</div>
-                                        <div className="flex items-center gap-2"><button onClick={() => onOpenChat(order.customerUserId, order.customerName)} className="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100"><Icon name="message-circle" size={18}/></button><button onClick={() => printInvoice(order, t)} className="bg-green-50 text-green-600 p-2 rounded-lg hover:bg-green-100"><Icon name="printer" size={18}/></button><select value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value, order.customerUserId)} className={`flex-1 p-2 rounded-lg text-xs font-bold outline-none ${lang==='ar'?'text-right':''} ${STATUS_COLORS[order.status]}`}>{STATUS_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label[lang]}</option>)}</select><button onClick={() => deleteOrder(order.id)} className="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"><Icon name="trash" size={18}/></button></div>
+                                        <div className="flex justify-between items-start border-b border-gray-50 pb-2 mb-2">
+                                            <div>
+                                                <div className="font-bold text-slate-800">{order.customerName}</div>
+                                                <div className="text-xs text-slate-500 dir-ltr text-right font-mono">{order.phone}</div>
+                                                <div className="text-[10px] text-gray-500 mt-1">{order.wilaya}</div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="font-bold text-slate-900">{order.total} {t.currency}</div>
+                                                <div className="text-[10px] text-gray-400">#{order.id.slice(-4)}</div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-slate-50 p-2 rounded-lg text-xs text-slate-600 mb-2 border border-slate-100">
+                                            <span className="font-bold block mb-1">{t.details}:</span>
+                                            {order.orderDetails || "—"}
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <button aria-label="Chat" onClick={() => onOpenChat(order.customerUserId, order.customerName)} className="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100"><Icon name="message-circle" size={18}/></button>
+                                            <button aria-label="Print" onClick={() => printInvoice(order, t)} className="bg-green-50 text-green-600 p-2 rounded-lg hover:bg-green-100"><Icon name="printer" size={18}/></button>
+                                            <select aria-label="Status" value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value, order.customerUserId)} className={`flex-1 p-2 rounded-lg text-xs font-bold outline-none ${lang==='ar'?'text-right':''} ${STATUS_COLORS[order.status]}`}>
+                                                {STATUS_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label[lang]}</option>)}
+                                            </select>
+                                            <button aria-label="Delete" onClick={() => deleteOrder(order.id)} className="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"><Icon name="trash" size={18}/></button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         )
-                    )}
-                    {tab === 'chats' && <div className="animate-fadeIn pb-24"><div className="space-y-2">{window.firebase && <AdminChatList db={db} appId={appId} onSelectChat={onOpenChat} t={t} />}</div></div>}
-                    {tab === 'codes' && (
+                    ) : tab === 'chats' ? (
+                        <div className="animate-fadeIn pb-24">
+                           <div className="space-y-2">
+                                {window.firebase && <AdminChatList db={db} appId={appId} onSelectChat={onOpenChat} t={t} />}
+                           </div>
+                        </div>
+                    ) : tab === 'codes' ? (
                         <div className="animate-fadeIn space-y-4 pb-24">
                             <h3 className="font-bold text-lg">{t.createCode}</h3>
-                            <form onSubmit={addPromoCode} className="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-slate-100"><input required name="code" placeholder={t.codeName} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 uppercase dir-ltr"/><div className="flex gap-3"><select name="discountType" required className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 w-1/3"><option value="percent">%</option><option value="fixed">{t.currency}</option></select><input required name="discountValue" type="number" step="0.01" min="1" placeholder={t.discountValue} className="w-2/3 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr"/></div><input name="minAmount" type="number" step="0.01" min="0" placeholder={t.minOrderAmount} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr"/><button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2"><Icon name="plus" size={18}/> {t.createCode}</button></form>
+                            <form onSubmit={addPromoCode} className="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-slate-100">
+                                <input required name="code" placeholder={t.codeName} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 uppercase dir-ltr"/>
+                                <div className="flex gap-3">
+                                    <select aria-label="Discount Type" name="discountType" required className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 w-1/3">
+                                        <option value="percent">%</option>
+                                        <option value="fixed">{t.currency}</option>
+                                    </select>
+                                    <input required name="discountValue" type="number" step="0.01" min="1" placeholder={t.discountValue} className="w-2/3 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr"/>
+                                </div>
+                                <input name="minAmount" type="number" step="0.01" min="0" placeholder={t.minOrderAmount} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr"/>
+                                <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2">
+                                    <Icon name="plus" size={18}/> {t.createCode}
+                                </button>
+                            </form>
+
                             <h3 className="font-bold text-lg pt-4 flex justify-between items-center">{t.activeCodes} <span className="text-sm bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">{promoCodes.length}</span></h3>
-                            <div className="space-y-3">{promoCodes.map(code => (<div key={code.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center"><div><div className="font-bold text-slate-900 text-lg dir-ltr">{code.code}</div><div className={`text-xs font-bold mt-1 ${code.discountType==='percent'?'text-red-600':'text-green-600'}`}>{code.discountType === 'percent' ? `${code.discountValue}% ${t.discount}` : `${code.discountValue} ${t.currency} ${t.fixedDiscount}`}</div></div><button onClick={() => deletePromoCode(code.id)} className="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-full transition"><Icon name="trash" size={18}/></button></div>))}</div>
+                            <div className="space-y-3">
+                                {promoCodes.map(code => (
+                                    <div key={code.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center">
+                                        <div>
+                                            <div className="font-bold text-slate-900 text-lg dir-ltr">{code.code}</div>
+                                            <div className={`text-xs font-bold mt-1 ${code.discountType==='percent'?'text-red-600':'text-green-600'}`}>
+                                                {code.discountType === 'percent' ? `${code.discountValue}% ${t.discount}` : `${code.discountValue} ${t.currency} ${t.fixedDiscount}`}
+                                            </div>
+                                        </div>
+                                        <button aria-label="Delete" onClick={() => deletePromoCode(code.id)} className="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-full transition"><Icon name="trash" size={18}/></button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    )}
-                    {tab === 'offers' && (
+                    ) : tab === 'offers' ? (
                         <div className="animate-fadeIn space-y-6 pb-24">
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Icon name="tag" size={18}/> {editingOffer ? t.updateOffer : t.manageOffers}</h3><form name="offerForm" onSubmit={addOrUpdateOffer} className="space-y-3"><input required name="title" defaultValue={editingOffer?.title || ''} placeholder={t.offerTitle} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/><input required name="description" defaultValue={editingOffer?.description || ''} placeholder={t.offerDesc} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/><input required name="price" defaultValue={editingOffer?.price || ''} placeholder={t.offerPrice} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/><input name="image" defaultValue={editingOffer?.image || ''} placeholder={t.addImage} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none dir-ltr"/><input name="promoCode" defaultValue={editingOffer?.promoCode || ''} placeholder={t.associatedPromo} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none dir-ltr uppercase"/><div className="flex gap-2 items-center text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200"><Icon name="calendar" size={16}/><label>{t.offerEndDate}:</label><input name="endDate" defaultValue={editingOffer?.endDate || ''} type="datetime-local" className="bg-transparent outline-none flex-1"/></div><div className="flex gap-2"><button type="submit" className={`flex-1 ${editingOffer ? 'bg-blue-600' : 'bg-orange-500'} text-white py-3 rounded-xl font-bold flex justify-center gap-2`}><Icon name={editingOffer ? "save" : "plus"} size={18}/> {editingOffer ? t.edit : t.addOffer}</button>{editingOffer && (<button type="button" onClick={()=>setEditingOffer(null)} className="bg-slate-200 text-slate-700 px-4 rounded-xl font-bold">{t.cancel}</button>)}</div></form></div>
-                            <div className="space-y-3">{uiConfig.offers && uiConfig.offers.map(offer => (<div key={offer.id} className={`bg-white p-3 rounded-xl shadow-sm border flex gap-3 ${editingOffer?.id === offer.id ? 'border-blue-500 bg-blue-50' : 'border-slate-100'}`}>{offer.image ? (<img src={offer.image} className="w-20 h-20 rounded-lg object-cover bg-slate-100"/>) : (<div className="w-20 h-20 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center font-bold text-xs p-1 text-center">{offer.price}</div>)}<div className="flex-1"><h4 className="font-bold text-sm">{offer.title}</h4><p className="text-xs text-slate-500 line-clamp-2">{offer.description}</p><p className="text-orange-500 font-bold text-sm mt-1">{offer.price}</p>{offer.promoCode && <p className="text-[10px] text-green-600 bg-green-50 inline-block px-2 rounded mt-1 border border-green-200 font-bold">Promo: {offer.promoCode}</p>}{offer.endDate && <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><Icon name="clock" size={10}/> {new Date(offer.endDate).toLocaleDateString()}</p>}</div><div className="flex flex-col gap-2"><button onClick={()=>{setEditingOffer(offer); document.querySelector('form[name="offerForm"]').scrollIntoView({ behavior: 'smooth' });}} className="text-blue-500 p-1 bg-blue-50 rounded-full"><Icon name="edit" size={16}/></button><button onClick={()=>deleteOffer(offer.id)} className="text-red-500 p-1 bg-red-50 rounded-full"><Icon name="trash" size={16}/></button></div></div>))}</div>
+                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                                    <Icon name="tag" size={18}/> {editingOffer ? t.updateOffer : t.manageOffers}
+                                </h3>
+                                <form name="offerForm" onSubmit={addOrUpdateOffer} className="space-y-3">
+                                    <input aria-label="Title" required name="title" defaultValue={editingOffer?.title || ''} placeholder={t.offerTitle} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/>
+                                    <input aria-label="Description" required name="description" defaultValue={editingOffer?.description || ''} placeholder={t.offerDesc} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/>
+                                    <input aria-label="Price" required name="price" defaultValue={editingOffer?.price || ''} placeholder={t.offerPrice} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/>
+                                    <input aria-label="Image URL" name="image" defaultValue={editingOffer?.image || ''} placeholder={t.addImage} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none dir-ltr"/>
+                                    <input aria-label="Promo Code" name="promoCode" defaultValue={editingOffer?.promoCode || ''} placeholder={t.associatedPromo} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none dir-ltr uppercase"/>
+                                    
+                                    <div className="flex gap-2 items-center text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                        <Icon name="calendar" size={16}/>
+                                        <label>{t.offerEndDate}:</label>
+                                        <input aria-label="End Date" name="endDate" defaultValue={editingOffer?.endDate || ''} type="datetime-local" className="bg-transparent outline-none flex-1"/>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button type="submit" className={`flex-1 ${editingOffer ? 'bg-blue-600' : 'bg-orange-500'} text-white py-3 rounded-xl font-bold flex justify-center gap-2`}>
+                                            <Icon name={editingOffer ? "save" : "plus"} size={18}/> {editingOffer ? t.edit : t.addOffer}
+                                        </button>
+                                        {editingOffer && (
+                                            <button type="button" onClick={cancelEdit} className="bg-slate-200 text-slate-700 px-4 rounded-xl font-bold">
+                                                {t.cancel}
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                {uiConfig.offers && uiConfig.offers.map(offer => (
+                                    <div key={offer.id} className={`bg-white p-3 rounded-xl shadow-sm border flex gap-3 ${editingOffer?.id === offer.id ? 'border-blue-500 bg-blue-50' : 'border-slate-100'}`}>
+                                        {offer.image ? (
+                                            <img src={offer.image} className="w-20 h-20 rounded-lg object-cover bg-slate-100"/>
+                                        ) : (
+                                            <div className="w-20 h-20 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center font-bold text-xs p-1 text-center">
+                                                {offer.price}
+                                            </div>
+                                        )}
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-sm">{offer.title}</h4>
+                                            <p className="text-xs text-slate-500 line-clamp-2">{offer.description}</p>
+                                            <p className="text-orange-500 font-bold text-sm mt-1">{offer.price}</p>
+                                            {offer.promoCode && <p className="text-[10px] text-green-600 bg-green-50 inline-block px-2 rounded mt-1 border border-green-200 font-bold">Promo: {offer.promoCode}</p>}
+                                            {offer.endDate && <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><Icon name="clock" size={10}/> {new Date(offer.endDate).toLocaleDateString()}</p>}
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <button aria-label="Edit" onClick={()=>handleEditOffer(offer)} className="text-blue-500 p-1 bg-blue-50 rounded-full"><Icon name="edit" size={16}/></button>
+                                            <button aria-label="Delete" onClick={()=>deleteOffer(offer.id)} className="text-red-500 p-1 bg-red-50 rounded-full"><Icon name="trash" size={16}/></button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    )}
-                    {tab === 'content' && (
+                    ) : (
                         <div className="animate-fadeIn space-y-6 pb-24">
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Icon name="megaphone" size={18}/> {t.announcement}</h3><form onSubmit={saveConfig} className="space-y-3"><input name="announcementAr" defaultValue={uiConfig.announcementAr} placeholder={t.textAr} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/><input name="announcementFr" defaultValue={uiConfig.announcementFr} placeholder={t.textFr} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/><div className="flex items-center gap-2"><input type="checkbox" name="showAnnouncement" defaultChecked={uiConfig.showAnnouncement} id="showAnn" className="w-4 h-4"/><label htmlFor="showAnn" className="text-sm font-bold text-slate-600">{t.show}</label></div><button className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">{t.statusUpdate}</button></form></div>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Icon name="images" size={18}/> {t.stories}</h3><div className="flex gap-2 overflow-x-auto mb-4 pb-2">{uiConfig.stories && uiConfig.stories.map(s => (<div key={s.id} className="relative shrink-0 w-20 group"><img src={s.img} className="w-20 h-20 rounded-xl object-cover border border-slate-200"/><button onClick={()=>deleteStory(s.id)} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 shadow-md"><Icon name="x" size={12}/></button><div className="text-[10px] truncate text-center mt-1 font-medium">{s.name}</div></div>))}</div><form onSubmit={addStory} className="space-y-3 pt-3 border-t border-slate-100"><input required name="name" placeholder={t.storyName} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/><input required name="img" placeholder={t.addImage} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none dir-ltr"/><button className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold flex justify-center gap-2"><Icon name="plus" size={18}/> {t.addStory}</button></form></div>
+                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Icon name="megaphone" size={18}/> {t.announcement}</h3>
+                                <form onSubmit={saveConfig} className="space-y-3">
+                                    <input aria-label="Announcement AR" name="announcementAr" defaultValue={uiConfig.announcementAr} placeholder={t.textAr} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/>
+                                    <input aria-label="Announcement FR" name="announcementFr" defaultValue={uiConfig.announcementFr} placeholder={t.textFr} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/>
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" name="showAnnouncement" defaultChecked={uiConfig.showAnnouncement} id="showAnn" className="w-4 h-4"/>
+                                        <label htmlFor="showAnn" className="text-sm font-bold text-slate-600">{t.show}</label>
+                                    </div>
+                                    <button className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold">{t.statusUpdate}</button>
+                                </form>
+                            </div>
+
+                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Icon name="images" size={18}/> {t.stories}</h3>
+                                
+                                <div className="flex gap-2 overflow-x-auto mb-4 pb-2">
+                                    {uiConfig.stories && uiConfig.stories.map(s => (
+                                        <div key={s.id} className="relative shrink-0 w-20 group">
+                                            <img src={s.img} className="w-20 h-20 rounded-xl object-cover border border-slate-200"/>
+                                            <button aria-label="Delete" onClick={()=>deleteStory(s.id)} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 shadow-md"><Icon name="x" size={12}/></button>
+                                            <div className="text-[10px] truncate text-center mt-1 font-medium">{s.name}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <form onSubmit={addStory} className="space-y-3 pt-3 border-t border-slate-100">
+                                    <input aria-label="Name" required name="name" placeholder={t.storyName} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"/>
+                                    <input aria-label="Image URL" required name="img" placeholder={t.addImage} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none dir-ltr"/>
+                                    <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold flex justify-center gap-2">
+                                        <Icon name="plus" size={18}/> {t.addStory}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -956,18 +1190,79 @@
         const AdminChatList = ({ db, appId, onSelectChat, t }) => {
             const [chats, setChats] = useState([]);
             useEffect(() => {
-                const unsub = window.firebase.onSnapshot(window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/chats`), window.firebase.orderBy('lastMessageTime', 'desc')), (snap) => setChats(snap.docs.map(d => ({id: d.id, ...d.data()}))));
+                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/chats`), window.firebase.orderBy('lastMessageTime', 'desc'));
+                const unsub = window.firebase.onSnapshot(q, (snap) => setChats(snap.docs.map(d => ({id: d.id, ...d.data()}))));
                 return () => unsub();
             }, [db, appId]);
-            return chats.length === 0 ? <p className="text-center text-gray-400 py-10">No active chats.</p> : chats.map(chat => (<div key={chat.id} onClick={() => onSelectChat(chat.userId, chat.userName)} className="bg-white p-3 rounded-xl border border-slate-100 hover:border-blue-300 shadow-sm cursor-pointer transition flex gap-3 items-center group"><div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition uppercase">{chat.userName ? chat.userName.charAt(0) : 'G'}</div><div className="flex-1 overflow-hidden"><div className="flex justify-between items-center mb-0.5"><h4 className="font-bold text-slate-800 text-sm truncate">{chat.userName}</h4><span className="text-[10px] text-slate-400 font-mono">{chat.lastMessageTime?.toDate ? chat.lastMessageTime.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span></div><p className="text-xs text-slate-500 truncate group-hover:text-blue-600 transition">{chat.lastMessage}</p></div></div>));
+            return chats.length === 0 ? <p className="text-center text-gray-400 py-10">No active chats.</p> : chats.map(chat => (
+                <div key={chat.id} onClick={() => onSelectChat(chat.userId, chat.userName)} className="bg-white p-3 rounded-xl border border-slate-100 hover:border-blue-300 shadow-sm cursor-pointer transition flex gap-3 items-center group">
+                    <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold group-hover:bg-blue-600 group-hover:text-white transition uppercase">
+                        {chat.userName ? chat.userName.charAt(0) : 'G'}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <div className="flex justify-between items-center mb-0.5">
+                            <h4 className="font-bold text-slate-800 text-sm truncate">{chat.userName}</h4>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                                {chat.lastMessageTime?.toDate ? chat.lastMessageTime.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                            </span>
+                        </div>
+                        <p className="text-xs text-slate-500 truncate group-hover:text-blue-600 transition">{chat.lastMessage}</p>
+                    </div>
+                </div>
+            ));
         };
+
+        const MaintenanceScreen = ({ t, lang, onAdminClick }) => (
+            <div className={`min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center relative overflow-hidden ${lang === 'ar' ? 'dir-rtl' : 'dir-ltr'}`}>
+                {/* Background Decor */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900 z-0"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-pulse-glow"></div>
+                
+                {/* Content Card */}
+                <div className="relative z-10 w-full max-w-lg mx-auto bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl backdrop-blur-xl animate-slideUp">
+                    <div className="w-24 h-24 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-500/30">
+                        <Icon name="settings" size={48} className="animate-spin-slow" />
+                    </div>
+                    
+                    <h1 className="text-3xl md:text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
+                        {t.maintenanceTitle}
+                    </h1>
+                    
+                    <p className="text-slate-300 mb-8 leading-relaxed text-sm md:text-base">
+                        {t.maintenanceDesc}
+                    </p>
+                    
+                    <div className="flex flex-col items-center gap-4">
+                        <a href="https://wa.me/213549179000" target="_blank" className="bg-green-600 hover:bg-green-500 text-white px-8 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 w-full sm:w-auto">
+                            <Icon name="message-circle" size={20} /> {t.contactUsMsg}
+                        </a>
+                    </div>
+                </div>
+
+                {/* Hidden/Subtle Admin Login Button */}
+                <button aria-label="Admin Login" onClick={onAdminClick} className="absolute bottom-8 text-slate-600 hover:text-slate-400 text-xs font-bold transition flex items-center gap-2 z-10 px-4 py-2 rounded-full border border-transparent hover:border-slate-700">
+                    <Icon name="lock" size={14} /> {t.maintenanceAdminLogin}
+                </button>
+            </div>
+        );
 
         function App() {
             const getInitialView = () => window.location.hash.substring(1).split('/')[0] || 'home';
             const [lang, setLang] = useState(() => localStorage.getItem('app_lang') || 'ar');
             const [view, setView] = useState(getInitialView());
-            const [cart, setCart] = useState(() => { try { const storedCart = JSON.parse(localStorage.getItem('artisanCart')) || []; return storedCart.map(item => ({ ...item, price: item.price || item.basePrice || 0, totalPrice: item.totalPrice || (item.price * item.qty) || 0 })); } catch { return []; } });
-            const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem('artisanFavs')) || []; } catch { return []; } });
+            const [cart, setCart] = useState(() => { 
+                try { 
+                    const storedCart = JSON.parse(localStorage.getItem('artisanCart')) || [];
+                    return storedCart.map(item => ({ 
+                        ...item, 
+                        price: item.price || item.basePrice || 0,
+                        totalPrice: item.totalPrice || (item.price * item.qty) || 0
+                    }));
+                } catch { return []; } 
+            });
+            const [favorites, setFavorites] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('artisanFavs')) || []; } catch { return []; }
+            });
             
             const [appliedPromo, setAppliedPromo] = useState(null); 
             const [promoCodeInput, setPromoCodeInput] = useState(''); 
@@ -980,11 +1275,13 @@
             const [activeChat, setActiveChat] = useState(null);
             const [productModal, setProductModal] = useState(null);
             const [showQrModal, setShowQrModal] = useState(false);
-            const [showTrackModal, setShowTrackModal] = useState(false);
             const [uiConfig, setUiConfig] = useState({});
+            const [bypassMaintenance, setBypassMaintenance] = useState(false);
             
+            // Search and Filter state
             const [searchTerm, setSearchTerm] = useState("");
             const [isListening, setIsListening] = useState(false);
+            const [activeCategory, setActiveCategory] = useState('all');
             
             const [selectedWilayaZone, setSelectedWilayaZone] = useState(null);
             const [expandedOrderId, setExpandedOrderId] = useState(null);
@@ -997,19 +1294,29 @@
             const startVoiceSearch = () => {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) return showToast("متصفحك لا يدعم البحث الصوتي", "error");
+                
                 const recognition = new SpeechRecognition();
                 recognition.lang = lang === 'ar' ? 'ar-DZ' : 'fr-FR';
+                
                 recognition.onstart = () => setIsListening(true);
-                recognition.onresult = (e) => { setSearchTerm(e.results[0][0].transcript); setIsListening(false); };
+                recognition.onresult = (e) => { 
+                    setSearchTerm(e.results[0][0].transcript); 
+                    setIsListening(false); 
+                };
                 recognition.onerror = () => { setIsListening(false); };
                 recognition.onend = () => setIsListening(false);
+                
                 recognition.start();
             };
 
             const calculateTotal = (cart, promo, zone) => {
                 const subtotal = cart.reduce((s,i) => s + (i.price*i.qty), 0);
                 let discount = 0;
-                if (promo) { if (promo.discountType === 'percent') discount = subtotal * (promo.discountValue / 100); else if (promo.discountType === 'fixed') discount = promo.discountValue; discount = Math.min(discount, subtotal); }
+                if (promo) {
+                    if (promo.discountType === 'percent') discount = subtotal * (promo.discountValue / 100);
+                    else if (promo.discountType === 'fixed') discount = promo.discountValue;
+                    discount = Math.min(discount, subtotal);
+                }
                 const delivery = zone ? (DELIVERY_FEES[zone] || 0) : 0;
                 const finalTotal = subtotal - discount + delivery;
                 return { subtotal, discount, delivery, finalTotal: Math.max(0, finalTotal) };
@@ -1017,92 +1324,177 @@
 
             const applyPromoCode = async (code) => {
                 if (!db || !appId) return showToast(t.conn, "error");
-                const safeCode = code.trim().replace(/[^A-Za-z0-9]/g, '');
-                if (!safeCode) return showToast(t.promoEnter, 'info');
+                if (!code) return showToast(t.promoEnter, 'info');
                 try {
-                    const snapshot = await window.firebase.getDocs(window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/public/data/promoCodes`), window.firebase.where('code', '==', safeCode.toUpperCase()), window.firebase.where('active', '==', true), window.firebase.limit(1)));
+                    const q = window.firebase.query(
+                        window.firebase.collection(db, `artifacts/${appId}/public/data/promoCodes`),
+                        window.firebase.where('code', '==', code.toUpperCase()),
+                        window.firebase.where('active', '==', true),
+                        window.firebase.limit(1)
+                    );
+                    const snapshot = await window.firebase.getDocs(q);
                     if (snapshot.empty) { setAppliedPromo(null); showToast(t.promoInvalid, 'error'); return; }
                     const promo = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
                     const currentTotal = cart.reduce((s,i) => s + (i.price*i.qty), 0);
-                    if (promo.minAmount && currentTotal < promo.minAmount) { showToast(`${t.promoMinAmount} ${promo.minAmount} ${t.currency}`, 'error'); setAppliedPromo(null); return; }
-                    setAppliedPromo(promo); showToast(t.promoApplied, 'success');
+                    if (promo.minAmount && currentTotal < promo.minAmount) {
+                         showToast(`${t.promoMinAmount} ${promo.minAmount} ${t.currency}`, 'error');
+                         setAppliedPromo(null);
+                         return;
+                    }
+                    setAppliedPromo(promo);
+                    showToast(t.promoApplied, 'success');
                 } catch (e) { showToast(t.err, "error"); }
             };
             
             const handleGetOffer = async (offer) => {
-                const cartItem = { id: `offer-${offer.id}`, name: { fr: offer.title, ar: offer.title }, basePrice: parseFloat(offer.price) || 0, price: parseFloat(offer.price) || 0, image: offer.image, qty: 1, selectedVariants: [{ id: 'type', label: 'Type', value: 'Offre Spéciale' }] };
+                const cartItem = {
+                    id: `offer-${offer.id}`,
+                    name: { fr: offer.title, ar: offer.title }, 
+                    basePrice: parseFloat(offer.price) || 0,
+                    price: parseFloat(offer.price) || 0,
+                    image: offer.image,
+                    qty: 1,
+                    selectedVariants: [{ id: 'type', label: 'Type', value: 'Offre Spéciale' }]
+                };
+                
                 setCart(prev => [...prev, { ...cartItem, cartId: `offer-${Date.now()}` }]);
                 if (offer.promoCode) await applyPromoCode(offer.promoCode);
-                navigate('cart'); showToast(t.addToCart, 'success');
+                
+                navigate('cart');
+                showToast(t.addToCart, 'success');
             };
 
             const toggleFavorite = (product) => {
                 let newFavs;
-                if (favorites.some(f => f.id === product.id)) { newFavs = favorites.filter(f => f.id !== product.id); showToast(t.removeFromFav); } 
-                else { newFavs = [...favorites, product]; showToast(t.addToFav, 'success'); }
-                setFavorites(newFavs); localStorage.setItem('artisanFavs', JSON.stringify(newFavs));
+                if (favorites.some(f => f.id === product.id)) {
+                    newFavs = favorites.filter(f => f.id !== product.id);
+                    showToast(t.removeFromFav);
+                } else {
+                    newFavs = [...favorites, product];
+                    showToast(t.addToFav, 'success');
+                }
+                setFavorites(newFavs);
+                localStorage.setItem('artisanFavs', JSON.stringify(newFavs));
             };
 
             const navigate = (newView, replace = false) => {
-                if (newView === view && !activeChat && !productModal && !showQrModal && !showTrackModal) return;
-                setView(newView); setAppliedPromo(null); setActiveChat(null); setProductModal(null); setShowQrModal(false); setShowTrackModal(false);
+                if (newView === view && !activeChat && !productModal && !showQrModal) return;
+                setView(newView);
+                setAppliedPromo(null); 
+                setActiveChat(null); 
+                setProductModal(null);
+                setShowQrModal(false);
                 const hash = newView;
                 if (replace) window.history.replaceState({ view: newView, chat: false }, '', `#${hash}`);
                 else window.history.pushState({ view: newView, chat: false }, '', `#${hash}`);
             };
 
-            const openChat = (chatDetails) => { setActiveChat(chatDetails); window.history.pushState({ view: view, chat: true, userId: chatDetails?.userId, userName: chatDetails?.userName }, '', `#chat`); };
+            const openChat = (chatDetails) => {
+                setActiveChat(chatDetails);
+                window.history.pushState({ view: view, chat: true, userId: chatDetails?.userId, userName: chatDetails?.userName }, '', `#chat`);
+            };
+
             const closeChat = () => window.history.back();
             const openProductModal = (product) => setProductModal(product);
             const closeProductModal = () => setProductModal(null);
 
-            const deleteOrder = async (orderId) => { if (!confirm(t.confirmDeleteOrder)) return; try { await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders`, orderId)); showToast(t.orderDeleted, 'success'); } catch (e) { showToast(t.err, 'error'); } };
-
             useEffect(() => { document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = lang; localStorage.setItem('app_lang', lang); }, [lang]);
             const toggleLang = () => setLang(prev => prev === 'ar' ? 'fr' : 'ar');
             
-            useEffect(() => { localStorage.setItem('artisanCart', JSON.stringify(cart.map(i => ({ id: i.id, name: i.name, basePrice: i.basePrice, price: i.price, qty: i.qty, image: i.image, selectedVariants: i.selectedVariants || [] })))); }, [cart]);
+            useEffect(() => { 
+                localStorage.setItem('artisanCart', JSON.stringify(cart.map(i => ({
+                    id: i.id, 
+                    name: i.name, 
+                    basePrice: i.basePrice, 
+                    price: i.price,
+                    qty: i.qty, 
+                    image: i.image, 
+                    selectedVariants: i.selectedVariants || [] 
+                }))));
+            }, [cart]);
 
             useEffect(() => {
-                const handlePopState = (event) => { const state = event.state; if (state && state.view) { setView(state.view); setActiveChat(state.chat ? { userId: state.userId, userName: state.userName } : null); } else { setView(getInitialView()); setActiveChat(null); } };
+                const handlePopState = (event) => {
+                    const state = event.state;
+                    if (state && state.view) {
+                        setView(state.view);
+                        setActiveChat(state.chat ? { userId: state.userId, userName: state.userName } : null);
+                    } else {
+                        setView(getInitialView());
+                        setActiveChat(null);
+                    }
+                };
                 window.addEventListener('popstate', handlePopState);
-                if (window.history.state === null) { const initialViewName = getInitialView(); window.history.replaceState({ view: initialViewName, chat: false }, '', `#${initialViewName}`); }
+                if (window.history.state === null) {
+                    const initialViewName = getInitialView();
+                    window.history.replaceState({ view: initialViewName, chat: false }, '', `#${initialViewName}`);
+                }
                 return () => window.removeEventListener('popstate', handlePopState);
             }, [view]);
 
             useEffect(() => {
                 const init = async () => {
                     if(!window.__firebase_config) return;
-                    try { const app = window.firebase.initializeApp(JSON.parse(window.__firebase_config)); const auth = window.firebase.getAuth(app); const firestore = window.firebase.getFirestore(app); setDb(firestore); if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token); window.firebase.onAuthStateChanged(auth, (u) => { setUser(u); setAuthLoading(false); }); } catch (e) { console.error("Firebase Init Error", e); }
-                }; init();
+                    try {
+                        const app = window.firebase.initializeApp(JSON.parse(window.__firebase_config));
+                        const auth = window.firebase.getAuth(app);
+                        const firestore = window.firebase.getFirestore(app);
+                        setDb(firestore);
+                        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
+                        window.firebase.onAuthStateChanged(auth, (u) => { setUser(u); setAuthLoading(false); });
+                    } catch (e) { console.error("Firebase Init Error", e); }
+                };
+                init();
             }, []);
 
             useEffect(() => {
                 if (!user || !db || !appId) return;
-                const unsubNotif = window.firebase.onSnapshot(window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), window.firebase.orderBy('date', 'desc')), (snap) => { const list = snap.docs.map(d => ({id: d.id, ...d.data()})); setNotifications(list); const fresh = list.find(n => !n.read && (Date.now() - (n.date?.toMillis?.() || 0)) < 5000); if (fresh) showToast(fresh.message[lang] || fresh.message, 'success'); });
-                const unsubOrders = window.firebase.onSnapshot(window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`), window.firebase.where('customerUserId', '==', user.uid), window.firebase.orderBy('createdAt', 'desc')), (snap) => setMyOrders(snap.docs.map(d => ({id: d.id, ...d.data()}))));
+                const notifRef = window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`);
+                const unsubNotif = window.firebase.onSnapshot(window.firebase.query(notifRef, window.firebase.orderBy('date', 'desc')), (snap) => {
+                    const list = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                    setNotifications(list);
+                    const fresh = list.find(n => !n.read && (Date.now() - (n.date?.toMillis?.() || 0)) < 5000);
+                    if (fresh) showToast(fresh.message[lang] || fresh.message, 'success');
+                });
+                const ordersRef = window.firebase.collection(db, `artifacts/${appId}/public/data/orders`);
+                const unsubOrders = window.firebase.onSnapshot(window.firebase.query(ordersRef, window.firebase.where('customerUserId', '==', user.uid), window.firebase.orderBy('createdAt', 'desc')), (snap) => setMyOrders(snap.docs.map(d => ({id: d.id, ...d.data()}))));
                 const unsubConfig = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (d) => { if(d.exists()) setUiConfig(d.data()); });
                 return () => { unsubNotif(); unsubOrders(); unsubConfig(); };
             }, [user, db, lang, appId]);
 
             const showToast = (msg, type='info') => { setToast({msg, type}); setTimeout(() => setToast(null), 3000); };
             
-            const addToCart = (p) => { setCart(prev => [...prev, { ...p, cartId: `${p.id}-${Date.now()}`, price: p.price, qty: p.qty, selectedVariants: p.selectedVariants || [] }]); showToast(t.addToCart); };
-            const updateQty = (cartId, delta) => { setCart(prev => prev.map(item => { if(item.cartId === cartId) { return {...item, qty: Math.max(0, item.qty + delta)}; } return item; }).filter(item => item.qty > 0)); };
-            const handleReorder = (order) => { const reorderedItems = order.items.map(item => ({ ...item, cartId: `${item.id}-${Date.now()}-${Math.random()}` })); setCart(prev => [...prev, ...reorderedItems]); showToast(t.addToCart); navigate('cart'); };
+            const addToCart = (p) => { 
+                setCart(prev => {
+                    const cartItemId = `${p.id}-${Date.now()}`; 
+                    const newItem = { ...p, cartId: cartItemId, price: p.price, qty: p.qty, selectedVariants: p.selectedVariants || [] };
+                    return [...prev, newItem];
+                }); 
+                showToast(t.addToCart); 
+            };
+
+            const updateQty = (cartId, delta) => {
+                setCart(prev => prev.map(item => {
+                    if(item.cartId === cartId) { const newQty = Math.max(0, item.qty + delta); return {...item, qty: newQty}; }
+                    return item;
+                }).filter(item => item.qty > 0));
+            };
+            
+            const handleReorder = (order) => {
+                const reorderedItems = order.items.map(item => ({ ...item, cartId: `${item.id}-${Date.now()}-${Math.random()}`, name: item.name, price: item.price, qty: item.qty, image: item.image, selectedVariants: item.selectedVariants || [] }));
+                setCart(prev => [...prev, ...reorderedItems]); showToast(t.addToCart); navigate('cart');
+            };
 
             const submitOrder = async (e) => {
                 e.preventDefault(); if (!user || !db) return showToast(t.conn, "error");
-                const formData = new FormData(e.target); const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, selectedWilayaZone); 
-                
-                // Sanitization
-                const safeName = formData.get('name').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                const safePhone = formData.get('phone').replace(/[^0-9+ ]/g, '');
-                const safeDetails = formData.get('orderDetails').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
+                const formData = new FormData(e.target);
+                const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, selectedWilayaZone); 
                 try {
-                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`), { customerUserId: user.uid, customerName: safeName, phone: safePhone, wilaya: formData.get('wilaya'), orderDetails: safeDetails, items: cart.map(i => ({ id: i.id, name: i.name, basePrice: i.basePrice, price: i.price, qty: i.qty, image: i.image, selectedVariants: i.selectedVariants || [] })), subtotal, total: finalTotal, discount, deliveryFee: delivery, promoCode: appliedPromo ? { code: appliedPromo.code, value: discount, type: appliedPromo.discountType } : null, status: 'En attente', createdAt: window.firebase.Timestamp.now() });
-                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { message: { fr: "Commande reçue!", ar: "تم استلام الطلب!" }, date: window.firebase.Timestamp.now(), read: false, type: 'info' });
+                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`), {
+                        customerUserId: user.uid, customerName: formData.get('name'), phone: formData.get('phone'), wilaya: formData.get('wilaya'), orderDetails: formData.get('orderDetails'), items: cart.map(i => ({ id: i.id, name: i.name, basePrice: i.basePrice, price: i.price, qty: i.qty, image: i.image, selectedVariants: i.selectedVariants || [] })), subtotal, total: finalTotal, discount, deliveryFee: delivery, promoCode: appliedPromo ? { code: appliedPromo.code, value: discount, type: appliedPromo.discountType } : null, status: 'En attente', createdAt: window.firebase.Timestamp.now()
+                    });
+                    let msg = { fr: "Commande reçue!", ar: "تم استلام الطلب!" };
+                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { message: msg, date: window.firebase.Timestamp.now(), read: false, type: 'info' });
                     setCart([]); setAppliedPromo(null); setPromoCodeInput(''); navigate('orders'); showToast(t.orderSent);
                 } catch (e) { showToast(t.err, "error"); }
             };
@@ -1110,7 +1502,8 @@
             const updateOrderStatus = async (orderId, newStatus, customerId) => {
                 if (!db || !appId) return;
                 try {
-                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders`, orderId), { status: newStatus }); showToast(t.statusUpdate);
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders`, orderId), { status: newStatus });
+                    showToast(t.statusUpdate);
                     if (customerId) {
                         const statusLabel = STATUS_OPTIONS.find(s => s.key === newStatus)?.label;
                         let msg = { fr: `Statut: ${statusLabel.fr}`, ar: `الحالة: ${statusLabel.ar}` }; if (newStatus === 'Prêt') msg = { fr: "Commande prête!", ar: "طلبك جاهز!" };
@@ -1120,27 +1513,20 @@
             };
             const markRead = async (id) => { if (db && appId) await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/users/${user.uid}/notifications`, id), {read: true}); };
             
-            const handleShareOrder = async (order) => {
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: `${t.appTitle} - Order #${order.id.slice(-4)}`,
-                            text: `Status: ${STATUS_OPTIONS.find(s=>s.key===order.status)?.label[lang]}\nTotal: ${order.total} ${t.currency}\nTrack it with ID: ${order.id}`,
-                        });
-                    } catch (error) { console.log('Sharing failed', error); }
-                } else { showToast("Sharing not supported", "error"); }
-            };
-
             if (authLoading) return <div className="h-screen flex items-center justify-center bg-slate-50"><div className="loader"></div></div>;
-            
-            // Render Auth Screen (or redirect to Privacy if that's the current view)
-            if (!user) {
-                if (view === 'privacy') return <div className="min-h-screen bg-slate-50 p-4 pt-10"><PrivacyScreen t={t} navigate={navigate} /></div>;
-                return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} navigate={navigate} />;
+
+            // --- Maintenance Mode Logic ---
+            if (UNDER_MAINTENANCE && !bypassMaintenance && (!user || user.email !== ADMIN_EMAIL)) {
+                return <MaintenanceScreen t={t} lang={lang} onAdminClick={() => setBypassMaintenance(true)} />;
             }
+
+            if (!user) return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} />;
             
             const unreadCount = notifications.filter(n => !n.read).length;
-            const filteredProducts = PRODUCTS_DATA.filter(p => p.name[lang].toLowerCase().includes(searchTerm.toLowerCase()));
+            const filteredProducts = PRODUCTS_DATA.filter(p => 
+                p.name[lang].toLowerCase().includes(searchTerm.toLowerCase()) && 
+                (activeCategory === 'all' || p.category === activeCategory)
+            );
 
             return (
                 <div key={lang} className="min-h-screen bg-slate-50 h-full relative">
@@ -1153,9 +1539,9 @@
                                 <div className="leading-tight hidden sm:block"><span className="block">{t.appTitle}</span><span className="text-blue-600 text-xs">{t.appSubtitle}</span></div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <button onClick={()=>navigate('favorites')} className="p-2 bg-slate-50 rounded-full hover:bg-slate-100 text-red-500"><Icon name="heart" size={20} fill={favorites.length > 0 ? "currentColor" : "none"}/></button>
-                                <button onClick={()=>navigate('notifications')} className="relative p-2 bg-slate-50 rounded-full hover:bg-slate-100"><Icon name="bell" className="text-slate-600"/>{unreadCount > 0 && <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full shadow border border-white"></span>}</button>
-                                <button onClick={toggleLang} className="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-full hover:bg-slate-200 transition">{lang === 'ar' ? 'EN' : 'عربي'}</button>
+                                <button aria-label="Favorites" onClick={()=>navigate('favorites')} className="p-2 bg-slate-50 rounded-full hover:bg-slate-100 text-red-500 transition"><Icon name="heart" size={20} fill={favorites.length > 0 ? "currentColor" : "none"}/></button>
+                                <button aria-label="Notifications" onClick={()=>navigate('notifications')} className="relative p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition"><Icon name="bell" className="text-slate-600"/>{unreadCount > 0 && <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full shadow border border-white"></span>}</button>
+                                <button aria-label="Language Toggle" onClick={toggleLang} className="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-full hover:bg-slate-200 transition">{lang === 'ar' ? 'EN' : 'عربي'}</button>
                             </div>
                         </div>
                     </nav>
@@ -1165,15 +1551,41 @@
                             <div className="animate-fadeIn pb-10">
                                 {uiConfig.showAnnouncement && <div className="bg-yellow-400 text-yellow-900 p-2 rounded-xl marquee-container font-black text-[10px] shadow-sm mb-4"><div className="animate-marquee inline-block">{lang === 'ar' ? uiConfig.announcementAr : uiConfig.announcementFr}</div></div>}
                                 
-                                <div className="mb-6 relative flex items-center gap-2">
+                                <div className="mb-4 relative flex items-center gap-2">
                                     <div className="relative flex-1">
-                                        <input type="text" placeholder={isListening ? t.listening : t.search} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full p-4 pl-12 bg-white rounded-2xl shadow-sm border outline-none transition-all ${isListening ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-100 focus:ring-2 focus:ring-blue-500'}`} />
+                                        <input 
+                                            aria-label="Search"
+                                            type="text" 
+                                            placeholder={isListening ? t.listening : t.search} 
+                                            value={searchTerm} 
+                                            onChange={(e) => setSearchTerm(e.target.value)} 
+                                            className={`w-full p-4 pl-12 bg-white rounded-2xl shadow-sm border outline-none transition-all ${isListening ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-100 focus:ring-2 focus:ring-blue-500'}`}
+                                        />
                                         <Icon name="search" className="absolute left-4 top-4 text-slate-400" size={20}/>
                                     </div>
-                                    <button onClick={startVoiceSearch} className={`p-4 rounded-2xl shadow-sm transition-all flex items-center justify-center ${isListening ? 'bg-red-500 text-white animate-pulse shadow-red-500/30' : 'bg-white text-blue-600 border border-slate-100 hover:bg-slate-50'}`}><Icon name="mic" size={24}/></button>
+                                    <button 
+                                        aria-label="Voice Search"
+                                        onClick={startVoiceSearch} 
+                                        className={`p-4 rounded-2xl shadow-sm transition-all flex items-center justify-center ${isListening ? 'bg-red-500 text-white animate-pulse shadow-red-500/30' : 'bg-white text-blue-600 border border-slate-100 hover:bg-slate-50'}`}
+                                    >
+                                        <Icon name="mic" size={24}/>
+                                    </button>
                                 </div>
 
-                                {!searchTerm && (
+                                {/* Categories Filter */}
+                                <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2">
+                                    {[{id:'all', name:t.all, icon:'grid'}, {id:'cards', name:t.catCards, icon:'credit-card'}, {id:'flyers', name:t.catFlyers, icon:'file-text'}, {id:'goodies', name:t.catGoodies, icon:'gift'}].map(cat => (
+                                        <button 
+                                            key={cat.id} 
+                                            onClick={() => setActiveCategory(cat.id)}
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-sm ${activeCategory === cat.id ? 'bg-blue-600 text-white shadow-blue-600/30' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
+                                        >
+                                            <Icon name={cat.icon} size={14} /> {cat.name}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {!searchTerm && activeCategory === 'all' && (
                                     <>
                                         <StoriesBar stories={uiConfig.stories} />
                                         <div className="bg-slate-900 text-white rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
@@ -1182,7 +1594,7 @@
                                                 <p className="text-slate-300 text-sm mb-4">{t.heroSubtitle}</p>
                                                 <div className="flex gap-2">
                                                     <button onClick={()=>navigate('cart')} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg transition">{t.orderNow}</button>
-                                                    <button onClick={()=>setShowTrackModal(true)} className="bg-white text-slate-900 px-4 py-2 rounded-lg font-bold text-sm shadow-lg transition flex items-center gap-1 hover:bg-slate-100"><Icon name="scan" size={16}/> {t.trackOrder}</button>
+                                                    <button onClick={()=>setShowQrModal(true)} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-bold text-sm transition border border-white/20 flex items-center gap-1"><Icon name="qr-code" size={16}/> {t.qrTool}</button>
                                                 </div>
                                             </div>
                                             <Icon name="layers" size={140} className={`absolute -bottom-8 text-white opacity-5 rotate-12 ${lang==='ar' ? '-left-8' : '-right-8'}`}/>
@@ -1193,58 +1605,151 @@
                                                 <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><Icon name="tag" size={18} className="text-orange-500"/> {t.specialOffers}</h3>
                                                 <div className="flex overflow-x-auto gap-4 hide-scrollbar pb-2">
                                                     {uiConfig.offers.map(offer => (
-                                                        <div key={offer.id} className="min-w-[260px] bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden flex-shrink-0 group"><div className="h-32 bg-slate-100 relative">{offer.image ? (<img src={offer.image} className="w-full h-full object-cover" />) : (<div className="w-full h-full flex items-center justify-center bg-orange-100 text-orange-400"><Icon name="image" size={32}/></div>)}<span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">{offer.price}</span></div><div className="p-3"><h4 className="font-bold text-sm truncate">{offer.title}</h4><p className="text-xs text-slate-500 line-clamp-2 mt-1">{offer.description}</p>{offer.endDate && (<div className="mt-2 flex items-center justify-between"><span className="text-[10px] text-gray-400">{t.endsIn}:</span><CountdownTimer targetDate={offer.endDate} t={t} /></div>)}<button onClick={()=>handleGetOffer(offer)} className="w-full mt-3 bg-slate-900 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-700 transition">{t.getOffer}</button></div></div>
+                                                        <div key={offer.id} className="min-w-[260px] bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden flex-shrink-0 group">
+                                                            <div className="h-32 bg-slate-100 relative">
+                                                                {offer.image ? (
+                                                                    <img src={offer.image} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center bg-orange-100 text-orange-400">
+                                                                        <Icon name="image" size={32}/>
+                                                                    </div>
+                                                                )}
+                                                                <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">{offer.price}</span>
+                                                            </div>
+                                                            <div className="p-3">
+                                                                <h4 className="font-bold text-sm truncate">{offer.title}</h4>
+                                                                <p className="text-xs text-slate-500 line-clamp-2 mt-1">{offer.description}</p>
+                                                                {offer.endDate && (
+                                                                    <div className="mt-2 flex items-center justify-between">
+                                                                        <span className="text-[10px] text-gray-400">{t.endsIn}:</span>
+                                                                        <CountdownTimer targetDate={offer.endDate} t={t} />
+                                                                    </div>
+                                                                )}
+                                                                <button onClick={()=>handleGetOffer(offer)} className="w-full mt-3 bg-slate-900 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-700 transition">{t.getOffer}</button>
+                                                            </div>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         )}
 
                                         <div className="flex overflow-x-auto gap-4 mb-8 hide-scrollbar">
-                                            {FEATURED_PRODUCTS.map(f => (<div key={f.id} onClick={() => navigate(f.link)} className={`min-w-[280px] flex-shrink-0 p-4 rounded-xl shadow-lg border-2 cursor-pointer transition hover:scale-[1.02] ${f.bg} border-dashed ${f.color.replace('text', 'border')}`}><div className="flex items-center gap-3"><div className={`w-8 h-8 rounded-full flex items-center justify-center ${f.color} ${f.bg}`.replace('-50', '-200')}><Icon name={f.icon} size={18}/></div><p className={`font-bold text-sm ${f.color}`}>{f.name[lang]}</p></div></div>))}
+                                            {FEATURED_PRODUCTS.map(f => (
+                                                <div key={f.id} onClick={() => navigate(f.link)} className={`min-w-[280px] flex-shrink-0 p-4 rounded-xl shadow-lg border-2 cursor-pointer transition hover:scale-[1.02] ${f.bg} border-dashed ${f.color.replace('text', 'border')}`}>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${f.color} ${f.bg}`.replace('-50', '-200')}><Icon name={f.icon} size={18}/></div>
+                                                        <p className={`font-bold text-sm ${f.color}`}>{f.name[lang]}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </>
                                 )}
 
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-slate-700 flex items-center gap-2"><Icon name="grid" size={18}/> {searchTerm ? t.search : t.services}</h3>
-                                    <button onClick={()=>setShowQrModal(true)} className="text-xs bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold flex items-center gap-1 hover:bg-slate-300"><Icon name="qr-code" size={14}/> {t.qrTool}</button>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-bold text-slate-700 flex items-center gap-2"><Icon name="grid" size={18}/> {searchTerm ? t.search : (activeCategory !== 'all' ? t.categories : t.services)}</h3>
                                 </div>
-                                
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {filteredProducts.map(p => (
-                                        <div key={p.id} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition group relative">
-                                            <button onClick={(e) => { e.stopPropagation(); toggleFavorite(p); }} className="absolute top-2 right-2 z-10 p-1.5 bg-white/80 rounded-full shadow-sm"><Icon name="heart" size={16} className={favorites.some(f=>f.id===p.id) ? "text-red-500" : "text-slate-400"} fill={favorites.some(f=>f.id===p.id) ? "currentColor" : "none"}/></button>
-                                            <div className="relative"><ImageWithSkeleton src={p.image} className={`w-full h-32 rounded-lg mb-3 bg-slate-100 ${p.comingSoon ? 'grayscale' : ''}`}/>{p.badge && <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full text-white shadow-sm ${p.badge === 'bestSeller' ? 'bg-orange-500' : p.badge === 'soon' ? 'bg-slate-500' : 'bg-blue-500'}`}>{t[p.badge]}</span>}</div>
-                                            <h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight">{p.name[lang]}</h3>
-                                            <div className="mt-auto flex justify-between items-center pt-2"><span className={`text-blue-700 font-bold text-sm ${p.comingSoon ? 'opacity-50' : ''}`}>{p.comingSoon ? '---' : `${p.basePrice} ${t.currency} +`}</span><button onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2 rounded-full shadow-sm transition ${p.comingSoon ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-100 text-slate-700 hover:bg-blue-600 hover:text-white'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button></div>
+                                        <div key={p.id} className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex flex-col hover:shadow-lg transition-all group relative">
+                                            <button aria-label="Add to Favorites" onClick={(e) => { e.stopPropagation(); toggleFavorite(p); }} className="absolute top-2 right-2 z-10 p-1.5 bg-white/80 rounded-full shadow-sm hover:scale-110 transition-transform"><Icon name="heart" size={16} className={favorites.some(f=>f.id===p.id) ? "text-red-500 fill-red-500" : "text-slate-400"}/></button>
+                                            <div className="relative overflow-hidden rounded-xl mb-3"><ImageWithSkeleton src={p.image} className={`w-full h-32 group-hover:scale-105 transition-transform duration-300 bg-slate-100 ${p.comingSoon ? 'grayscale' : ''}`}/>{p.badge && <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full text-white shadow-sm ${p.badge === 'bestSeller' ? 'bg-orange-500' : p.badge === 'soon' ? 'bg-slate-500' : 'bg-blue-500'}`}>{t[p.badge]}</span>}</div>
+                                            <h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight group-hover:text-blue-600 transition-colors">{p.name[lang]}</h3>
+                                            <div className="mt-auto flex justify-between items-center pt-2"><span className={`text-blue-700 font-black text-sm ${p.comingSoon ? 'opacity-50' : ''}`}>{p.comingSoon ? '---' : `${p.basePrice} ${t.currency} +`}</span><button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2 rounded-xl shadow-sm transition ${p.comingSoon ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-100 text-slate-700 hover:bg-blue-600 hover:text-white hover:shadow-blue-600/30'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button></div>
                                         </div>
                                     ))}
+                                    {filteredProducts.length === 0 && <div className="col-span-2 text-center text-slate-400 py-10 text-sm">لا توجد منتجات مطابقة.</div>}
                                 </div>
                             </div>
                         )}
                         {view === 'favorites' && (
-                            <div className="animate-fadeIn max-w-md mx-auto pb-10"><h2 className="font-bold text-xl mb-4 flex items-center gap-2"><Icon name="heart" className="text-red-500" fill="currentColor"/> {t.favorites}</h2>{favorites.length === 0 ? <div className="text-center py-20 text-gray-400"><Icon name="heart-off" size={40} className="mx-auto mb-2"/>{t.noFavorites}</div> : (<div className="grid grid-cols-2 gap-4">{favorites.map(p => (<div key={p.id} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col relative"><button onClick={() => toggleFavorite(p)} className="absolute top-2 right-2 z-10 p-1.5 bg-white/80 rounded-full text-red-500"><Icon name="x" size={14}/></button><ImageWithSkeleton src={p.image} className="w-full h-32 rounded-lg mb-3 bg-slate-100"/><h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight">{p.name[lang]}</h3><div className="mt-auto flex justify-between items-center pt-2"><span className="text-blue-700 font-bold text-sm">{p.basePrice} {t.currency}</span><button onClick={()=>openProductModal(p)} className="bg-blue-50 text-blue-600 p-2 rounded-full hover:bg-blue-600 hover:text-white transition"><Icon name="shopping-cart" size={16}/></button></div></div>))}</div>)}</div>
+                            <div className="animate-fadeIn max-w-md mx-auto pb-10">
+                                <h2 className="font-bold text-xl mb-4 flex items-center gap-2"><Icon name="heart" className="text-red-500"/> {t.favorites}</h2>
+                                {favorites.length === 0 ? <div className="text-center py-20 text-gray-400"><Icon name="heart-off" size={40} className="mx-auto mb-2"/>{t.noFavorites}</div> : (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {favorites.map(p => (
+                                            <div key={p.id} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col relative group">
+                                                <button aria-label="Remove from Favorites" onClick={() => toggleFavorite(p)} className="absolute top-2 right-2 z-10 p-1.5 bg-white/80 rounded-full text-red-500 hover:bg-red-50 transition"><Icon name="x" size={14}/></button>
+                                                <ImageWithSkeleton src={p.image} className="w-full h-32 rounded-lg mb-3 bg-slate-100"/>
+                                                <h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight group-hover:text-blue-600 transition">{p.name[lang]}</h3>
+                                                <div className="mt-auto flex justify-between items-center pt-2"><span className="text-blue-700 font-bold text-sm">{p.basePrice} {t.currency}</span><button aria-label="Add to Cart" onClick={()=>openProductModal(p)} className="bg-blue-50 text-blue-600 p-2 rounded-xl hover:bg-blue-600 hover:text-white transition"><Icon name="shopping-cart" size={16}/></button></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         )}
                         {view === 'cart' && (
                             <div className="animate-fadeIn max-w-md mx-auto pb-10">
-                                <h2 className="font-bold text-xl mb-4 flex items-center gap-2"><Icon name="shopping-cart"/> {t.cart}</h2>
-                                {cart.length === 0 ? <div className="text-center py-10 text-gray-400"><Icon name="shopping-bag" size={40} className="mx-auto mb-2"/>{t.emptyCart}</div> : (
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="font-bold text-xl flex items-center gap-2"><Icon name="shopping-cart"/> {t.cart}</h2>
+                                    {cart.length > 0 && <button onClick={() => setCart([])} className="text-red-500 text-xs font-bold hover:underline flex items-center gap-1"><Icon name="trash" size={14}/> {t.clearCart}</button>}
+                                </div>
+                                {cart.length === 0 ? <div className="text-center py-10 text-gray-400"><Icon name="shopping-bag" size={40} className="mx-auto mb-2 opacity-50"/>{t.emptyCart}</div> : (
                                     <div className="space-y-4">
-                                        {cart.map((i) => (<div key={i.cartId} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex gap-3 items-center"><ImageWithSkeleton src={i.image} className="w-16 h-16 rounded-lg object-cover bg-slate-100"/><div className="flex-1"><h4 className="font-bold text-sm text-slate-800">{i.name[lang]}</h4><div className="text-xs text-slate-500 mb-2">{i.price} {t.currency} {i.selectedVariants && i.selectedVariants.length > 0 && <span className="font-bold text-blue-600">(مخصص)</span>}{i.selectedVariants && i.selectedVariants.map(v => <span key={v.id} className="block text-[10px] text-slate-400 truncate">{v.label}: {v.value}</span>)}</div><div className="flex items-center gap-3"><button onClick={()=>updateQty(i.cartId, -1)} className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">-</button><span className="text-sm font-bold w-4 text-center">{i.qty}</span><button onClick={()=>updateQty(i.cartId, 1)} className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">+</button></div></div><div className="text-right"><div className="font-bold text-blue-700 text-sm mb-2">{i.price * i.qty} {t.currency}</div><button onClick={()=>updateQty(i.cartId, -100)} className="text-gray-400 hover:text-red-500"><Icon name="trash-2" size={16}/></button></div></div>))}
+                                        {cart.map((i) => (
+                                            <div key={i.cartId} className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex gap-3 items-center hover:border-blue-200 transition">
+                                                <ImageWithSkeleton src={i.image} className="w-16 h-16 rounded-xl object-cover bg-slate-100"/>
+                                                <div className="flex-1">
+                                                    <h4 className="font-bold text-sm text-slate-800">{i.name[lang]}</h4>
+                                                    <div className="text-xs text-slate-500 mb-2">
+                                                        {i.price} {t.currency} {i.selectedVariants && i.selectedVariants.length > 0 && <span className="font-bold text-blue-600">(مخصص)</span>}
+                                                        {i.selectedVariants && i.selectedVariants.map(v => <span key={v.id} className="block text-[10px] text-slate-400 truncate">{v.label}: {v.value}</span>)}
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <button aria-label="Decrease Quantity" onClick={()=>updateQty(i.cartId, -1)} className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition">-</button>
+                                                        <span className="text-sm font-bold w-4 text-center">{i.qty}</span>
+                                                        <button aria-label="Increase Quantity" onClick={()=>updateQty(i.cartId, 1)} className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition">+</button>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="font-bold text-blue-700 text-sm mb-2">{i.price * i.qty} {t.currency}</div>
+                                                    <button aria-label="Remove Item" onClick={()=>updateQty(i.cartId, -100)} className="text-gray-400 hover:text-red-500 p-1 rounded transition"><Icon name="trash-2" size={16}/></button>
+                                                </div>
+                                            </div>
+                                        ))}
                                         
                                         {(() => {
                                             const { subtotal, discount, finalTotal, delivery } = calculateTotal(cart, appliedPromo, selectedWilayaZone); 
                                             return (
-                                                <div className="bg-white p-5 rounded-xl shadow-lg border border-slate-100 mt-4">
-                                                    <div className="space-y-3 pb-4 border-b border-slate-100 mb-4"><h4 className="font-bold text-slate-700">{t.promoPh}</h4>{appliedPromo ? (<div className="bg-green-50 border border-green-200 text-green-700 font-bold p-3 rounded-xl flex justify-between items-center text-sm"><span>{appliedPromo.code} - ({t.discount}: {discount} {t.currency})</span><button onClick={() => { setAppliedPromo(null); setPromoCodeInput(''); }} className="text-red-500 hover:text-red-700 p-1"><Icon name="x" size={16} /></button></div>) : (<div className="flex gap-2"><input type="text" value={promoCodeInput} onChange={e => setPromoCodeInput(e.target.value)} placeholder={t.promoPh} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr uppercase" /><button onClick={() => applyPromoCode(promoCodeInput)} disabled={!promoCodeInput.trim()} className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-3 rounded-lg font-bold text-sm transition disabled:opacity-50">{t.promoApply}</button></div>)}</div>
-                                                    <div className="space-y-2 text-sm mb-2 text-slate-600"><div className="flex justify-between"><span>{t.subtotal}</span><span>{subtotal} {t.currency}</span></div>{delivery > 0 && <div className="flex justify-between text-slate-800 font-bold"><span>{t.deliveryFee}</span><span>+ {delivery} {t.currency}</span></div>}{discount > 0 && <div className="flex justify-between text-green-600 font-bold"><span>{t.discount}</span><span>- {discount} {t.currency}</span></div>}</div>
-                                                    <div className="flex justify-between font-bold border-t border-slate-200 pt-3"><span>{t.total}</span><span className="text-xl text-blue-800">{finalTotal} {t.currency}</span></div>
+                                                <div className="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 mt-4">
+                                                    <div className="space-y-3 pb-4 border-b border-slate-100 mb-4">
+                                                        <h4 className="font-bold text-slate-700 text-sm">{t.promoPh}</h4>
+                                                        {appliedPromo ? (
+                                                            <div className="bg-green-50 border border-green-200 text-green-700 font-bold p-3 rounded-xl flex justify-between items-center text-sm">
+                                                                <span>{appliedPromo.code} - ({t.discount}: {discount} {t.currency})</span>
+                                                                <button aria-label="Remove Promo" onClick={() => { setAppliedPromo(null); setPromoCodeInput(''); }} className="text-red-500 hover:text-red-700 p-1"><Icon name="x" size={16} /></button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex gap-2">
+                                                                <input aria-label="Promo Code" type="text" value={promoCodeInput} onChange={e => setPromoCodeInput(e.target.value)} placeholder={t.promoPh} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr uppercase transition" />
+                                                                <button onClick={() => applyPromoCode(promoCodeInput)} disabled={!promoCodeInput.trim()} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-3 rounded-xl font-bold text-sm transition disabled:opacity-50 shadow-md">{t.promoApply}</button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="space-y-2 text-sm mb-2 text-slate-600">
+                                                        <div className="flex justify-between"><span>{t.subtotal}</span><span>{subtotal} {t.currency}</span></div>
+                                                        {delivery > 0 && <div className="flex justify-between text-slate-800 font-bold"><span>{t.deliveryFee}</span><span>+ {delivery} {t.currency}</span></div>}
+                                                        {discount > 0 && <div className="flex justify-between text-green-600 font-bold"><span>{t.discount}</span><span>- {discount} {t.currency}</span></div>}
+                                                    </div>
+                                                    <div className="flex justify-between font-bold border-t border-slate-200 pt-3"><span>{t.total}</span><span className="text-2xl text-blue-800 font-black">{finalTotal} {t.currency}</span></div>
+                                                    
                                                     <form onSubmit={submitOrder} className="space-y-3 mt-5">
-                                                        <input required name="name" defaultValue={user.displayName || ''} placeholder={t.namePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500"/>
-                                                        <input required name="phone" type="tel" placeholder={t.phonePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500"/>
-                                                        <div className="relative"><select name="wilaya" required onChange={(e) => { const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === e.target.value); setSelectedWilayaZone(w ? w.zone : null); }} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 appearance-none text-slate-800 bg-white"><option value="">{t.selectWilaya}</option>{WILAYAS.map((w) => <option key={w.id} value={`${w.id} - ${w.name}`} className="text-black">{w.id} - {w.name}</option>)}</select><Icon name="chevron-down" className="absolute left-3 top-3.5 text-slate-400 pointer-events-none" size={16}/></div>
-                                                        <textarea required name="orderDetails" placeholder={t.orderDetails} rows="3" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500"></textarea>
-                                                        <button className="w-full bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg font-bold shadow-lg transition flex justify-center gap-2" disabled={cart.length === 0}><Icon name="check" size={18}/> {t.confirm}</button>
+                                                        <input aria-label="Name" required name="name" defaultValue={user.displayName || ''} placeholder={t.namePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+                                                        <input aria-label="Phone" required name="phone" type="tel" placeholder={t.phonePh} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition dir-ltr"/>
+                                                        <div className="relative">
+                                                            <select aria-label="Wilaya" name="wilaya" required onChange={(e) => {
+                                                                const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === e.target.value);
+                                                                setSelectedWilayaZone(w ? w.zone : null);
+                                                            }} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none text-slate-800">
+                                                                <option value="">{t.selectWilaya}</option>
+                                                                {WILAYAS.map((w) => <option key={w.id} value={`${w.id} - ${w.name}`} className="text-black">{w.id} - {w.name}</option>)}
+                                                            </select>
+                                                            <Icon name="chevron-down" className="absolute left-3 top-3.5 text-slate-400 pointer-events-none" size={16}/>
+                                                        </div>
+                                                        <textarea aria-label="Order Details" required name="orderDetails" placeholder={t.orderDetails} rows="3" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"></textarea>
+                                                        <button className="w-full bg-green-600 hover:bg-green-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-green-600/30 transition flex justify-center gap-2 active:scale-95" disabled={cart.length === 0}><Icon name="check" size={18}/> {t.confirm}</button>
                                                     </form>
                                                 </div>
                                             );
@@ -1255,24 +1760,23 @@
                         )}
                         {view === 'orders' && (
                             <div className="animate-fadeIn space-y-4 max-w-md mx-auto pb-10">
-                                <div className="flex justify-between items-center mb-2">
-                                    <h2 className="font-bold text-xl">{t.myOrders}</h2>
-                                    <button onClick={()=>setShowTrackModal(true)} className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1"><Icon name="scan" size={14}/> {t.trackOrder}</button>
-                                </div>
-
+                                <h2 className="font-bold text-xl mb-2">{t.myOrders}</h2>
                                 {myOrders.length === 0 ? <p className="text-center text-gray-400 py-10">{t.noOrders}</p> : myOrders.map(o => {
                                     const statusObj = STATUS_OPTIONS.find(s => s.key === o.status) || STATUS_OPTIONS[0];
                                     const isExpanded = expandedOrderId === o.id;
                                     const currentStatusIndex = STATUS_OPTIONS.findIndex(s => s.key === o.status);
                                     
-                                    const orderDate = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-                                    const estDate = new Date(orderDate); estDate.setDate(estDate.getDate() + 3);
-                                    
                                     return (
-                                        <div key={o.id} className="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
+                                        <div key={o.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition">
                                             <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-slate-50/50">
-                                                <div><span className="font-bold text-lg text-slate-800">#{o.id.slice(-4)}</span><span className="text-[10px] text-gray-400 block">{orderDate.toISOString().split('T')[0]}</span></div>
-                                                <div className="text-right"><div className="font-bold text-blue-700">{o.total} {t.currency}</div><span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${STATUS_COLORS[o.status]}`}>{statusObj.label[lang]}</span></div>
+                                                <div>
+                                                    <span className="font-bold text-lg text-slate-800">#{o.id.slice(-4)}</span>
+                                                    <span className="text-[10px] text-gray-400 block">{o.createdAt?.toDate ? o.createdAt.toDate().toISOString().split('T')[0] : '—'}</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="font-bold text-blue-700 text-lg">{o.total} {t.currency}</div>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${STATUS_COLORS[o.status]}`}>{statusObj.label[lang]}</span>
+                                                </div>
                                             </div>
                                             
                                             <div className="px-6 py-4">
@@ -1281,34 +1785,48 @@
                                                         const isCompleted = idx <= currentStatusIndex;
                                                         const isCurrent = idx === currentStatusIndex;
                                                         return (
-                                                            <div key={step.key} className="relative pl-4"><div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 transition-all ${isCompleted ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'}`}>{isCompleted && <Icon name="check" size={10} className="text-white absolute top-0.5 left-0.5"/>}</div><p className={`text-xs font-bold transition-all ${isCurrent ? 'text-blue-700 scale-105' : isCompleted ? 'text-slate-700' : 'text-slate-300'}`}>{step.label[lang]}</p></div>
+                                                            <div key={step.key} className="relative pl-4">
+                                                                <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 transition-all ${isCompleted ? 'bg-blue-600 border-blue-600 shadow-sm' : 'bg-white border-slate-300'}`}>
+                                                                    {isCompleted && <Icon name="check" size={10} className="text-white absolute top-0.5 left-0.5"/>}
+                                                                </div>
+                                                                <p className={`text-xs font-bold transition-all ${isCurrent ? 'text-blue-700 scale-105' : isCompleted ? 'text-slate-700' : 'text-slate-300'}`}>
+                                                                    {step.label[lang]}
+                                                                </p>
+                                                            </div>
                                                         );
                                                     })}
                                                 </div>
                                             </div>
 
                                             <div className="px-4 pb-4 flex justify-between items-center pt-2 border-t border-slate-50">
-                                                <button onClick={() => setExpandedOrderId(isExpanded ? null : o.id)} className="text-xs text-slate-500 font-bold flex items-center gap-1 hover:text-slate-800 transition">
+                                                <button aria-label="Toggle Details" onClick={() => setExpandedOrderId(isExpanded ? null : o.id)} className="text-xs text-slate-500 font-bold flex items-center gap-1 hover:text-slate-800 transition">
                                                     {isExpanded ? <Icon name="chevron-up" size={14}/> : <Icon name="chevron-down" size={14}/>} {isExpanded ? 'Masquer' : t.showDetails}
                                                 </button>
                                                 <div className="flex gap-2">
-                                                    {o.status === 'En attente' && (<button onClick={() => deleteOrder(o.id)} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 transition flex items-center gap-1"><Icon name="x-circle" size={14}/> {t.cancelOrder}</button>)}
-                                                    <button onClick={() => handleReorder(o)} className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-bold hover:bg-blue-100 transition flex items-center gap-1"><Icon name="rotate-ccw" size={14}/> {t.reOrder}</button>
+                                                    {o.status === 'En attente' && (
+                                                        <button onClick={() => deleteOrder(o.id)} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1">
+                                                            <Icon name="x-circle" size={14}/> {t.cancelOrder}
+                                                        </button>
+                                                    )}
+                                                    <button onClick={() => handleReorder(o)} className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl font-bold hover:bg-blue-100 transition flex items-center gap-1">
+                                                        <Icon name="rotate-ccw" size={14}/> {t.reOrder}
+                                                    </button>
                                                 </div>
                                             </div>
 
                                             {isExpanded && (
                                                 <div className="bg-slate-50 p-4 border-t border-slate-100 text-xs animate-slideUp">
                                                     <p className="font-bold text-slate-700 mb-2">{t.details}:</p>
-                                                    <ul className="space-y-2 mb-3">{o.items.map((item, idx) => (<li key={idx} className="flex justify-between border-b border-slate-200 pb-1 last:border-0"><span>{item.qty}x {item.name[lang]}</span><span className="font-mono">{item.price * item.qty} {t.currency}</span></li>))}</ul>
+                                                    <ul className="space-y-2 mb-3">
+                                                        {o.items.map((item, idx) => (
+                                                            <li key={idx} className="flex justify-between border-b border-slate-200 pb-1 last:border-0">
+                                                                <span>{item.qty}x {item.name[lang]}</span>
+                                                                <span className="font-mono">{item.price * item.qty} {t.currency}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
                                                     {o.deliveryFee > 0 && <div className="flex justify-between text-slate-500 pt-1 border-t border-slate-200"><span>{t.deliveryFee}</span><span>{o.deliveryFee} {t.currency}</span></div>}
-                                                    
-                                                    <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-                                                        <div className="flex items-center gap-1 text-slate-500 font-medium"><Icon name="truck" size={14}/> <span>{t.estDelivery}: {estDate.toLocaleDateString()}</span></div>
-                                                        <button onClick={()=>handleShareOrder(o)} className="text-blue-600 bg-blue-100 px-2 py-1 rounded font-bold flex items-center gap-1"><Icon name="share-2" size={12}/> {t.shareOrder}</button>
-                                                    </div>
-
-                                                    <p className="mt-3 text-slate-500 italic bg-white p-2 rounded border border-slate-200">{o.orderDetails || "No additional notes."}</p>
+                                                    <p className="mt-3 text-slate-500 italic bg-white p-2 rounded-lg border border-slate-200">{o.orderDetails || "No additional notes."}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -1319,27 +1837,25 @@
                         {view === 'notifications' && (
                             <div className="animate-fadeIn max-w-md mx-auto pb-10"><h2 className="font-bold text-xl mb-4">{t.notifications}</h2>{notifications.length === 0 ? <p className="text-center text-gray-400 py-10">{t.noNotifs}</p> : (<div className="space-y-3">{notifications.map(n => (<div key={n.id} onClick={()=>markRead(n.id)} className={`p-4 rounded-xl border cursor-pointer transition ${n.read ? 'bg-white border-slate-100' : 'bg-blue-50 border-blue-100 shadow-sm'}`}><div className="flex gap-3"><div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read ? 'bg-slate-300' : 'bg-blue-500'}`}></div><div><p className={`text-sm ${!n.read ? 'font-bold text-slate-900' : 'text-slate-600'}`}>{typeof n.message === 'object' ? n.message[lang] : n.message}</p><span className="text-[10px] text-slate-400 mt-1 block dir-ltr text-right">{n.date?.toDate ? n.date.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span></div></div></div>))}</div>)}</div>
                         )}
-                        {view === 'privacy' && <PrivacyScreen t={t} navigate={navigate} />}
-                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} myOrders={myOrders} />}
+                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} />}
                         {view === 'admin' && (isAdmin ? <AdminDashboard db={db} appId={appId} updateOrderStatus={updateOrderStatus} lang={lang} t={t} onOpenChat={openChat} showToast={showToast} /> : <div className="text-center py-20 text-red-500 font-bold">{t.accessDenied}</div>)}
                     </main>
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
-                    {showTrackModal && <TrackOrderModal db={db} appId={appId} t={t} lang={lang} onClose={()=>setShowTrackModal(false)} />}
 
                     <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 flex justify-between px-2 py-3 pb-safe z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] safe-bottom">
-                        <button onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1 nav-btn ${view==='home'?'active text-slate-900':'text-slate-400'}`}><Icon name="home" size={22} fill={view==='home'?"currentColor":"none"}/><span className="text-[10px] font-bold">{t.home}</span></button>
-                        <button onClick={()=>navigate('orders')} className={`flex flex-col items-center gap-1 nav-btn ${view==='orders'?'active text-slate-900':'text-slate-400'}`}><Icon name="list-checks" size={22}/><span className="text-[10px] font-bold">{t.orders}</span></button>
-                        <button onClick={()=>navigate('cart')} className={`flex flex-col items-center gap-1 nav-btn ${view==='cart'?'active text-slate-900':'text-slate-400'}`}><div className="relative"><Icon name="shopping-cart" size={22} fill={view==='cart'?"currentColor":"none"}/>{cart.length > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white"></span>}</div><span className="text-[10px] font-bold">{t.cart}</span></button>
-                        <button onClick={()=>navigate('profile')} className={`flex flex-col items-center gap-1 nav-btn ${(view==='profile'||view==='privacy')?'active text-slate-900':'text-slate-400'}`}><Icon name="user" size={22} fill={(view==='profile'||view==='privacy')?"currentColor":"none"}/><span className="text-[10px] font-bold">{t.profile}</span></button>
-                        {isAdmin && <button onClick={()=>navigate('admin')} className={`flex flex-col items-center gap-1 nav-btn ${view==='admin'?'active text-slate-900':'text-slate-400'}`}><Icon name="shield" size={22}/><span className="text-[10px] font-bold">{t.admin}</span></button>}
+                        <button aria-label="Home" onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1 nav-btn ${view==='home'?'active text-slate-900':'text-slate-400'}`}><Icon name="home" size={22}/><span className="text-[10px] font-bold">{t.home}</span></button>
+                        <button aria-label="Orders" onClick={()=>navigate('orders')} className={`flex flex-col items-center gap-1 nav-btn ${view==='orders'?'active text-slate-900':'text-slate-400'}`}><Icon name="list-checks" size={22}/><span className="text-[10px] font-bold">{t.orders}</span></button>
+                        <button aria-label="Cart" onClick={()=>navigate('cart')} className={`flex flex-col items-center gap-1 nav-btn ${view==='cart'?'active text-slate-900':'text-slate-400'}`}><div className="relative"><Icon name="shopping-cart" size={22}/>{cart.length > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white"></span>}</div><span className="text-[10px] font-bold">{t.cart}</span></button>
+                        <button aria-label="Profile" onClick={()=>navigate('profile')} className={`flex flex-col items-center gap-1 nav-btn ${view==='profile'?'active text-slate-900':'text-slate-400'}`}><Icon name="user" size={22}/><span className="text-[10px] font-bold">{t.profile}</span></button>
+                        {isAdmin && <button aria-label="Admin Panel" onClick={()=>navigate('admin')} className={`flex flex-col items-center gap-1 nav-btn ${view==='admin'?'active text-slate-900':'text-slate-400'}`}><Icon name="shield" size={22}/><span className="text-[10px] font-bold">{t.admin}</span></button>}
                     </div>
 
                     {!isAdmin && !activeChat && view !== 'admin' && (
                         <div className="fixed bottom-24 right-4 flex flex-col gap-3 z-40">
-                             <a href="https://wa.me/213549179000" target="_blank" className="bg-green-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center"><Icon name="phone" size={24} fill="white" className="text-white"/></a>
-                            <button onClick={() => openChat({ userId: user.uid, userName: user.displayName })} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-full shadow-2xl shadow-blue-600/40 animate-slideUp hover:scale-110 transition-transform flex items-center gap-2 group"><Icon name="message-circle" size={24} fill="currentColor" /></button>
+                             <a aria-label="WhatsApp" href="https://wa.me/213549179000" target="_blank" className="bg-green-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center"><Icon name="phone" size={24} fill="white" className="text-white"/></a>
+                            <button aria-label="Chat with us" onClick={() => openChat({ userId: user.uid, userName: user.displayName })} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-full shadow-2xl shadow-blue-600/40 animate-slideUp hover:scale-110 transition-transform flex items-center gap-2 group"><Icon name="message-circle" size={24} /></button>
                         </div>
                     )}
                     {activeChat && <ChatScreen user={user} db={db} appId={appId} targetUserId={isAdmin ? activeChat.userId : null} targetUserName={isAdmin ? activeChat.userName : null} lang={lang} t={t} onBack={closeChat} />}
@@ -1351,4 +1867,4 @@
         root.render(<App />);
     </script>
 </body>
-    </html>
+</html>
