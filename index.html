@@ -19,7 +19,7 @@
             theme: {
                 extend: {
                     animation: { 
-                 const subm       'bounce-slow': 'bounce 3s infinite', 
+                  'bounce-slow': 'bounce 3s infinite', 
                         'spin-slow': 'spin 3s linear infinite', 
                         'pulse-glow': 'pulseGlow 2s infinite',
                         'fadeIn': 'fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards',
@@ -1462,19 +1462,36 @@
             }, [view]);
 
             useEffect(() => {
-                const init = async () => {
-                    if(!window.__firebase_config) return;
-                    try {
-                        const app = window.firebase.initializeApp(JSON.parse(window.__firebase_config));
-                        const auth = window.firebase.getAuth(app);
-                        const firestore = window.firebase.getFirestore(app);
-                        setDb(firestore);
-                        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
-                        window.firebase.onAuthStateChanged(auth, (u) => { setUser(u); setAuthLoading(false); });
-                    } catch (e) { console.error("Firebase Init Error", e); }
-                };
-                init();
-            }, []);
+    const init = async () => {
+        if(!window.__firebase_config) return;
+        
+        // إنشاء مؤقت للانتظار حتى يكتمل تحميل Firebase
+        const checkFirebase = setInterval(async () => {
+            if (window.firebase && window.isFirebaseReady) {
+                clearInterval(checkFirebase); // إيقاف المؤقت عند نجاح التحميل
+                try {
+                    const app = window.firebase.initializeApp(JSON.parse(window.__firebase_config));
+                    const auth = window.firebase.getAuth(app);
+                    const firestore = window.firebase.getFirestore(app);
+                    setDb(firestore);
+                    
+                    if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+                        await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
+                    }
+                    
+                    window.firebase.onAuthStateChanged(auth, (u) => { 
+                        setUser(u); 
+                        setAuthLoading(false); 
+                    });
+                } catch (e) { 
+                    console.error("Firebase Init Error", e); 
+                    setAuthLoading(false); // مهم جداً حتى لا يعلق التطبيق في شاشة التحميل
+                }
+            }
+        }, 100); // يفحص كل 100 ملي ثانية
+    };
+    init();
+}, []);
 
             useEffect(() => {
                 if (!user || !db || !appId) return;
