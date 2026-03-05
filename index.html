@@ -40,6 +40,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 
     <script>
         if (typeof window.__app_id === 'undefined') window.__app_id = "l-artisan-imprimeur";
@@ -85,6 +87,7 @@
         .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
         .marquee-container { overflow: hidden; white-space: nowrap; }
         .tilt-card { transition: transform 0.1s ease; transform-style: preserve-3d; }
+        .pattern-dots { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
     </style>
 </head>
 <body class="text-slate-800 h-screen overflow-hidden">
@@ -92,7 +95,6 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // تم تعطيل الصيانة ليتمكن الجميع من الدخول
         const UNDER_MAINTENANCE = false;
 
         const Icon = ({ name, size = 20, className = "" }) => {
@@ -807,23 +809,20 @@
             const [editingOffer, setEditingOffer] = useState(null);
 
             useEffect(() => {
-    if (!db || !appId) return;
-    const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`));
-    const unsub = window.firebase.onSnapshot(q, (snap) => {
-        const fetchedOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        
-        // استخدام toMillis() الخاص بـ Firebase لترتيب الطلبات بشكل صحيح (الأحدث أولاً)
-        fetchedOrders.sort((a, b) => {
-            const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-            const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-            return timeB - timeA;
-        }); 
-        
-        setOrders(fetchedOrders);
-        setLoading(false);
-    });
-    return () => unsub();
-}, [db, appId]);
+                if (!db || !appId) return;
+                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/public/data/orders`));
+                const unsub = window.firebase.onSnapshot(q, (snap) => {
+                    const fetchedOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    fetchedOrders.sort((a, b) => {
+                        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                        return timeB - timeA;
+                    }); 
+                    setOrders(fetchedOrders);
+                    setLoading(false);
+                });
+                return () => unsub();
+            }, [db, appId]);
 
             useEffect(() => {
                 if (!db || !appId) return;
@@ -863,16 +862,16 @@
             };
             
             const deleteOrder = async (orderId) => {
-    if (!confirm(t.confirmDeleteOrder)) return;
-    try { 
-        const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
-        await window.firebase.deleteDoc(window.firebase.doc(db, docPath)); 
-        showToast(t.orderDeleted, 'success'); 
-    } catch (e) { 
-        console.error("Error deleting order:", e);
-        showToast(t.err, 'error'); 
-    }
-};
+                if (!confirm(t.confirmDeleteOrder)) return;
+                try { 
+                    const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
+                    await window.firebase.deleteDoc(window.firebase.doc(db, docPath)); 
+                    showToast(t.orderDeleted, 'success'); 
+                } catch (e) { 
+                    console.error("Error deleting order:", e);
+                    showToast(t.err, 'error'); 
+                }
+            };
             
             const saveConfig = async (e) => {
                 e.preventDefault();
@@ -1235,11 +1234,9 @@
 
         const MaintenanceScreen = ({ t, lang, onAdminClick }) => (
             <div className={`min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center relative overflow-hidden ${lang === 'ar' ? 'dir-rtl' : 'dir-ltr'}`}>
-                {/* Background Decor */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900 z-0"></div>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-pulse-glow"></div>
                 
-                {/* Content Card */}
                 <div className="relative z-10 w-full max-w-lg mx-auto bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl backdrop-blur-xl animate-slideUp">
                     <div className="w-24 h-24 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-500/30">
                         <Icon name="settings" size={48} className="animate-spin-slow" />
@@ -1260,12 +1257,140 @@
                     </div>
                 </div>
 
-                {/* Hidden/Subtle Admin Login Button */}
                 <button aria-label="Admin Login" onClick={onAdminClick} className="absolute bottom-8 text-slate-600 hover:text-slate-400 text-xs font-bold transition flex items-center gap-2 z-10 px-4 py-2 rounded-full border border-transparent hover:border-slate-700">
                     <Icon name="lock" size={14} /> {t.maintenanceAdminLogin}
                 </button>
             </div>
         );
+
+        const DesignStudio = ({ t, lang, onClose }) => {
+            const canvasRef = useRef(null);
+            const [fabricCanvas, setFabricCanvas] = useState(null);
+            const [activeObject, setActiveObject] = useState(null);
+
+            useEffect(() => {
+                if (!window.fabric) {
+                    alert(lang === 'ar' ? 'جاري تحميل مكتبة التصميم...' : 'Chargement de la bibliothèque...');
+                    return;
+                }
+                const canvas = new window.fabric.Canvas(canvasRef.current, {
+                    backgroundColor: '#ffffff',
+                    width: Math.min(window.innerWidth - 40, 800),
+                    height: 500,
+                    preserveObjectStacking: true
+                });
+
+                canvas.on('selection:created', (e) => setActiveObject(e.selected[0]));
+                canvas.on('selection:updated', (e) => setActiveObject(e.selected[0]));
+                canvas.on('selection:cleared', () => setActiveObject(null));
+
+                setFabricCanvas(canvas);
+
+                return () => canvas.dispose();
+            }, []);
+
+            const addText = () => {
+                if (!fabricCanvas) return;
+                const text = new window.fabric.IText(lang === 'ar' ? 'نص جديد' : 'Nouveau Texte', {
+                    left: 50,
+                    top: 50,
+                    fontFamily: 'Cairo', 
+                    fill: '#0f172a',
+                    fontSize: 40
+                });
+                fabricCanvas.add(text);
+                fabricCanvas.setActiveObject(text);
+            };
+
+            const addRectangle = () => {
+                if (!fabricCanvas) return;
+                const rect = new window.fabric.Rect({
+                    left: 50,
+                    top: 150,
+                    fill: '#3b82f6', 
+                    width: 100,
+                    height: 100,
+                    rx: 10, ry: 10    
+                });
+                fabricCanvas.add(rect);
+                fabricCanvas.setActiveObject(rect);
+            };
+
+            const deleteActiveObject = () => {
+                if (!fabricCanvas || !activeObject) return;
+                fabricCanvas.remove(activeObject);
+                fabricCanvas.discardActiveObject();
+            };
+
+            const clearCanvas = () => {
+                if (!fabricCanvas) return;
+                if(confirm(lang === 'ar' ? "هل أنت متأكد من مسح اللوحة؟" : "Effacer la zone de travail?")) {
+                    fabricCanvas.clear();
+                    fabricCanvas.backgroundColor = '#ffffff';
+                }
+            };
+
+            const downloadImage = () => {
+                if (!fabricCanvas) return;
+                const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1 });
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'design_lartisan.png';
+                link.click();
+            };
+
+            return (
+                <div className="fixed inset-0 z-[140] bg-slate-900/95 backdrop-blur-md flex flex-col p-2 md:p-6 animate-fadeIn">
+                    <div className="flex justify-between items-center mb-4 bg-white p-3 md:px-6 rounded-2xl shadow-lg safe-top">
+                        <h3 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <Icon name="pen-tool" /> <span className="hidden sm:inline">{lang === 'ar' ? "أستوديو التصميم المتقدم" : "Studio de Design Avancé"}</span>
+                        </h3>
+                        <div className="flex gap-2">
+                            <button onClick={downloadImage} className="bg-green-600 text-white px-3 md:px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-500 transition flex items-center gap-2">
+                                <Icon name="download" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "تحميل التصميم" : "Télécharger"}</span>
+                            </button>
+                            <button onClick={onClose} className="bg-red-50 text-red-500 p-2 rounded-xl hover:bg-red-100 transition">
+                                <Icon name="x" size={20}/>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row flex-1 gap-4 overflow-hidden mb-safe">
+                        <div className="w-full md:w-64 bg-white rounded-2xl p-4 shadow-lg flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0">
+                            <h4 className="font-bold text-sm text-slate-500 mb-2 uppercase hidden md:block">{lang === 'ar' ? "الأدوات" : "Outils"}</h4>
+                            
+                            <button onClick={addText} className="shrink-0 bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2 md:py-3 rounded-xl font-bold hover:bg-slate-100 transition flex items-center justify-center gap-2 text-sm">
+                                <Icon name="type" size={16}/> {lang === 'ar' ? "إضافة نص" : "Ajouter Texte"}
+                            </button>
+                            
+                            <button onClick={addRectangle} className="shrink-0 bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2 md:py-3 rounded-xl font-bold hover:bg-slate-100 transition flex items-center justify-center gap-2 text-sm">
+                                <Icon name="square" size={16}/> {lang === 'ar' ? "إضافة شكل" : "Ajouter Forme"}
+                            </button>
+                            
+                            {activeObject && (
+                                <div className="flex flex-row md:flex-col gap-2 md:mt-4 shrink-0 border-r md:border-r-0 md:border-t border-slate-200 pr-2 md:pr-0 md:pt-4">
+                                    <button onClick={deleteActiveObject} className="bg-red-50 text-red-600 px-4 py-2 md:py-2 rounded-lg font-bold hover:bg-red-100 transition text-sm flex justify-center gap-2">
+                                        <Icon name="trash-2" size={16}/> {lang === 'ar' ? "حذف العنصر" : "Supprimer"}
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="md:mt-auto md:pt-4 shrink-0 border-r md:border-r-0 md:border-t border-slate-200 pr-2 md:pr-0">
+                                <button onClick={clearCanvas} className="text-slate-400 px-4 py-2 md:py-2 rounded-lg font-bold hover:text-red-500 transition text-sm flex justify-center gap-2">
+                                    <Icon name="trash" size={16}/> {lang === 'ar' ? "مسح اللوحة" : "Tout effacer"}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 bg-slate-100 rounded-2xl shadow-inner flex items-center justify-center overflow-auto pattern-dots p-4">
+                            <div className="shadow-2xl bg-white flex-shrink-0 mx-auto">
+                                <canvas ref={canvasRef} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         function App() {
             const getInitialView = () => window.location.hash.substring(1).split('/')[0] || 'home';
@@ -1296,10 +1421,10 @@
             const [activeChat, setActiveChat] = useState(null);
             const [productModal, setProductModal] = useState(null);
             const [showQrModal, setShowQrModal] = useState(false);
+            const [showDesignStudio, setShowDesignStudio] = useState(false);
             const [uiConfig, setUiConfig] = useState({});
             const [bypassMaintenance, setBypassMaintenance] = useState(false);
             
-            // Search and Filter state
             const [searchTerm, setSearchTerm] = useState("");
             const [isListening, setIsListening] = useState(false);
             const [activeCategory, setActiveCategory] = useState('all');
@@ -1407,12 +1532,13 @@
             };
 
             const navigate = (newView, replace = false) => {
-                if (newView === view && !activeChat && !productModal && !showQrModal) return;
+                if (newView === view && !activeChat && !productModal && !showQrModal && !showDesignStudio) return;
                 setView(newView);
                 setAppliedPromo(null); 
                 setActiveChat(null); 
                 setProductModal(null);
                 setShowQrModal(false);
+                setShowDesignStudio(false);
                 const hash = newView;
                 if (replace) window.history.replaceState({ view: newView, chat: false }, '', `#${hash}`);
                 else window.history.pushState({ view: newView, chat: false }, '', `#${hash}`);
@@ -1462,36 +1588,35 @@
             }, [view]);
 
             useEffect(() => {
-    const init = async () => {
-        if(!window.__firebase_config) return;
-        
-        // إنشاء مؤقت للانتظار حتى يكتمل تحميل Firebase
-        const checkFirebase = setInterval(async () => {
-            if (window.firebase && window.isFirebaseReady) {
-                clearInterval(checkFirebase); // إيقاف المؤقت عند نجاح التحميل
-                try {
-                    const app = window.firebase.initializeApp(JSON.parse(window.__firebase_config));
-                    const auth = window.firebase.getAuth(app);
-                    const firestore = window.firebase.getFirestore(app);
-                    setDb(firestore);
+                const init = async () => {
+                    if(!window.__firebase_config) return;
                     
-                    if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
-                        await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
-                    }
-                    
-                    window.firebase.onAuthStateChanged(auth, (u) => { 
-                        setUser(u); 
-                        setAuthLoading(false); 
-                    });
-                } catch (e) { 
-                    console.error("Firebase Init Error", e); 
-                    setAuthLoading(false); // مهم جداً حتى لا يعلق التطبيق في شاشة التحميل
-                }
-            }
-        }, 100); // يفحص كل 100 ملي ثانية
-    };
-    init();
-}, []);
+                    const checkFirebase = setInterval(async () => {
+                        if (window.firebase && window.isFirebaseReady) {
+                            clearInterval(checkFirebase); 
+                            try {
+                                const app = window.firebase.initializeApp(JSON.parse(window.__firebase_config));
+                                const auth = window.firebase.getAuth(app);
+                                const firestore = window.firebase.getFirestore(app);
+                                setDb(firestore);
+                                
+                                if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+                                    await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
+                                }
+                                
+                                window.firebase.onAuthStateChanged(auth, (u) => { 
+                                    setUser(u); 
+                                    setAuthLoading(false); 
+                                });
+                            } catch (e) { 
+                                console.error("Firebase Init Error", e); 
+                                setAuthLoading(false); 
+                            }
+                        }
+                    }, 100); 
+                };
+                init();
+            }, []);
 
             useEffect(() => {
                 if (!user || !db || !appId) return;
@@ -1499,21 +1624,19 @@
                 const unsubNotif = window.firebase.onSnapshot(window.firebase.query(notifRef, window.firebase.orderBy('date', 'desc')), (snap) => {
                     const list = snap.docs.map(d => ({id: d.id, ...d.data()}));
                     setNotifications(list);
-                    // Fixed Notification Timestamp Issue
                     const fresh = list.find(n => !n.read && n.date && n.date.toMillis && (Date.now() - n.date.toMillis()) < 5000);
                     if (fresh) showToast(fresh.message[lang] || fresh.message, 'success');
                 });
                 const ordersRef = window.firebase.collection(db, `artifacts/${appId}/public/data/orders`);
                 const unsubOrders = window.firebase.onSnapshot(window.firebase.query(ordersRef, window.firebase.where('customerUserId', '==', user.uid)), (snap) => {
-    const fetchedOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-    // الترتيب محلياً لتجاوز مشكلة فهرس Firebase وإظهار الطلب فوراً
-    fetchedOrders.sort((a, b) => {
-        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-        return timeB - timeA;
-    });
-    setMyOrders(fetchedOrders);
-});
+                    const fetchedOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                    fetchedOrders.sort((a, b) => {
+                        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                        return timeB - timeA;
+                    });
+                    setMyOrders(fetchedOrders);
+                });
                 const unsubConfig = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (d) => { if(d.exists()) setUiConfig(d.data()); });
                 return () => { unsubNotif(); unsubOrders(); unsubConfig(); };
             }, [user, db, lang, appId]);
@@ -1541,111 +1664,103 @@
                 setCart(prev => [...prev, ...reorderedItems]); showToast(t.addToCart); navigate('cart');
             };
 
-  const submitOrder = async (e) => {
-    e.preventDefault(); 
-    if (!user || !db) return showToast(t.conn, "error");
-    
-    const formData = new FormData(e.target);
-    
-    // 1. إصلاح مشكلة حساب التوصيل في حال استخدام المتصفح للملء التلقائي (Auto-fill)
-    const selectedWilayaString = formData.get('wilaya');
-    let currentZone = selectedWilayaZone;
-    if (selectedWilayaString) {
-        const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === selectedWilayaString);
-        if (w) currentZone = w.zone;
-    }
+            const submitOrder = async (e) => {
+                e.preventDefault(); 
+                if (!user || !db) return showToast(t.conn, "error");
+                
+                const formData = new FormData(e.target);
+                const selectedWilayaString = formData.get('wilaya');
+                let currentZone = selectedWilayaZone;
+                if (selectedWilayaString) {
+                    const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === selectedWilayaString);
+                    if (w) currentZone = w.zone;
+                }
 
-    const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, currentZone); 
-    
-    // استخدام substring بدلاً من substr (لأنها Deprecated)
-    const generateId = () => Math.random().toString(36).substring(2, 11).toUpperCase();
-    const customOrderId = generateId();
-    
-    try {
-        // 2. تنظيف كائن البيانات بالكامل لتجنب خطأ (Unsupported field value: undefined) في Firebase
-        const orderData = {
-            id: customOrderId,
-            customerUserId: user.uid,
-            customerName: formData.get('name') || '',
-            phone: formData.get('phone') || '',
-            wilaya: formData.get('wilaya') || '',
-            orderDetails: formData.get('orderDetails') || '',
-            items: cart.map(i => ({ 
-                id: i.id || '', 
-                name: i.name || '', 
-                basePrice: i.basePrice || 0, 
-                price: i.price || 0, 
-                qty: i.qty || 1, 
-                image: i.image || '', 
-                selectedVariants: i.selectedVariants || [] 
-            })),
-            subtotal: subtotal || 0,
-            total: finalTotal || 0,
-            discount: discount || 0,
-            deliveryFee: delivery || 0,
-            promoCode: appliedPromo ? { 
-                code: appliedPromo.code || '', 
-                value: discount || 0, 
-                type: appliedPromo.discountType || '' 
-            } : null,
-            status: 'En attente',
-            createdAt: window.firebase.Timestamp.now()
-        };
+                const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, currentZone); 
+                const customOrderId = Math.random().toString(36).substring(2, 11).toUpperCase();
+                
+                try {
+                    const orderData = {
+                        id: customOrderId,
+                        customerUserId: user.uid,
+                        customerName: formData.get('name') || '',
+                        phone: formData.get('phone') || '',
+                        wilaya: formData.get('wilaya') || '',
+                        orderDetails: formData.get('orderDetails') || '',
+                        items: cart.map(i => ({ 
+                            id: i.id || '', 
+                            name: i.name || '', 
+                            basePrice: i.basePrice || 0, 
+                            price: i.price || 0, 
+                            qty: i.qty || 1, 
+                            image: i.image || '', 
+                            selectedVariants: i.selectedVariants || [] 
+                        })),
+                        subtotal: subtotal || 0,
+                        total: finalTotal || 0,
+                        discount: discount || 0,
+                        deliveryFee: delivery || 0,
+                        promoCode: appliedPromo ? { 
+                            code: appliedPromo.code || '', 
+                            value: discount || 0, 
+                            type: appliedPromo.discountType || '' 
+                        } : null,
+                        status: 'En attente',
+                        createdAt: window.firebase.Timestamp.now()
+                    };
 
-        localStorage.setItem('saved_phone', formData.get('phone') || '');
-        localStorage.setItem('saved_wilaya', formData.get('wilaya') || '');
+                    localStorage.setItem('saved_phone', formData.get('phone') || '');
+                    localStorage.setItem('saved_wilaya', formData.get('wilaya') || '');
 
-        // 3. كتابة المسار كمتغير نصي واحد لتجنب أخطاء تجميع المسارات في مكتبة doc
-        const documentPath = `artifacts/${appId}/public/data/orders/${customOrderId}`;
-        await window.firebase.setDoc(window.firebase.doc(db, documentPath), orderData);
-        
-        let msg = { fr: "Commande reçue!", ar: "تم استلام الطلب!" };
-        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { 
-            message: msg, 
-            date: window.firebase.Timestamp.now(), 
-            read: false, 
-            type: 'info' 
-        });
-        
-        setCart([]); 
-        setAppliedPromo(null); 
-        setPromoCodeInput(''); 
-        navigate('orders'); 
-        showToast(t.orderSent, "success");
+                    const documentPath = `artifacts/${appId}/public/data/orders/${customOrderId}`;
+                    await window.firebase.setDoc(window.firebase.doc(db, documentPath), orderData);
+                    
+                    let msg = { fr: "Commande reçue!", ar: "تم استلام الطلب!" };
+                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { 
+                        message: msg, 
+                        date: window.firebase.Timestamp.now(), 
+                        read: false, 
+                        type: 'info' 
+                    });
+                    
+                    setCart([]); 
+                    setAppliedPromo(null); 
+                    setPromoCodeInput(''); 
+                    navigate('orders'); 
+                    showToast(t.orderSent, "success");
 
-    } catch (e) { 
-        console.error("Order Submit Error:", e); 
-        showToast(t.err, "error"); 
-    }
-};
+                } catch (e) { 
+                    console.error("Order Submit Error:", e); 
+                    showToast(t.err, "error"); 
+                }
+            };
 
             const updateOrderStatus = async (orderId, newStatus, customerId) => {
-    if (!db || !appId) return;
-    try {
-        // دمج المسار في متغير نصي واحد لتجنب أخطاء Firebase
-        const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
-        await window.firebase.updateDoc(window.firebase.doc(db, docPath), { status: newStatus });
-        
-        showToast(t.statusUpdate);
-        
-        if (customerId) {
-            const statusLabel = STATUS_OPTIONS.find(s => s.key === newStatus)?.label;
-            let msg = { fr: `Statut: ${statusLabel.fr}`, ar: `الحالة: ${statusLabel.ar}` }; 
-            if (newStatus === 'Prêt') msg = { fr: "Commande prête!", ar: "طلبك جاهز!" };
-            
-            await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${customerId}/notifications`), { 
-                message: msg, 
-                date: window.firebase.Timestamp.now(), 
-                read: false, 
-                type: 'status', 
-                orderId 
-            });
-        }
-    } catch (e) { 
-        console.error("Error updating status:", e);
-        showToast("Error updating status", "error"); 
-    }
-};
+                if (!db || !appId) return;
+                try {
+                    const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
+                    await window.firebase.updateDoc(window.firebase.doc(db, docPath), { status: newStatus });
+                    
+                    showToast(t.statusUpdate);
+                    
+                    if (customerId) {
+                        const statusLabel = STATUS_OPTIONS.find(s => s.key === newStatus)?.label;
+                        let msg = { fr: `Statut: ${statusLabel.fr}`, ar: `الحالة: ${statusLabel.ar}` }; 
+                        if (newStatus === 'Prêt') msg = { fr: "Commande prête!", ar: "طلبك جاهز!" };
+                        
+                        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${customerId}/notifications`), { 
+                            message: msg, 
+                            date: window.firebase.Timestamp.now(), 
+                            read: false, 
+                            type: 'status', 
+                            orderId 
+                        });
+                    }
+                } catch (e) { 
+                    console.error("Error updating status:", e);
+                    showToast("Error updating status", "error"); 
+                }
+            };
             const markRead = async (id) => { if (db && appId) await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/users/${user.uid}/notifications`, id), {read: true}); };
             
             if (authLoading) return <div className="h-screen flex items-center justify-center bg-slate-50"><div className="loader"></div></div>;
@@ -1706,7 +1821,6 @@
                                     </button>
                                 </div>
 
-                                {/* Categories Filter */}
                                 <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2">
                                     {[{id:'all', name:t.all, icon:'grid'}, {id:'cards', name:t.catCards, icon:'credit-card'}, {id:'flyers', name:t.catFlyers, icon:'file-text'}, {id:'goodies', name:t.catGoodies, icon:'gift'}].map(cat => (
                                         <button 
@@ -1726,9 +1840,10 @@
                                             <div className="relative z-10">
                                                 <h2 className="text-xl font-bold mb-1">{t.hello} {user.displayName || (user.isAnonymous ? t.guestLogin.split(' ')[0] : '')}</h2>
                                                 <p className="text-slate-300 text-sm mb-4">{t.heroSubtitle}</p>
-                                                <div className="flex gap-2">
+                                                <div className="flex gap-2 flex-wrap">
                                                     <button onClick={()=>navigate('cart')} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg transition">{t.orderNow}</button>
                                                     <button onClick={()=>setShowQrModal(true)} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-bold text-sm transition border border-white/20 flex items-center gap-1"><Icon name="qr-code" size={16}/> {t.qrTool}</button>
+                                                    <button onClick={()=>setShowDesignStudio(true)} className="bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-lg font-bold text-sm transition border border-indigo-400 flex items-center gap-1"><Icon name="pen-tool" size={16}/> {lang === 'ar' ? 'أستوديو التصميم' : 'Studio de Design'}</button>
                                                 </div>
                                             </div>
                                             <Icon name="layers" size={140} className={`absolute -bottom-8 text-white opacity-5 rotate-12 ${lang==='ar' ? '-left-8' : '-right-8'}`}/>
@@ -1907,104 +2022,101 @@
                             </div>
                         )}
                         {view === 'orders' && (
-    <div className="animate-fadeIn space-y-4 max-w-md mx-auto pb-10">
-        <h2 className="font-bold text-xl mb-2">{t.myOrders}</h2>
-        {myOrders.length === 0 ? <p className="text-center text-gray-400 py-10">{t.noOrders}</p> : myOrders.map(o => {
-            const statusObj = STATUS_OPTIONS.find(s => s.key === o.status) || STATUS_OPTIONS[0];
-            const isExpanded = expandedOrderId === o.id;
-            const currentStatusIndex = STATUS_OPTIONS.findIndex(s => s.key === o.status);
-            
-            const orderDate = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-            const estDelivery = new Date(orderDate);
-            estDelivery.setDate(estDelivery.getDate() + 3);
-            
-            return (
-                <div key={o.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition">
-                    <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-slate-50/50">
-                        <div>
-                            {/* ميزة نسخ رقم الطلب */}
-                            <div className="flex items-center gap-2">
-                                <span className="font-bold text-lg text-slate-800">#{o.id.slice(-6)}</span>
-                                <button onClick={() => { navigator.clipboard.writeText(o.id); showToast(lang === 'ar' ? 'تم نسخ رقم الطلب' : 'Numéro copié', 'success'); }} className="text-slate-400 hover:text-blue-600 transition" title="نسخ المعرف">
-                                    <Icon name="copy" size={14}/>
-                                </button>
-                            </div>
-                            {/* عرض التاريخ والوقت معاً */}
-                            <span className="text-[11px] font-mono text-gray-500 block mt-1" dir="ltr">
-                                {o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString(lang === 'ar' ? 'ar-DZ' : 'fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : 'الآن'}
-                            </span>
-                        </div>
-                        <div className="text-right">
-                            <div className="font-bold text-blue-700 text-lg">{o.total} {t.currency}</div>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${STATUS_COLORS[o.status]}`}>{statusObj.label[lang]}</span>
-                        </div>
-                    </div>
-                    
-                    <div className="px-6 py-4">
-                        <div className="relative border-l-2 border-slate-200 space-y-6 ml-2">
-                            {STATUS_OPTIONS.map((step, idx) => {
-                                const isCompleted = idx <= currentStatusIndex;
-                                const isCurrent = idx === currentStatusIndex;
-                                return (
-                                    <div key={step.key} className="relative pl-4">
-                                        <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 transition-all ${isCompleted ? 'bg-blue-600 border-blue-600 shadow-sm' : 'bg-white border-slate-300'}`}>
-                                            {isCompleted && <Icon name="check" size={10} className="text-white absolute top-0.5 left-0.5"/>}
+                            <div className="animate-fadeIn space-y-4 max-w-md mx-auto pb-10">
+                                <h2 className="font-bold text-xl mb-2">{t.myOrders}</h2>
+                                {myOrders.length === 0 ? <p className="text-center text-gray-400 py-10">{t.noOrders}</p> : myOrders.map(o => {
+                                    const statusObj = STATUS_OPTIONS.find(s => s.key === o.status) || STATUS_OPTIONS[0];
+                                    const isExpanded = expandedOrderId === o.id;
+                                    const currentStatusIndex = STATUS_OPTIONS.findIndex(s => s.key === o.status);
+                                    
+                                    const orderDate = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
+                                    const estDelivery = new Date(orderDate);
+                                    estDelivery.setDate(estDelivery.getDate() + 3);
+                                    
+                                    return (
+                                        <div key={o.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition">
+                                            <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-slate-50/50">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-lg text-slate-800">#{o.id.slice(-6)}</span>
+                                                        <button onClick={() => { navigator.clipboard.writeText(o.id); showToast(lang === 'ar' ? 'تم نسخ رقم الطلب' : 'Numéro copié', 'success'); }} className="text-slate-400 hover:text-blue-600 transition" title="نسخ المعرف">
+                                                            <Icon name="copy" size={14}/>
+                                                        </button>
+                                                    </div>
+                                                    <span className="text-[11px] font-mono text-gray-500 block mt-1" dir="ltr">
+                                                        {o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString(lang === 'ar' ? 'ar-DZ' : 'fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : 'الآن'}
+                                                    </span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="font-bold text-blue-700 text-lg">{o.total} {t.currency}</div>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${STATUS_COLORS[o.status]}`}>{statusObj.label[lang]}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="px-6 py-4">
+                                                <div className="relative border-l-2 border-slate-200 space-y-6 ml-2">
+                                                    {STATUS_OPTIONS.map((step, idx) => {
+                                                        const isCompleted = idx <= currentStatusIndex;
+                                                        const isCurrent = idx === currentStatusIndex;
+                                                        return (
+                                                            <div key={step.key} className="relative pl-4">
+                                                                <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 transition-all ${isCompleted ? 'bg-blue-600 border-blue-600 shadow-sm' : 'bg-white border-slate-300'}`}>
+                                                                    {isCompleted && <Icon name="check" size={10} className="text-white absolute top-0.5 left-0.5"/>}
+                                                                </div>
+                                                                <p className={`text-xs font-bold transition-all ${isCurrent ? 'text-blue-700 scale-105' : isCompleted ? 'text-slate-700' : 'text-slate-300'}`}>
+                                                                    {step.label[lang]}
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                {o.status !== 'Prêt' && (
+                                                    <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                                                        <Icon name="truck" size={14} className="text-blue-500" />
+                                                        {t.estimatedDelivery} <span className="text-slate-700">{estDelivery.toLocaleDateString()}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="px-4 pb-4 flex justify-between items-center pt-2 border-t border-slate-50">
+                                                <button aria-label="Toggle Details" onClick={() => setExpandedOrderId(isExpanded ? null : o.id)} className="text-xs text-slate-500 font-bold flex items-center gap-1 hover:text-slate-800 transition">
+                                                    {isExpanded ? <Icon name="chevron-up" size={14}/> : <Icon name="chevron-down" size={14}/>} {isExpanded ? 'Masquer' : t.showDetails}
+                                                </button>
+                                                <div className="flex gap-2 flex-wrap justify-end">
+                                                    <a href={`https://wa.me/213549179000?text=${encodeURIComponent(lang === 'ar' ? `مرحباً، أستفسر عن طلبي رقم #${o.id}` : `Bonjour, je me renseigne sur ma commande #${o.id}`)}`} target="_blank" className="text-xs bg-green-50 text-green-600 px-3 py-1.5 rounded-xl font-bold hover:bg-green-100 transition flex items-center gap-1">
+                                                        <Icon name="message-circle" size={14}/> {t.whatsapp}
+                                                    </a>
+                                                    {o.status === 'En attente' && (
+                                                        <button onClick={() => deleteOrder(o.id)} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1">
+                                                            <Icon name="x-circle" size={14}/> {t.cancelOrder}
+                                                        </button>
+                                                    )}
+                                                    <button onClick={() => handleReorder(o)} className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl font-bold hover:bg-blue-100 transition flex items-center gap-1">
+                                                        <Icon name="rotate-ccw" size={14}/> {t.reOrder}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {isExpanded && (
+                                                <div className="bg-slate-50 p-4 border-t border-slate-100 text-xs animate-slideUp">
+                                                    <p className="font-bold text-slate-700 mb-2">{t.details}:</p>
+                                                    <ul className="space-y-2 mb-3">
+                                                        {o.items.map((item, idx) => (
+                                                            <li key={idx} className="flex justify-between border-b border-slate-200 pb-1 last:border-0">
+                                                                <span>{item.qty}x {item.name[lang] || item.name}</span>
+                                                                <span className="font-mono">{item.price * item.qty} {t.currency}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                    {o.deliveryFee > 0 && <div className="flex justify-between text-slate-500 pt-1 border-t border-slate-200"><span>{t.deliveryFee}</span><span>{o.deliveryFee} {t.currency}</span></div>}
+                                                    <p className="mt-3 text-slate-500 italic bg-white p-2 rounded-lg border border-slate-200">{o.orderDetails || "No additional notes."}</p>
+                                                </div>
+                                            )}
                                         </div>
-                                        <p className={`text-xs font-bold transition-all ${isCurrent ? 'text-blue-700 scale-105' : isCompleted ? 'text-slate-700' : 'text-slate-300'}`}>
-                                            {step.label[lang]}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        {o.status !== 'Prêt' && (
-                            <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] font-bold text-slate-500 flex items-center gap-1">
-                                <Icon name="truck" size={14} className="text-blue-500" />
-                                {t.estimatedDelivery} <span className="text-slate-700">{estDelivery.toLocaleDateString()}</span>
+                                    );
+                                })}
                             </div>
                         )}
-                    </div>
-
-                    <div className="px-4 pb-4 flex justify-between items-center pt-2 border-t border-slate-50">
-                        <button aria-label="Toggle Details" onClick={() => setExpandedOrderId(isExpanded ? null : o.id)} className="text-xs text-slate-500 font-bold flex items-center gap-1 hover:text-slate-800 transition">
-                            {isExpanded ? <Icon name="chevron-up" size={14}/> : <Icon name="chevron-down" size={14}/>} {isExpanded ? 'Masquer' : t.showDetails}
-                        </button>
-                        <div className="flex gap-2 flex-wrap justify-end">
-                            {/* ميزة الدعم المباشر عبر واتساب المخصصة للطلب */}
-                            <a href={`https://wa.me/213549179000?text=${encodeURIComponent(lang === 'ar' ? `مرحباً، أستفسر عن طلبي رقم #${o.id}` : `Bonjour, je me renseigne sur ma commande #${o.id}`)}`} target="_blank" className="text-xs bg-green-50 text-green-600 px-3 py-1.5 rounded-xl font-bold hover:bg-green-100 transition flex items-center gap-1">
-                                <Icon name="message-circle" size={14}/> {t.whatsapp}
-                            </a>
-                            {o.status === 'En attente' && (
-                                <button onClick={() => deleteOrder(o.id)} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1">
-                                    <Icon name="x-circle" size={14}/> {t.cancelOrder}
-                                </button>
-                            )}
-                            <button onClick={() => handleReorder(o)} className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl font-bold hover:bg-blue-100 transition flex items-center gap-1">
-                                <Icon name="rotate-ccw" size={14}/> {t.reOrder}
-                            </button>
-                        </div>
-                    </div>
-
-                    {isExpanded && (
-                        <div className="bg-slate-50 p-4 border-t border-slate-100 text-xs animate-slideUp">
-                            <p className="font-bold text-slate-700 mb-2">{t.details}:</p>
-                            <ul className="space-y-2 mb-3">
-                                {o.items.map((item, idx) => (
-                                    <li key={idx} className="flex justify-between border-b border-slate-200 pb-1 last:border-0">
-                                        <span>{item.qty}x {item.name[lang] || item.name}</span>
-                                        <span className="font-mono">{item.price * item.qty} {t.currency}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            {o.deliveryFee > 0 && <div className="flex justify-between text-slate-500 pt-1 border-t border-slate-200"><span>{t.deliveryFee}</span><span>{o.deliveryFee} {t.currency}</span></div>}
-                            <p className="mt-3 text-slate-500 italic bg-white p-2 rounded-lg border border-slate-200">{o.orderDetails || "No additional notes."}</p>
-                        </div>
-                    )}
-                </div>
-            );
-        })}
-    </div>
-)}
                         {view === 'notifications' && (
                             <div className="animate-fadeIn max-w-md mx-auto pb-10"><h2 className="font-bold text-xl mb-4">{t.notifications}</h2>{notifications.length === 0 ? <p className="text-center text-gray-400 py-10">{t.noNotifs}</p> : (<div className="space-y-3">{notifications.map(n => (<div key={n.id} onClick={()=>markRead(n.id)} className={`p-4 rounded-xl border cursor-pointer transition ${n.read ? 'bg-white border-slate-100' : 'bg-blue-50 border-blue-100 shadow-sm'}`}><div className="flex gap-3"><div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read ? 'bg-slate-300' : 'bg-blue-500'}`}></div><div><p className={`text-sm ${!n.read ? 'font-bold text-slate-900' : 'text-slate-600'}`}>{typeof n.message === 'object' ? n.message[lang] : n.message}</p><span className="text-[10px] text-slate-400 mt-1 block dir-ltr text-right">{n.date?.toDate ? n.date.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span></div></div></div>))}</div>)}</div>
                         )}
@@ -2014,6 +2126,7 @@
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
+                    {showDesignStudio && <DesignStudio t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} />}
 
                     <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 flex justify-between px-2 py-3 pb-safe z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] safe-bottom">
                         <button aria-label="Home" onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1 nav-btn ${view==='home'?'active text-slate-900':'text-slate-400'}`}><Icon name="home" size={22}/><span className="text-[10px] font-bold">{t.home}</span></button>
