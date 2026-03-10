@@ -79,7 +79,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
         :root { --font-main: 'Cairo', sans-serif; --color-brand: #0f172a; --color-accent: #3b82f6; }
         
-        /* Global Background with Animated Meshes for Glassmorphism contrast */
         body { 
             font-family: var(--font-main); 
             background-color: #f8fafc; 
@@ -96,7 +95,6 @@
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* iOS Glass Styles */
         .ios-glass {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(24px);
@@ -771,6 +769,7 @@
                         .status { font-weight: bold; color: ${order.status === 'Prêt' ? '#10b981' : '#f59e0b'}; }
                         .variants ul { list-style: none; padding: 0; margin: 0; font-size: 11px; color: #64748b; }
                         .variants li { margin-top: 2px; }
+                        .item-img { max-width: 50px; max-height: 50px; border-radius: 4px; border: 1px solid #eee; }
                         @media print {
                             .no-print { display: none; }
                         }
@@ -799,6 +798,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th style="width: 60px;">الصورة</th>
                                 <th>${t.items}</th>
                                 <th>${t.qty}</th>
                                 <th>سعر الوحدة (${t.currency})</th>
@@ -808,6 +808,7 @@
                         <tbody>
                             ${order.items.map(item => `
                                 <tr>
+                                    <td>${item.image ? `<img src="${item.image}" class="item-img" />` : '-'}</td>
                                     <td>
                                         ${item.name[t.langName] || item.name}
                                         ${item.selectedVariants && item.selectedVariants.length > 0 ? `
@@ -825,10 +826,10 @@
                             `).join('')}
                         </tbody>
                         <tfoot>
-                            <tr><td colspan="3">${t.subtotal}</td><td class="total-cell">${subtotal} ${t.currency}</td></tr>
-                            <tr><td colspan="3">${t.deliveryFee}</td><td class="total-cell">${order.deliveryFee || 0} ${t.currency}</td></tr>
-                            ${totalDiscount > 0 ? `<tr><td colspan="3">${t.discount}</td><td class="total-cell" style="color: #ef4444;">- ${totalDiscount} ${t.currency}</td></tr>` : ''}
-                            <tr class="total-row"><td colspan="3">${t.total}</td><td class="total-cell">${order.total} ${t.currency}</td></tr>
+                            <tr><td colspan="4">${t.subtotal}</td><td class="total-cell">${subtotal} ${t.currency}</td></tr>
+                            <tr><td colspan="4">${t.deliveryFee}</td><td class="total-cell">${order.deliveryFee || 0} ${t.currency}</td></tr>
+                            ${totalDiscount > 0 ? `<tr><td colspan="4">${t.discount}</td><td class="total-cell" style="color: #ef4444;">- ${totalDiscount} ${t.currency}</td></tr>` : ''}
+                            <tr class="total-row"><td colspan="4">${t.total}</td><td class="total-cell">${order.total} ${t.currency}</td></tr>
                         </tfoot>
                     </table>
                     
@@ -1311,10 +1312,11 @@
             </div>
         );
 
-        const DesignStudio = ({ t, lang, onClose }) => {
+        const DesignStudio = ({ t, lang, onClose, onAddToCart }) => {
             const canvasRef = useRef(null);
             const [fabricCanvas, setFabricCanvas] = useState(null);
             const [activeObject, setActiveObject] = useState(null);
+            const [objectColor, setObjectColor] = useState('#0f172a');
 
             useEffect(() => {
                 if (!window.fabric) {
@@ -1328,23 +1330,32 @@
                     preserveObjectStacking: true
                 });
 
-                canvas.on('selection:created', (e) => setActiveObject(e.selected[0]));
-                canvas.on('selection:updated', (e) => setActiveObject(e.selected[0]));
+                canvas.on('selection:created', (e) => updateTools(e.selected[0]));
+                canvas.on('selection:updated', (e) => updateTools(e.selected[0]));
                 canvas.on('selection:cleared', () => setActiveObject(null));
 
                 setFabricCanvas(canvas);
-
                 return () => canvas.dispose();
             }, []);
+
+            const updateTools = (obj) => {
+                setActiveObject(obj);
+                if (obj && obj.fill && typeof obj.fill === 'string') setObjectColor(obj.fill);
+            };
+
+            const changeColor = (e) => {
+                const newColor = e.target.value;
+                setObjectColor(newColor);
+                if (activeObject) {
+                    activeObject.set('fill', newColor);
+                    fabricCanvas.renderAll();
+                }
+            };
 
             const addText = () => {
                 if (!fabricCanvas) return;
                 const text = new window.fabric.IText(lang === 'ar' ? 'نص جديد' : 'Nouveau Texte', {
-                    left: 50,
-                    top: 50,
-                    fontFamily: 'Cairo', 
-                    fill: '#0f172a',
-                    fontSize: 40
+                    left: 50, top: 50, fontFamily: 'Cairo', fill: '#0f172a', fontSize: 40
                 });
                 fabricCanvas.add(text);
                 fabricCanvas.setActiveObject(text);
@@ -1353,15 +1364,36 @@
             const addRectangle = () => {
                 if (!fabricCanvas) return;
                 const rect = new window.fabric.Rect({
-                    left: 50,
-                    top: 150,
-                    fill: '#3b82f6', 
-                    width: 100,
-                    height: 100,
-                    rx: 10, ry: 10    
+                    left: 50, top: 150, fill: '#3b82f6', width: 100, height: 100, rx: 10, ry: 10    
                 });
                 fabricCanvas.add(rect);
                 fabricCanvas.setActiveObject(rect);
+            };
+
+            const addCircle = () => {
+                if (!fabricCanvas) return;
+                const circle = new window.fabric.Circle({
+                    left: 100, top: 100, fill: '#10b981', radius: 50
+                });
+                fabricCanvas.add(circle);
+                fabricCanvas.setActiveObject(circle);
+            };
+
+            const handleImageUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file || !fabricCanvas) return;
+                const reader = new FileReader();
+                reader.onload = (f) => {
+                    const data = f.target.result;
+                    window.fabric.Image.fromURL(data, (img) => {
+                        img.scaleToWidth(150);
+                        img.set({ left: 100, top: 100 });
+                        fabricCanvas.add(img);
+                        fabricCanvas.setActiveObject(img);
+                    });
+                };
+                reader.readAsDataURL(file);
+                e.target.value = null; 
             };
 
             const deleteActiveObject = () => {
@@ -1369,6 +1401,9 @@
                 fabricCanvas.remove(activeObject);
                 fabricCanvas.discardActiveObject();
             };
+
+            const bringForward = () => { if (activeObject) fabricCanvas.bringForward(activeObject); };
+            const sendBackwards = () => { if (activeObject) fabricCanvas.sendBackwards(activeObject); };
 
             const clearCanvas = () => {
                 if (!fabricCanvas) return;
@@ -1379,6 +1414,8 @@
 
             const downloadImage = () => {
                 if (!fabricCanvas) return;
+                fabricCanvas.discardActiveObject(); 
+                fabricCanvas.renderAll();
                 const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
                 const link = document.createElement('a');
                 link.href = dataURL;
@@ -1386,15 +1423,38 @@
                 link.click();
             };
 
+            const handleAddToCart = () => {
+                if (!fabricCanvas) return;
+                fabricCanvas.discardActiveObject();
+                fabricCanvas.renderAll();
+                const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
+                
+                const customProduct = {
+                    id: `custom-${Date.now()}`,
+                    name: { fr: "Design Personnalisé (Studio)", ar: "تصميم مخصص (الأستوديو)" },
+                    basePrice: 1500, 
+                    price: 1500,
+                    image: dataURL,
+                    qty: 1,
+                    selectedVariants: [{ id: 'type', label: lang==='ar'?'المصدر':'Source', value: lang==='ar'?'أستوديو التصميم':'Studio de Design' }]
+                };
+                
+                onAddToCart(customProduct);
+                onClose();
+            };
+
             return (
                 <div className="fixed inset-0 z-[140] bg-slate-900/80 backdrop-blur-xl flex flex-col p-2 md:p-6 animate-fadeIn">
                     <div className="flex justify-between items-center mb-4 bg-white/10 border border-white/20 p-3 md:px-6 rounded-3xl shadow-lg safe-top backdrop-blur-md">
                         <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-                            <Icon name="pen-tool" /> <span className="hidden sm:inline">{lang === 'ar' ? "أستوديو التصميم المتقدم" : "Studio de Design Avancé"}</span>
+                            <Icon name="pen-tool" /> <span className="hidden sm:inline">{lang === 'ar' ? "أستوديو التصميم" : "Studio de Design"}</span>
                         </h3>
                         <div className="flex gap-2">
+                            <button onClick={handleAddToCart} className="bg-blue-600/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-blue-500 transition flex items-center gap-2 shadow-lg backdrop-blur">
+                                <Icon name="shopping-cart" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "أضف للسلة" : "Ajouter au panier"}</span>
+                            </button>
                             <button onClick={downloadImage} className="bg-green-500/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-green-400 transition flex items-center gap-2 shadow-lg backdrop-blur">
-                                <Icon name="download" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "تحميل التصميم" : "Télécharger"}</span>
+                                <Icon name="download" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "تحميل" : "Télécharger"}</span>
                             </button>
                             <button onClick={onClose} className="bg-white/10 text-white p-2.5 rounded-2xl hover:bg-white/20 hover:text-red-400 transition backdrop-blur">
                                 <Icon name="x" size={20}/>
@@ -1403,27 +1463,49 @@
                     </div>
 
                     <div className="flex flex-col md:flex-row flex-1 gap-4 overflow-hidden mb-safe">
-                        <div className="w-full md:w-64 bg-white/10 border border-white/20 backdrop-blur-md rounded-3xl p-5 shadow-lg flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0">
-                            <h4 className="font-bold text-sm text-slate-300 mb-2 uppercase hidden md:block">{lang === 'ar' ? "الأدوات" : "Outils"}</h4>
+                        <div className="w-full md:w-64 bg-white/10 border border-white/20 backdrop-blur-md rounded-3xl p-4 shadow-lg flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0">
                             
-                            <button onClick={addText} className="shrink-0 bg-white/20 text-white px-4 py-2.5 md:py-3.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center justify-center gap-2 text-sm backdrop-blur">
-                                <Icon name="type" size={16}/> {lang === 'ar' ? "إضافة نص" : "Ajouter Texte"}
+                            <button onClick={addText} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur">
+                                <Icon name="type" size={16}/> {lang === 'ar' ? "نص" : "Texte"}
                             </button>
                             
-                            <button onClick={addRectangle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 md:py-3.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center justify-center gap-2 text-sm backdrop-blur">
-                                <Icon name="square" size={16}/> {lang === 'ar' ? "إضافة شكل" : "Ajouter Forme"}
+                            <button onClick={addRectangle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur">
+                                <Icon name="square" size={16}/> {lang === 'ar' ? "مربع" : "Carré"}
                             </button>
-                            
+
+                            <button onClick={addCircle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur">
+                                <Icon name="circle" size={16}/> {lang === 'ar' ? "دائرة" : "Cercle"}
+                            </button>
+
+                            <label className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur cursor-pointer">
+                                <Icon name="image" size={16}/> {lang === 'ar' ? "صورة" : "Image"}
+                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                            </label>
+
                             {activeObject && (
-                                <div className="flex flex-row md:flex-col gap-2 md:mt-4 shrink-0 border-r md:border-r-0 md:border-t border-white/20 pr-3 md:pr-0 md:pt-5">
-                                    <button onClick={deleteActiveObject} className="bg-red-500/80 text-white px-4 py-2.5 md:py-3 rounded-2xl font-bold hover:bg-red-500 transition text-sm flex justify-center gap-2 backdrop-blur">
-                                        <Icon name="trash-2" size={16}/> {lang === 'ar' ? "حذف العنصر" : "Supprimer"}
+                                <div className="flex flex-row md:flex-col gap-2 md:mt-4 shrink-0 border-l md:border-l-0 md:border-t border-white/20 pl-3 md:pl-0 md:pt-4">
+                                    <div className="flex items-center gap-2 bg-white/10 p-2 rounded-2xl shrink-0">
+                                        <input type="color" value={objectColor} onChange={changeColor} className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
+                                        <span className="text-white text-xs font-bold">{lang === 'ar' ? "اللون" : "Couleur"}</span>
+                                    </div>
+                                    
+                                    <div className="flex gap-2 shrink-0">
+                                        <button onClick={bringForward} title={lang === 'ar' ? "للأمام" : "Avancer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center backdrop-blur">
+                                            <Icon name="arrow-up" size={16}/>
+                                        </button>
+                                        <button onClick={sendBackwards} title={lang === 'ar' ? "للخلف" : "Reculer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center backdrop-blur">
+                                            <Icon name="arrow-down" size={16}/>
+                                        </button>
+                                    </div>
+
+                                    <button onClick={deleteActiveObject} className="bg-red-500/80 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-red-500 transition text-sm flex justify-center gap-2 backdrop-blur shrink-0 mt-1">
+                                        <Icon name="trash-2" size={16}/>
                                     </button>
                                 </div>
                             )}
 
-                            <div className="md:mt-auto md:pt-5 shrink-0 border-r md:border-r-0 md:border-t border-white/20 pr-3 md:pr-0">
-                                <button onClick={clearCanvas} className="text-slate-300 px-4 py-2.5 md:py-3 rounded-2xl font-bold hover:text-white hover:bg-white/10 transition text-sm flex justify-center gap-2">
+                            <div className="md:mt-auto md:pt-4 shrink-0 border-l md:border-l-0 md:border-t border-white/20 pl-3 md:pl-0">
+                                <button onClick={clearCanvas} className="text-red-300 w-full py-2.5 rounded-2xl font-bold hover:text-white hover:bg-red-500/50 transition text-sm flex justify-center gap-2">
                                     <Icon name="trash" size={16}/> {lang === 'ar' ? "مسح اللوحة" : "Tout effacer"}
                                 </button>
                             </div>
@@ -1782,6 +1864,17 @@
                 }
             };
 
+            const cancelOrder = async (orderId) => {
+                if (!confirm(lang === 'ar' ? "هل أنت متأكد من إلغاء هذا الطلب نهائياً؟" : "Voulez-vous vraiment annuler cette commande ?")) return;
+                try {
+                    await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`));
+                    showToast(lang === 'ar' ? "تم إلغاء الطلب بنجاح" : "Commande annulée avec succès", "success");
+                } catch (error) {
+                    console.error("Cancel Error:", error);
+                    showToast(t.err, "error");
+                }
+            };
+
             const updateOrderStatus = async (orderId, newStatus, customerId) => {
                 if (!db || !appId) return;
                 try {
@@ -1875,7 +1968,7 @@
                                             onClick={() => setActiveCategory(cat.id)}
                                             className={`flex items-center gap-1.5 px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all shadow-sm backdrop-blur-md border ${activeCategory === cat.id ? 'bg-blue-600/90 text-white border-blue-500 shadow-blue-600/30' : 'bg-white/60 text-slate-600 border-white/50 hover:bg-white/80'}`}
                                         >
-                                            <Icon name={cat.icon} size={16} /> {cat.name}
+                                            <Icon name="grid" size={16} /> {cat.name}
                                         </button>
                                     ))}
                                 </div>
@@ -2148,7 +2241,7 @@
                                                         <Icon name="message-circle" size={14}/> {t.whatsapp}
                                                     </a>
                                                     {o.status === 'En attente' && (
-                                                        <button onClick={() => deleteOrder(o.id)} className="text-xs bg-red-50/80 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1 border border-red-100 backdrop-blur-sm">
+                                                        <button onClick={() => cancelOrder(o.id)} className="text-xs bg-red-50/80 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1 border border-red-100 backdrop-blur-sm">
                                                             <Icon name="x-circle" size={14}/> {t.cancelOrder}
                                                         </button>
                                                     )}
@@ -2187,7 +2280,7 @@
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
-                    {showDesignStudio && <DesignStudio t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} />}
+                    {showDesignStudio && <DesignStudio t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
 
                     {/* Floating Bottom Navigation (iOS 26 Style Dock) */}
                     <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto ios-glass rounded-3xl flex justify-between px-2 py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.1)] safe-bottom border-t border-white/80">
@@ -2213,4 +2306,4 @@
         root.render(<App />);
     </script>
 </body>
-</html>
+    </html>
