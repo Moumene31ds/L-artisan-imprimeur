@@ -44,7 +44,6 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 
     <script>
@@ -65,12 +64,13 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // تم إضافة increment لدعم نظام الكوبونات وحمايته من التضارب
+        import { getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         window.firebase = { 
             initializeApp, getAuth, signInAnonymously, onAuthStateChanged, 
             GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, signInWithCustomToken,
-            getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp
+            getFirestore, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, getDocs, writeBatch, Timestamp, increment
         };
         window.isFirebaseReady = true;
     </script>
@@ -78,7 +78,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
         :root { --font-main: 'Cairo', sans-serif; --color-brand: #0f172a; --color-accent: #3b82f6; }
-        
         body { 
             font-family: var(--font-main); 
             background-color: #f8fafc; 
@@ -89,43 +88,20 @@
             background-attachment: fixed;
             -webkit-tap-highlight-color: transparent; 
         }
-        
         html[dir="ltr"] body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .ios-glass {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
-        }
-        .ios-glass-dark {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-        .ios-glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-        }
-
+        .ios-glass { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05); }
+        .ios-glass-dark { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+        .ios-glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.6); }
         .nav-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 20%; padding-left: 0; padding-right: 0; }
         .nav-btn.active { color: #3b82f6; transform: translateY(-3px) scale(1.05); }
         .nav-btn.active i { stroke-width: 2.5px; }
-        
         .login-bg { background-color: #0f172a; background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%); }
         .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
-        
         .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
         .safe-top { padding-top: env(safe-area-inset-top); }
-        
         .marquee-container { overflow: hidden; white-space: nowrap; }
         .tilt-card { transition: transform 0.1s ease; transform-style: preserve-3d; }
         .pattern-dots { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
@@ -227,12 +203,13 @@
                 offers: "Offres", addOffer: "Ajouter Offre", offerTitle: "Titre Offre", offerDesc: "Description", offerPrice: "Prix",
                 manageOffers: "Gérer Offres", specialOffers: "Offres Spéciales", endsIn: "Se termine dans", offerEndDate: "Date fin",
                 edit: "Modifier", updateOffer: "Mettre à jour l'offre", cancel: "Annuler", getOffer: "Obtenir l'offre",
-                associatedPromo: "Code Promo Associé (ex: EID20)", printReceipt: "Imprimer", fileUpload: "Fichier Design", uploading: "Téléchargement...",
+                associatedPromo: "Code Promo Associé", printReceipt: "Imprimer", fileUpload: "Fichier Design", uploading: "Téléchargement...",
                 voiceSearch: "Recherche vocale", listening: "Écoute...", qualityCheck: "Analyse IA...", 
                 qualityGood: "Excellente qualité", qualityBad: "Basse résolution", uploadDesign: "Vérifier design",
                 qrTool: "QR Code", qrText: "Lien/Texte", generateQR: "Générer", downloadQR: "Télécharger", qrDesc: "Créez votre QR Code",
                 categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Goodies", share: "Partager", clearCart: "Vider",
-                maintenanceTitle: "Site en Maintenance", maintenanceDesc: "Nous mettons à niveau notre plateforme.", maintenanceAdminLogin: "Admin", contactUsMsg: "Nous contacter"
+                maintenanceTitle: "Site en Maintenance", maintenanceDesc: "Nous mettons à niveau notre plateforme.", maintenanceAdminLogin: "Admin", contactUsMsg: "Nous contacter",
+                privacyPolicy: "Politique de Confidentialité", expiredPromo: "Code expiré", limitReachedPromo: "Limite d'utilisation atteinte", maxUses: "Utilisations max", expiryDate: "Date d'expiration", currentUses: "Utilisations actuelles"
             },
             ar: {
                 appTitle: "الحرفي", appSubtitle: "للطباعة", home: "الرئيسية", cart: "السلة", orders: "طلباتي", admin: "الإدارة",
@@ -278,7 +255,8 @@
                 qualityGood: "جودة ممتازة للطباعة", qualityBad: "دقة ضعيفة، قد تظهر ضبابية", uploadDesign: "افحص جودة تصميمك",
                 qrTool: "صانع QR الذكي", qrText: "أدخل رابط أو نص", generateQR: "توليد الكود", downloadQR: "تحميل الصورة", qrDesc: "أنشئ كود QR مجاني",
                 categories: "التصنيفات", catCards: "بطاقات", catFlyers: "مطويات", catGoodies: "إكسسوارات", share: "مشاركة", clearCart: "تفريغ السلة",
-                maintenanceTitle: "الموقع تحت الصيانة", maintenanceDesc: "نقوم بتحديث المنصة لخدمتكم بشكل أفضل.", maintenanceAdminLogin: "دخول الإدارة", contactUsMsg: "تواصل معنا"
+                maintenanceTitle: "الموقع تحت الصيانة", maintenanceDesc: "نقوم بتحديث المنصة لخدمتكم بشكل أفضل.", maintenanceAdminLogin: "دخول الإدارة", contactUsMsg: "تواصل معنا",
+                privacyPolicy: "سياسة الخصوصية والأمان", expiredPromo: "انتهت صلاحية الكود", limitReachedPromo: "تم الوصول للحد الأقصى للاستخدام", maxUses: "الحد الأقصى للاستخدام", expiryDate: "تاريخ الانتهاء", currentUses: "الاستخدامات الحالية"
             }
         };
         
@@ -319,7 +297,7 @@
             return (
                 <div className={`relative overflow-hidden ${className}`}>
                     {!loaded && <Skeleton className="absolute inset-0 w-full h-full z-10" />}
-                    <img src={src} alt={alt} onLoad={() => setLoaded(true)} onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/400x400/f1f5f9/94a3b8?text=L'Artisan"; }} className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`} />
+                    <img src={src} alt={alt} loading="lazy" onLoad={() => setLoaded(true)} onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/400x400/f1f5f9/94a3b8?text=L'Artisan"; }} className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`} />
                 </div>
             );
         };
@@ -591,9 +569,10 @@
             const sendMessage = async (e) => {
                 e.preventDefault();
                 if(!text.trim()) return;
-                const msgData = { content: text, senderId: user.uid, createdAt: window.firebase.Timestamp.now(), read: false };
+                const safeText = text.trim();
+                const msgData = { content: safeText, senderId: user.uid, createdAt: window.firebase.Timestamp.now(), read: false };
                 await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/chats/${chatId}/messages`), msgData);
-                await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/chats/${chatId}`), { lastMessage: text, lastMessageTime: window.firebase.Timestamp.now(), userName: isAdmin ? targetUserName : (user.displayName || 'Guest'), userId: chatId }, { merge: true });
+                await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/chats/${chatId}`), { lastMessage: safeText, lastMessageTime: window.firebase.Timestamp.now(), userName: isAdmin ? targetUserName : (user.displayName || 'Guest'), userId: chatId }, { merge: true });
                 setText("");
             };
             return (
@@ -641,7 +620,7 @@
                 const auth = window.firebase.getAuth();
                 try {
                     if (isLoginView) await window.firebase.signInWithEmailAndPassword(auth, email, password);
-                    else { const res = await window.firebase.createUserWithEmailAndPassword(auth, email, password); await window.firebase.updateProfile(res.user, { displayName: name }); }
+                    else { const res = await window.firebase.createUserWithEmailAndPassword(auth, email, password); await window.firebase.updateProfile(res.user, { displayName: name.trim() }); }
                 } catch (e) { setError(e.message); setLoading(false); }
             };
             const handleGuest = async () => { setLoading(true); try { await window.firebase.signInAnonymously(window.firebase.getAuth()); } catch(e) { setError("Guest login failed"); setLoading(false); } };
@@ -740,6 +719,14 @@
                             </form>
                         </div>
                     )}
+                    
+                    {/* Privacy Policy Link Button */}
+                    <div className="ios-glass p-4 rounded-3xl shadow-lg mb-6 text-center cursor-pointer hover:bg-white/50 transition" onClick={() => navigate('privacy')}>
+                        <div className="text-slate-600 font-bold flex items-center justify-center gap-2">
+                            <Icon name="shield-check" size={18}/> {t.privacyPolicy}
+                        </div>
+                    </div>
+
                     {isAdmin && <div className="text-center mb-6"><button onClick={() => navigate('admin')} className="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-2 mx-auto transition border border-blue-600/30 rounded-full px-4 py-2 bg-blue-50/50 backdrop-blur-sm"><Icon name="shield" size={18}/> {t.adminPanel}</button></div>}
                     <div className="text-center mt-8"><button onClick={handleLogout} className="text-red-500 hover:text-red-700 font-bold flex items-center gap-2 mx-auto transition"><Icon name="log-out" size={20}/> {t.logout}</button></div>
                 </div>
@@ -844,7 +831,7 @@
             printWindow.document.close();
         };
 
-        const AdminDashboard = ({ db, appId, updateOrderStatus, lang, t, onOpenChat, showToast }) => {
+        const AdminDashboard = ({ db, appId, updateOrderStatus, lang, t, onOpenChat, showToast, user, ADMIN_EMAIL }) => {
             const [orders, setOrders] = useState([]);
             const [promoCodes, setPromoCodes] = useState([]);
             const [uiConfig, setUiConfig] = useState({ showAnnouncement: false, announcementAr: "", announcementFr: "", stories: [], offers: [] });
@@ -854,6 +841,11 @@
             const [filterStatus, setFilterStatus] = useState("All");
             
             const [editingOffer, setEditingOffer] = useState(null);
+
+            // الحماية المزدوجة لواجهة الإدارة
+            if (user?.email !== ADMIN_EMAIL) {
+                return <div className="text-center py-20 text-red-500 font-bold">{t.accessDenied}</div>;
+            }
 
             useEffect(() => {
                 if (!db || !appId) return;
@@ -891,13 +883,24 @@
             const addPromoCode = async (e) => {
                 e.preventDefault();
                 const data = new FormData(e.target);
-                const code = data.get('code').toUpperCase();
+                const code = data.get('code').trim().toUpperCase();
                 const discountValue = parseFloat(data.get('discountValue'));
                 const minAmount = parseFloat(data.get('minAmount')) || 0;
+                const expiryDate = data.get('expiryDate');
+                const maxUses = parseInt(data.get('maxUses')) || 0;
+                
                 if (!code || isNaN(discountValue)) return;
                 try {
                     await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, code), {
-                        code: code, discountType: data.get('discountType'), discountValue: discountValue, minAmount: minAmount, active: true, createdAt: window.firebase.Timestamp.now()
+                        code: code, 
+                        discountType: data.get('discountType'), 
+                        discountValue: discountValue, 
+                        minAmount: minAmount, 
+                        expiryDate: expiryDate || null,
+                        maxUses: maxUses || null,
+                        currentUses: 0,
+                        active: true, 
+                        createdAt: window.firebase.Timestamp.now()
                     });
                     e.target.reset(); showToast(t.codeAdded, 'success');
                 } catch (e) { showToast(t.err, 'error'); }
@@ -967,7 +970,7 @@
                     price: formData.get('price'),
                     image: formData.get('image'),
                     endDate: formData.get('endDate'),
-                    promoCode: formData.get('promoCode') 
+                    promoCode: formData.get('promoCode').trim().toUpperCase()
                 };
 
                 let updatedOffers = [...(uiConfig.offers || [])];
@@ -1136,7 +1139,17 @@
                                     <input required name="discountValue" type="number" step="0.01" min="1" placeholder={t.discountValue} className="w-2/3 p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr shadow-inner"/>
                                 </div>
                                 <input name="minAmount" type="number" step="0.01" min="0" placeholder={t.minOrderAmount} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr shadow-inner"/>
-                                <button type="submit" className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2">
+                                <div className="flex gap-3">
+                                    <div className="w-1/2 relative">
+                                        <label className="text-[10px] text-slate-500 font-bold ml-1">{t.expiryDate}</label>
+                                        <input name="expiryDate" type="date" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/>
+                                    </div>
+                                    <div className="w-1/2 relative">
+                                        <label className="text-[10px] text-slate-500 font-bold ml-1">{t.maxUses}</label>
+                                        <input name="maxUses" type="number" min="1" placeholder="مثال: 100" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/>
+                                    </div>
+                                </div>
+                                <button type="submit" className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2 mt-2">
                                     <Icon name="plus" size={18}/> {t.createCode}
                                 </button>
                             </form>
@@ -1147,8 +1160,14 @@
                                     <div key={code.id} className="ios-glass p-4 rounded-2xl shadow-sm flex justify-between items-center">
                                         <div>
                                             <div className="font-bold text-slate-900 text-lg dir-ltr">{code.code}</div>
-                                            <div className={`text-xs font-bold mt-1 bg-white/50 inline-block px-2 py-0.5 rounded-md ${code.discountType==='percent'?'text-red-600':'text-green-600'}`}>
-                                                {code.discountType === 'percent' ? `${code.discountValue}% ${t.discount}` : `${code.discountValue} ${t.currency} ${t.fixedDiscount}`}
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                                <span className={`text-[10px] font-bold bg-white/50 px-2 py-0.5 rounded-md ${code.discountType==='percent'?'text-red-600':'text-green-600'}`}>
+                                                    {code.discountType === 'percent' ? `${code.discountValue}%` : `${code.discountValue} ${t.currency}`}
+                                                </span>
+                                                {code.expiryDate && <span className="text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-md flex items-center gap-1"><Icon name="clock" size={10}/> {code.expiryDate}</span>}
+                                                {code.maxUses && <span className="text-[10px] font-bold text-blue-600 bg-blue-50/50 px-2 py-0.5 rounded-md">
+                                                    {code.currentUses || 0}/{code.maxUses} {t.currentUses}
+                                                </span>}
                                             </div>
                                         </div>
                                         <button aria-label="Delete" onClick={() => deletePromoCode(code.id)} className="text-red-500 hover:text-red-700 p-2.5 bg-red-50/50 rounded-full transition border border-red-100"><Icon name="trash" size={18}/></button>
@@ -1576,7 +1595,7 @@
             
             const startVoiceSearch = () => {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SpeechRecognition) return showToast("متصفحك لا يدعم البحث الصوتي", "error");
+                if (!SpeechRecognition) return showToast(lang === 'ar' ? "متصفحك لا يدعم البحث الصوتي" : "Recherche vocale non supportée", "error");
                 
                 const recognition = new SpeechRecognition();
                 recognition.lang = lang === 'ar' ? 'ar-DZ' : 'fr-FR';
@@ -1608,22 +1627,44 @@
             const applyPromoCode = async (code) => {
                 if (!db || !appId) return showToast(t.conn, "error");
                 if (!code) return showToast(t.promoEnter, 'info');
+                
                 try {
                     const q = window.firebase.query(
                         window.firebase.collection(db, `artifacts/${appId}/public/data/promoCodes`),
-                        window.firebase.where('code', '==', code.toUpperCase()),
+                        window.firebase.where('code', '==', code.trim().toUpperCase()),
                         window.firebase.where('active', '==', true),
                         window.firebase.limit(1)
                     );
                     const snapshot = await window.firebase.getDocs(q);
-                    if (snapshot.empty) { setAppliedPromo(null); showToast(t.promoInvalid, 'error'); return; }
+                    
+                    if (snapshot.empty) { 
+                        setAppliedPromo(null); 
+                        showToast(t.promoInvalid, 'error'); 
+                        return; 
+                    }
+                    
                     const promo = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                    
+                    // حماية وتأمين الكوبون (التحقق من الصلاحية والحدود)
+                    if (promo.expiryDate && new Date(promo.expiryDate) < new Date()) {
+                        showToast(t.expiredPromo, 'error');
+                        setAppliedPromo(null);
+                        return;
+                    }
+                    
+                    if (promo.maxUses && promo.currentUses >= promo.maxUses) {
+                        showToast(t.limitReachedPromo, 'error');
+                        setAppliedPromo(null);
+                        return;
+                    }
+
                     const currentTotal = cart.reduce((s,i) => s + (i.price*i.qty), 0);
                     if (promo.minAmount && currentTotal < promo.minAmount) {
                          showToast(`${t.promoMinAmount} ${promo.minAmount} ${t.currency}`, 'error');
                          setAppliedPromo(null);
                          return;
                     }
+                    
                     setAppliedPromo(promo);
                     showToast(t.promoApplied, 'success');
                 } catch (e) { showToast(t.err, "error"); }
@@ -1749,12 +1790,25 @@
 
             useEffect(() => {
                 if (!user || !db || !appId) return;
+                
+                // تنبيهات المتصفح الأصلية (Native Notifications)
+                if ("Notification" in window && Notification.permission !== "granted") {
+                    Notification.requestPermission();
+                }
+
                 const notifRef = window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`);
                 const unsubNotif = window.firebase.onSnapshot(window.firebase.query(notifRef, window.firebase.orderBy('date', 'desc')), (snap) => {
                     const list = snap.docs.map(d => ({id: d.id, ...d.data()}));
                     setNotifications(list);
                     const fresh = list.find(n => !n.read && n.date && n.date.toMillis && (Date.now() - n.date.toMillis()) < 5000);
-                    if (fresh) showToast(fresh.message[lang] || fresh.message, 'success');
+                    if (fresh) {
+                        const msgText = typeof fresh.message === 'object' ? (fresh.message[lang] || fresh.message.fr) : fresh.message;
+                        showToast(msgText, 'success');
+                        
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            new Notification(t.appTitle, { body: msgText });
+                        }
+                    }
                 });
                 const ordersRef = window.firebase.collection(db, `artifacts/${appId}/public/data/orders`);
                 const unsubOrders = window.firebase.onSnapshot(window.firebase.query(ordersRef, window.firebase.where('customerUserId', '==', user.uid)), (snap) => {
@@ -1798,6 +1852,12 @@
                 if (!user || !db) return showToast(t.conn, "error");
                 
                 const formData = new FormData(e.target);
+                const phone = formData.get('phone') || '';
+                const name = formData.get('name') || '';
+                
+                // حماية Frontend بسيطة
+                if (phone.length < 8) return showToast(lang === 'ar' ? 'الرجاء إدخال رقم هاتف صحيح' : 'Veuillez entrer un numéro valide', 'error');
+                
                 const selectedWilayaString = formData.get('wilaya');
                 let currentZone = selectedWilayaZone;
                 if (selectedWilayaString) {
@@ -1812,9 +1872,9 @@
                     const orderData = {
                         id: customOrderId,
                         customerUserId: user.uid,
-                        customerName: formData.get('name') || '',
-                        phone: formData.get('phone') || '',
-                        wilaya: formData.get('wilaya') || '',
+                        customerName: name,
+                        phone: phone,
+                        wilaya: selectedWilayaString || '',
                         orderDetails: formData.get('orderDetails') || '',
                         items: cart.map(i => ({ 
                             id: i.id || '', 
@@ -1838,11 +1898,17 @@
                         createdAt: window.firebase.Timestamp.now()
                     };
 
-                    localStorage.setItem('saved_phone', formData.get('phone') || '');
-                    localStorage.setItem('saved_wilaya', formData.get('wilaya') || '');
+                    localStorage.setItem('saved_phone', phone);
+                    localStorage.setItem('saved_wilaya', selectedWilayaString || '');
 
                     const documentPath = `artifacts/${appId}/public/data/orders/${customOrderId}`;
                     await window.firebase.setDoc(window.firebase.doc(db, documentPath), orderData);
+                    
+                    // تحديث الكوبون بزيادة الاستخدام بشكل آمن (Security Update)
+                    if (appliedPromo && appliedPromo.id && window.firebase.increment) {
+                        const promoRef = window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes/${appliedPromo.id}`);
+                        await window.firebase.updateDoc(promoRef, { currentUses: window.firebase.increment(1) });
+                    }
                     
                     let msg = { fr: "Commande reçue!", ar: "تم استلام الطلب!" };
                     await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { 
@@ -1876,7 +1942,7 @@
             };
 
             const updateOrderStatus = async (orderId, newStatus, customerId) => {
-                if (!db || !appId) return;
+                if (!db || !appId || !isAdmin) return;
                 try {
                     const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
                     await window.firebase.updateDoc(window.firebase.doc(db, docPath), { status: newStatus });
@@ -1936,6 +2002,39 @@
                     </nav>
 
                     <main className="container mx-auto p-4 pb-32 overflow-y-auto hide-scrollbar max-w-md" style={{height: 'calc(100vh - 80px)'}}>
+                        
+                        {/* واجهة سياسة الخصوصية الجديدة */}
+                        {view === 'privacy' && (
+                            <div className="animate-fadeIn pb-10">
+                                <h2 className="font-bold text-2xl mb-4 text-slate-800 flex items-center gap-2">
+                                    <Icon name="shield-check" className="text-blue-600" size={28}/> {t.privacyPolicy}
+                                </h2>
+                                <div className="ios-glass p-6 rounded-3xl shadow-sm text-sm space-y-5 text-slate-700 leading-relaxed">
+                                    <p>نحن في <strong>L'Artisan Imprimeur</strong> نأخذ خصوصيتك وأمان بياناتك على محمل الجد. توضح هذه السياسة كيفية تعاملنا مع معلوماتك.</p>
+                                    
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">1. جمع البيانات (Data Collection)</h3>
+                                        <p>نقوم بجمع بياناتك الأساسية فقط (الاسم، رقم الهاتف، الولاية) لغرض واحد وهو معالجة طلبات الطباعة الخاصة بك وتوصيلها لك بشكل صحيح. لا نقوم بجمع أي بيانات حساسة أخرى.</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">2. حماية وتشفير البيانات (Data Security)</h3>
+                                        <p>نستخدم البنية التحتية الآمنة لـ <strong>Google Firebase</strong>. يتم تشفير كلمات المرور تلقائياً، ولا يمكن لأي شخص (بما في ذلك الإدارة) رؤية كلمة المرور الخاصة بك.</p>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">3. ملفات تعريف الارتباط (Cookies & Local Storage)</h3>
+                                        <p>نستخدم التخزين المحلي (Local Storage) في متصفحك لحفظ محتوى "سلة المشتريات"، تفضيلات اللغة، وحفظ معلومات التوصيل لنسهل عليك الطلب في المرات القادمة دون إزعاج.</p>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">4. عدم المشاركة (No Third-Party Sharing)</h3>
+                                        <p>نتعهد بأننا لا نقوم ببيع أو مشاركة بياناتك الشخصية لأي طرف ثالث بأي شكل من الأشكال لأغراض إعلانية.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {view === 'home' && (
                             <div className="animate-fadeIn pb-10">
                                 {uiConfig.showAnnouncement && <div className="ios-glass border-yellow-200/50 text-yellow-800 p-2.5 rounded-2xl marquee-container font-black text-[11px] shadow-sm mb-5 bg-gradient-to-r from-yellow-100/80 to-yellow-50/80"><div className="animate-marquee inline-block">{lang === 'ar' ? uiConfig.announcementAr : uiConfig.announcementFr}</div></div>}
@@ -2092,7 +2191,7 @@
                             <div className="animate-fadeIn max-w-md mx-auto pb-10">
                                 <div className="flex justify-between items-center mb-5">
                                     <h2 className="font-bold text-2xl flex items-center gap-2 text-slate-800"><Icon name="shopping-cart" size={24}/> {t.cart}</h2>
-                                    {cart.length > 0 && <button onClick={() => setCart([])} className="text-red-500 bg-red-50/50 px-3 py-1.5 rounded-xl border border-red-100 text-xs font-bold hover:bg-red-100 transition flex items-center gap-1"><Icon name="trash" size={14}/> {t.clearCart}</button>}
+                                    {cart.length > 0 && <button onClick={() => { if(window.confirm(lang === 'ar' ? 'هل أنت متأكد من مسح السلة؟' : 'Voulez-vous vider le panier?')) setCart([]); }} className="text-red-500 bg-red-50/50 px-3 py-1.5 rounded-xl border border-red-100 text-xs font-bold hover:bg-red-100 transition flex items-center gap-1"><Icon name="trash" size={14}/> {t.clearCart}</button>}
                                 </div>
                                 {cart.length === 0 ? <div className="text-center py-20 text-slate-400 ios-glass rounded-3xl"><Icon name="shopping-bag" size={48} className="mx-auto mb-4 opacity-40"/>{t.emptyCart}</div> : (
                                     <div className="space-y-4">
@@ -2154,7 +2253,7 @@
                                                     
                                                     <form onSubmit={submitOrder} className="space-y-3 relative z-10">
                                                         <input aria-label="Name" required name="name" defaultValue={user.displayName || ''} placeholder={t.namePh} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition shadow-inner"/>
-                                                        <input aria-label="Phone" required name="phone" type="tel" defaultValue={savedPhone} placeholder={t.phonePh} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition dir-ltr shadow-inner"/>
+                                                        <input aria-label="Phone" required name="phone" type="tel" minLength="8" defaultValue={savedPhone} placeholder={t.phonePh} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition dir-ltr shadow-inner"/>
                                                         <div className="relative">
                                                             <select aria-label="Wilaya" name="wilaya" required defaultValue={savedWilaya} onChange={(e) => {
                                                                 const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === e.target.value);
@@ -2274,8 +2373,8 @@
                         {view === 'notifications' && (
                             <div className="animate-fadeIn max-w-md mx-auto pb-10"><h2 className="font-bold text-2xl mb-4 text-slate-800">{t.notifications}</h2>{notifications.length === 0 ? <p className="text-center text-slate-400 py-20 ios-glass rounded-3xl"><Icon name="bell-off" size={48} className="mx-auto mb-4 opacity-40"/>{t.noNotifs}</p> : (<div className="space-y-3">{notifications.map(n => (<div key={n.id} onClick={()=>markRead(n.id)} className={`p-4 rounded-2xl border cursor-pointer transition backdrop-blur-md shadow-sm ${n.read ? 'bg-white/60 border-white/50' : 'bg-blue-50/80 border-blue-200 shadow-blue-500/10'}`}><div className="flex gap-3"><div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read ? 'bg-slate-300' : 'bg-blue-500 animate-pulse'}`}></div><div><p className={`text-sm ${!n.read ? 'font-bold text-slate-900' : 'text-slate-600'}`}>{typeof n.message === 'object' ? n.message[lang] : n.message}</p><span className="text-[10px] text-slate-400 mt-1.5 block dir-ltr text-right bg-white/50 w-max px-2 py-0.5 rounded-md font-mono">{n.date?.toDate ? n.date.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span></div></div></div>))}</div>)}</div>
                         )}
-                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} totalSpent={myOrders.filter(o => o.status === 'Prêt').reduce((sum, o) => sum + o.total, 0)} />}
-                        {view === 'admin' && (isAdmin ? <AdminDashboard db={db} appId={appId} updateOrderStatus={updateOrderStatus} lang={lang} t={t} onOpenChat={openChat} showToast={showToast} /> : <div className="text-center py-20 text-red-500 font-bold ios-glass rounded-3xl mt-10">{t.accessDenied}</div>)}
+                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} setView={setView} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} totalSpent={myOrders.filter(o => o.status === 'Prêt').reduce((sum, o) => sum + o.total, 0)} />}
+                        {view === 'admin' && <AdminDashboard db={db} appId={appId} updateOrderStatus={updateOrderStatus} lang={lang} t={t} onOpenChat={openChat} showToast={showToast} user={user} ADMIN_EMAIL={ADMIN_EMAIL} />}
                     </main>
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
