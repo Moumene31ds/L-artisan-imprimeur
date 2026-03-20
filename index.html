@@ -115,7 +115,6 @@
     <div id="root" class="h-full relative z-10"></div>
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
-const [showLanding, setShowLanding] = useState(true);
         const UNDER_MAINTENANCE = false;
 
         const formatPrice = (price) => {
@@ -1680,6 +1679,9 @@ const LandingScreen = ({ t, lang, toggleLang, onGetStarted }) => {
     );
 };
         function App() {
+            // ✅ تم نقل هذا السطر ليكون هنا داخل المكون لمنع انهيار تطبيق React
+            const [showLanding, setShowLanding] = useState(true);
+
             const getInitialView = () => window.location.hash.substring(1).split('/')[0] || 'home';
             const [lang, setLang] = useState(() => localStorage.getItem('app_lang') || 'ar');
             const [view, setView] = useState(getInitialView());
@@ -2119,16 +2121,16 @@ const LandingScreen = ({ t, lang, toggleLang, onGetStarted }) => {
             }
 
             if (!user) {
-    if (showLanding) {
-        return <LandingScreen 
-            t={t} 
-            lang={lang} 
-            toggleLang={toggleLang} 
-            onGetStarted={() => setShowLanding(false)} 
-        />;
-    }
-    return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} />;
-}
+                if (showLanding) {
+                    return <LandingScreen 
+                        t={t} 
+                        lang={lang} 
+                        toggleLang={toggleLang} 
+                        onGetStarted={() => setShowLanding(false)} 
+                    />;
+                }
+                return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} />;
+            }
             
             const unreadCount = notifications.filter(n => !n.read).length;
             const filteredProducts = PRODUCTS_DATA.filter(p => 
