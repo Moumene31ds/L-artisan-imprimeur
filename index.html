@@ -115,7 +115,7 @@
     <div id="root" class="h-full relative z-10"></div>
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
-
+const [showLanding, setShowLanding] = useState(true);
         const UNDER_MAINTENANCE = false;
 
         const formatPrice = (price) => {
@@ -1570,7 +1570,115 @@
                 </div>
             );
         };
+const LandingScreen = ({ t, lang, toggleLang, onGetStarted }) => {
+    return (
+        <div className={`min-h-screen relative overflow-hidden bg-slate-50 flex flex-col ${lang === 'ar' ? 'dir-rtl' : 'dir-ltr'}`}>
+            {/* الخلفية الزجاجية والأضواء العائمة */}
+            <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob pointer-events-none"></div>
+            <div className="absolute top-0 -right-4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob animation-delay-2000 pointer-events-none"></div>
+            <div className="absolute -bottom-8 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob animation-delay-4000 pointer-events-none"></div>
 
+            {/* الشريط العلوي */}
+            <header className="ios-glass-nav p-4 sticky top-0 z-50 safe-top border-b border-white/60">
+                <div className="container mx-auto flex justify-between items-center max-w-6xl">
+                    <div className="flex items-center gap-2 font-bold text-lg text-slate-800">
+                        <div className="bg-gradient-to-tr from-slate-900 to-slate-700 text-white p-2.5 rounded-2xl shadow-lg"><Icon name="printer" size={24}/></div>
+                        <div className="leading-tight"><span className="block text-[18px] font-black tracking-tight">{t.appTitle}</span><span className="text-blue-600 text-[11px] font-bold uppercase tracking-wider">{t.appSubtitle}</span></div>
+                    </div>
+                    <button onClick={toggleLang} className="text-xs font-black bg-white/60 border border-white/80 px-4 py-2 rounded-full hover:bg-white transition shadow-sm backdrop-blur-md text-slate-700">
+                        {lang === 'ar' ? 'FR' : 'عربي'}
+                    </button>
+                </div>
+            </header>
+
+            {/* القسم الرئيسي (Hero Section) */}
+            <div className="flex-1 flex flex-col lg:flex-row items-center justify-center container mx-auto px-6 py-12 z-10 max-w-6xl gap-12">
+                
+                {/* النصوص و زر البدء */}
+                <div className="flex-1 text-center lg:text-start flex flex-col items-center lg:items-start animate-slideUp">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full ios-glass text-blue-700 font-bold text-xs mb-6 border border-white/80 shadow-sm backdrop-blur-md">
+                        <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span>
+                        {lang === 'ar' ? 'المنصة الأولى للطباعة في الجزائر' : 'Plateforme d\'impression N°1 en Algérie'}
+                    </div>
+                    
+                    <h1 className="text-5xl lg:text-7xl font-black text-slate-900 tracking-tighter mb-6 leading-[1.1]">
+                        {lang === 'ar' ? 'طباعة' : 'Impression'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">{lang === 'ar' ? 'احترافية' : 'Pro'}</span><br/>
+                        {lang === 'ar' ? 'بلمسة واحدة.' : 'en un clic.'}
+                    </h1>
+                    
+                    <p className="text-slate-600 text-lg lg:text-xl max-w-lg mb-8 font-medium leading-relaxed">
+                        {lang === 'ar' 
+                            ? 'نحول أفكارك إلى واقع ملموس. جودة عالية، أسعار تنافسية، وتوصيل سريع لبطاقاتك، مطوياتك، والمزيد.' 
+                            : 'Transformez vos idées en réalité. Haute qualité, prix compétitifs et livraison rapide de vos cartes, flyers et plus.'}
+                    </p>
+                    
+                    <button onClick={onGetStarted} className="bg-slate-900/95 backdrop-blur-xl text-white px-10 py-4 rounded-2xl font-black text-lg shadow-[0_10px_40px_rgba(15,23,42,0.3)] hover:shadow-[0_15px_50px_rgba(15,23,42,0.4)] transition-all transform hover:-translate-y-1 flex items-center gap-3 border border-slate-700 group">
+                        {lang === 'ar' ? 'ابدأ تجربتك الآن' : 'Commencez l\'expérience'} 
+                        <Icon name={lang === 'ar' ? "arrow-left" : "arrow-right"} className="group-hover:-translate-x-1 transition-transform" size={20}/>
+                    </button>
+                </div>
+
+                {/* الأشكال الزجاجية العائمة (3D Floating Glass Elements) */}
+                <div className="flex-1 relative w-full h-[400px] lg:h-[500px] hidden md:flex items-center justify-center animate-fadeIn" style={{animationDelay: '0.3s'}}>
+                    {/* بطاقة زيارة عائمة */}
+                    <div className="absolute z-20 w-64 h-40 ios-glass-dark rounded-3xl p-5 shadow-2xl border border-white/20 transform -rotate-6 hover:rotate-0 transition-all duration-500 animate-bounce-slow flex flex-col justify-between overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
+                        <div className="flex justify-between items-start">
+                            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md">
+                                <Icon name="credit-card" size={20} className="text-white" />
+                            </div>
+                            <span className="text-white/50 font-mono text-xs">L'Artisan</span>
+                        </div>
+                        <div>
+                            <div className="w-3/4 h-3 bg-white/20 rounded-full mb-2"></div>
+                            <div className="w-1/2 h-2 bg-white/10 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    {/* فلاير عائم */}
+                    <div className="absolute z-10 right-4 lg:right-12 top-10 w-48 h-64 bg-white/40 backdrop-blur-xl rounded-3xl p-4 shadow-xl border border-white/60 transform rotate-12 hover:rotate-6 transition-all duration-500 animate-bounce-slow" style={{animationDelay: '1s'}}>
+                        <div className="w-full h-24 bg-gradient-to-br from-purple-400/30 to-blue-400/30 rounded-2xl mb-3"></div>
+                        <div className="w-full h-2 bg-slate-300/50 rounded-full mb-2"></div>
+                        <div className="w-5/6 h-2 bg-slate-300/50 rounded-full mb-2"></div>
+                        <div className="w-4/6 h-2 bg-slate-300/50 rounded-full"></div>
+                    </div>
+
+                    {/* إشعار زجاجي */}
+                    <div className="absolute z-30 bottom-16 left-10 lg:left-20 bg-white/90 backdrop-blur-2xl rounded-2xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-white/80 flex items-center gap-3 transform -rotate-3 hover:scale-105 transition-all">
+                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600">
+                            <Icon name="check-circle" size={24} />
+                        </div>
+                        <div>
+                            <p className="font-bold text-sm text-slate-800 leading-tight">{lang === 'ar' ? 'طلبك جاهز!' : 'Commande prête!'}</p>
+                            <p className="text-[10px] text-slate-500">{lang === 'ar' ? 'تمت الطباعة بجودة عالية' : 'Imprimé en haute qualité'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* شريط المميزات السفلية */}
+            <div className="w-full bg-white/30 backdrop-blur-xl border-t border-white/50 py-6 z-10 mt-auto">
+                <div className="container mx-auto max-w-6xl px-4 flex flex-wrap justify-center md:justify-between gap-6">
+                    {[
+                        { icon: 'star', title: lang === 'ar' ? 'جودة استثنائية' : 'Qualité Premium', desc: lang === 'ar' ? 'ورق فاخر وألوان زاهية' : 'Papier de luxe & couleurs vives', color: 'text-blue-600', bg: 'bg-blue-100/50' },
+                        { icon: 'clock', title: lang === 'ar' ? 'سرعة في الإنجاز' : 'Service Rapide', desc: lang === 'ar' ? 'التزام تام بالمواعيد' : 'Respect total des délais', color: 'text-purple-600', bg: 'bg-purple-100/50' },
+                        { icon: 'truck', title: lang === 'ar' ? 'توصيل لكل الولايات' : 'Livraison 58 Wilayas', desc: lang === 'ar' ? 'نصلك أينما كنت' : 'Partout en Algérie', color: 'text-green-600', bg: 'bg-green-100/50' }
+                    ].map((f, i) => (
+                        <div key={i} className="flex items-center gap-3 w-full md:w-auto p-2">
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/60 shadow-sm ${f.bg} ${f.color}`}>
+                                <Icon name={f.icon} size={24} />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-800 text-sm">{f.title}</h4>
+                                <p className="text-xs text-slate-500">{f.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
         function App() {
             const getInitialView = () => window.location.hash.substring(1).split('/')[0] || 'home';
             const [lang, setLang] = useState(() => localStorage.getItem('app_lang') || 'ar');
@@ -2010,7 +2118,17 @@
                 return <MaintenanceScreen t={t} lang={lang} onAdminClick={() => setBypassMaintenance(true)} />;
             }
 
-            if (!user) return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} />;
+            if (!user) {
+    if (showLanding) {
+        return <LandingScreen 
+            t={t} 
+            lang={lang} 
+            toggleLang={toggleLang} 
+            onGetStarted={() => setShowLanding(false)} 
+        />;
+    }
+    return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} />;
+}
             
             const unreadCount = notifications.filter(n => !n.read).length;
             const filteredProducts = PRODUCTS_DATA.filter(p => 
@@ -2439,4 +2557,4 @@
         root.render(<App />);
     </script>
 </body>
-</html>
+    </html>
