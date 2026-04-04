@@ -15,6 +15,11 @@
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-printer'%3E%3Cpolyline points='6 9 6 2 18 2 18 9'%3E%3C/polyline%3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'%3E%3C/path%3E%3Crect width='12' height='8' x='6' y='14'%3E%3C/rect></svg>" />
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,16 +32,14 @@
                         'fadeIn': 'fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
                         'slideUp': 'slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards',
                         'marquee': 'marquee 15s linear infinite',
-                        'blob': 'blob 7s infinite',
-                        'chartGrow': 'chartGrow 1s ease-out forwards'
+                        'blob': 'blob 7s infinite'
                     },
                     keyframes: {
                         fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
                         slideUp: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
                         pulseGlow: { '0%, 100%': { boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)' }, '50%': { boxShadow: '0 0 25px rgba(59, 130, 246, 0.8)' } },
                         marquee: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
-                        blob: { '0%': { transform: 'translate(0px, 0px) scale(1)' }, '33%': { transform: 'translate(30px, -50px) scale(1.1)' }, '66%': { transform: 'translate(-20px, 20px) scale(0.9)' }, '100%': { transform: 'translate(0px, 0px) scale(1)' } },
-                        chartGrow: { '0%': { height: '0%' }, '100%': { } }
+                        blob: { '0%': { transform: 'translate(0px, 0px) scale(1)' }, '33%': { transform: 'translate(30px, -50px) scale(1.1)' }, '66%': { transform: 'translate(-20px, 20px) scale(0.9)' }, '100%': { transform: 'translate(0px, 0px) scale(1)' } }
                     }
                 }
             }
@@ -46,8 +49,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js" defer></script>
 
     <script>
         if (typeof window.__app_id === 'undefined') window.__app_id = "l-artisan-imprimeur";
@@ -117,15 +119,15 @@
 
     <div id="root" class="h-full relative z-10"></div>
     <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback, useMemo } = React;
+        const { useState, useEffect, useRef, useCallback, useMemo, memo } = React;
 
         const formatPrice = (price) => {
             return Number(price).toLocaleString('fr-DZ', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         };
 
-        const Icon = ({ name, size = 20, className = "", fill = "none" }) => {
-            const [svgHtml, setSvgHtml] = useState(null);
-            useEffect(() => {
+        // تم تحسين مكون Icon باستخدام React.memo و useMemo لتسريع الأداء بشكل جذري
+        const Icon = memo(({ name, size = 20, className = "", fill = "none" }) => {
+            const svgHtml = useMemo(() => {
                 if (window.lucide && window.lucide.icons) {
                     const camelName = name.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
                     const pascalName = camelName.charAt(0).toUpperCase() + camelName.slice(1);
@@ -136,13 +138,15 @@
                         svg.setAttribute('height', size);
                         svg.setAttribute('fill', fill);
                         if (className) svg.setAttribute('class', className);
-                        setSvgHtml(svg.outerHTML);
+                        return svg.outerHTML;
                     }
                 }
+                return null;
             }, [name, size, className, fill]);
+
             if (!svgHtml) return <div style={{width: size, height: size}} className={`bg-transparent ${className}`}></div>;
             return <div dangerouslySetInnerHTML={{ __html: svgHtml }} className={`flex items-center justify-center ${className}`} style={{display: 'inline-flex'}} />;
-        };
+        });
 
         const WILAYAS = [
             { id: 1, name: "Adrar", zone: 3 }, { id: 2, name: "Chlef", zone: 1 }, { id: 3, name: "Laghouat", zone: 2 }, 
@@ -217,7 +221,7 @@
                 categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Goodies", share: "Partager", clearCart: "Vider",
                 maintenanceTitle: "Site en Maintenance", maintenanceDesc: "Nous mettons à niveau notre plateforme.", maintenanceAdminLogin: "Admin", contactUsMsg: "Nous contacter",
                 privacyPolicy: "Politique de Confidentialité", expiredPromo: "Code expiré", limitReachedPromo: "Limite d'utilisation atteinte", maxUses: "Utilisations max", expiryDate: "Date d'expiration", currentUses: "Utilisations actuelles", phoneError: "Entrez un numéro algérien valide",
-                newOrderAlert: "Nouvelle commande reçue !", rateOrder: "Évaluer", reviewSubmitted: "Merci pour votre évaluation!", ratingTitle: "Évaluer votre commande", undo: "Annuler", redo: "Refaire"
+                newOrderAlert: "Nouvelle commande reçue !"
             },
             ar: {
                 appTitle: "الحرفي", appSubtitle: "للطباعة", home: "الرئيسية", cart: "السلة", orders: "طلباتي", admin: "الإدارة",
@@ -266,7 +270,7 @@
                 categories: "التصنيفات", catCards: "بطاقات", catFlyers: "مطويات", catGoodies: "إكسسوارات", share: "مشاركة", clearCart: "تفريغ السلة",
                 maintenanceTitle: "الموقع تحت الصيانة", maintenanceDesc: "نقوم بتحديث المنصة لخدمتكم بشكل أفضل.", maintenanceAdminLogin: "دخول الإدارة", contactUsMsg: "تواصل معنا",
                 privacyPolicy: "سياسة الخصوصية والأمان", expiredPromo: "انتهت صلاحية الكود", limitReachedPromo: "تم الوصول للحد الأقصى للاستخدام", maxUses: "الحد الأقصى للاستخدام", expiryDate: "تاريخ الانتهاء", currentUses: "الاستخدامات الحالية", phoneError: "يرجى إدخال رقم هاتف جزائري صحيح",
-                newOrderAlert: "تم استلام طلب جديد!", rateOrder: "تقييم", reviewSubmitted: "شكراً لتقييمك!", ratingTitle: "تقييم الطلب", undo: "تراجع", redo: "إعادة"
+                newOrderAlert: "تم استلام طلب جديد!"
             }
         };
         
@@ -378,45 +382,6 @@
                             <span className="text-[10px] font-bold text-slate-700 max-w-[64px] truncate">{s.name}</span>
                         </div>
                     ))}
-                </div>
-            );
-        };
-
-        // Modal للتقييم
-        const RatingModal = ({ t, order, onClose, onSubmitReview }) => {
-            const [rating, setRating] = useState(0);
-            const [hover, setHover] = useState(0);
-
-            return (
-                <div className="fixed inset-0 z-[150] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-                    <div className="ios-glass w-full max-w-sm rounded-3xl p-6 relative animate-slideUp text-center">
-                        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition"><Icon name="x" size={20}/></button>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">{t.ratingTitle}</h3>
-                        <p className="text-xs text-slate-500 mb-6">#{order.id.slice(-6)}</p>
-                        
-                        <div className="flex justify-center gap-2 mb-6 text-slate-300">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button 
-                                    key={star}
-                                    type="button"
-                                    onClick={() => setRating(star)}
-                                    onMouseEnter={() => setHover(star)}
-                                    onMouseLeave={() => setHover(rating)}
-                                    className="focus:outline-none transition-transform hover:scale-110"
-                                >
-                                    <Icon name="star" size={36} className={`${star <= (hover || rating) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-300'} transition-colors duration-200`} />
-                                </button>
-                            ))}
-                        </div>
-                        
-                        <button 
-                            onClick={() => onSubmitReview(order.id, rating)} 
-                            disabled={rating === 0} 
-                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl shadow-lg transition-all"
-                        >
-                            {t.send}
-                        </button>
-                    </div>
                 </div>
             );
         };
@@ -801,127 +766,123 @@
             );
         };
 
+        // تم تحسين وتطوير تصميم الفاتورة بالكامل
         const printInvoice = (order, t) => {
             const printWindow = window.open('', '_blank');
             const totalDiscount = order.discount || 0;
             const subtotal = order.subtotal || 0;
+            const printDate = new Date().toLocaleString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+            const langDir = t.langName === 'العربية' ? 'rtl' : 'ltr';
 
             const htmlContent = `
-                <html>
+                <html dir="${langDir}">
                 <head>
-                    <title>${t.printInvoice} - #${order.id.slice(-4)}</title>
+                    <title>Facture / فاتورة - #${order.id.slice(-6)}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
                     <style>
-                        body { font-family: 'Cairo', sans-serif; direction: rtl; margin: 0; padding: 20px; font-size: 12px; }
-                        h1 { font-size: 18px; text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 20px; color: #0f172a; }
-                        .info { display: flex; justify-content: space-between; margin-bottom: 15px; }
-                        .info div { flex-basis: 48%; }
-                        .info p { margin: 2px 0; font-weight: 600; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-                        th { background-color: #f2f2f2; font-weight: bold; }
-                        .total-row td { font-size: 14px; font-weight: bold; background-color: #e0f2f1; }
-                        .total-cell { text-align: left; }
-                        .status { font-weight: bold; color: ${order.status === 'Prêt' ? '#10b981' : (order.status === 'Annulé' ? '#ef4444' : '#f59e0b')}; }
-                        .variants ul { list-style: none; padding: 0; margin: 0; font-size: 11px; color: #64748b; }
-                        .variants li { margin-top: 2px; }
-                        .item-img { max-width: 50px; max-height: 50px; border-radius: 4px; border: 1px solid #eee; }
-                        @media print {
-                            .no-print { display: none; }
-                        }
+                        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 40px; font-size: 14px; color: #1e293b; background: #fff; }
+                        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header-brand h1 { margin: 0; font-size: 28px; color: #0f172a; font-weight: 700; }
+                        .header-brand p { margin: 5px 0 0; color: #64748b; font-size: 12px; }
+                        .invoice-title { text-align: ${langDir === 'rtl' ? 'left' : 'right'}; }
+                        .invoice-title h2 { margin: 0; font-size: 24px; color: #3b82f6; text-transform: uppercase; }
+                        .invoice-title p { margin: 5px 0 0; font-size: 13px; font-weight: 600; }
+                        .info-grid { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
+                        .info-block { width: 48%; }
+                        .info-block h3 { margin-top: 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; }
+                        .info-block p { margin: 4px 0; font-weight: 600; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border-bottom: 1px solid #e2e8f0; padding: 12px 8px; text-align: ${langDir === 'rtl' ? 'right' : 'left'}; }
+                        th { background-color: #f1f5f9; font-weight: 700; color: #475569; }
+                        .total-section { width: 50%; margin-left: auto; margin-top: 20px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
+                        html[dir="rtl"] .total-section { margin-left: 0; margin-right: auto; }
+                        .total-row { display: flex; justify-content: space-between; padding: 8px 0; }
+                        .total-row.final { font-size: 18px; font-weight: 700; color: #0f172a; border-top: 1px solid #e2e8f0; margin-top: 10px; padding-top: 10px; }
+                        .footer { margin-top: 50px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px; color: #64748b; font-size: 12px; }
+                        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #e0e7ff; color: #3730a3; }
+                        @media print { .no-print { display: none; } body { padding: 0; } }
                     </style>
                 </head>
                 <body>
-                    <div style="text-align: left; margin-bottom: -50px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${order.id}" alt="Order QR" style="border: 1px solid #ddd; padding: 4px; border-radius: 4px;" />
+                    <div class="header">
+                        <div class="header-brand">
+                            <h1>L'Artisan Imprimeur</h1>
+                            <p>Imprimerie Numérique & Offset</p>
+                            <p>📍 Mostaganem, Algérie</p>
+                            <p>📞 +213 549 17 90 00</p>
+                        </div>
+                        <div class="invoice-title">
+                            <h2>${t.printInvoice}</h2>
+                            <p># ${order.id}</p>
+                            <p style="color:#64748b; font-weight:normal;">${printDate}</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${order.id}" style="margin-top: 10px; border-radius: 4px;"/>
+                        </div>
                     </div>
 
-                    <h1>${t.appTitle} ${t.appSubtitle} - ${t.printInvoice}</h1>
-                    <div class="info">
-                        <div>
-                            <p>${t.namePh}: ${order.customerName}</p>
-                            <p>${t.phonePh}: ${order.phone}</p>
-                            <p>${t.wilaya}: ${order.wilaya}</p>
-                            <p style="margin-top:5px; font-weight:normal;"><b>${t.orderDetails}:</b><br/>${order.orderDetails || '-'}</p>
+                    <div class="info-grid">
+                        <div class="info-block">
+                            <h3>Client / الزبون</h3>
+                            <p>${order.customerName}</p>
+                            <p dir="ltr" style="text-align: ${langDir === 'rtl' ? 'right' : 'left'};">${order.phone}</p>
+                            <p>${order.wilaya}</p>
                         </div>
-                        <div>
-                            <p># ${t.orders}: #${order.id.slice(-6)}</p>
-                            <p>التاريخ: ${order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : '—'}</p>
-                            <p>الحالة: <span class="status">${STATUS_OPTIONS.find(s=>s.key===order.status)?.label[t.langName] || order.status}</span></p>
+                        <div class="info-block">
+                            <h3>Commande / الطلب</h3>
+                            <p>Date: ${order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : '—'}</p>
+                            <p>Status: <span class="status-badge">${STATUS_OPTIONS.find(s=>s.key===order.status)?.label[t.langName === 'العربية' ? 'ar' : 'fr'] || order.status}</span></p>
                         </div>
                     </div>
+
+                    ${order.orderDetails ? `<div style="margin-bottom: 20px; padding: 15px; background: #f8fafc; border-right: ${langDir === 'rtl' ? '4px solid #3b82f6' : 'none'}; border-left: ${langDir === 'ltr' ? '4px solid #3b82f6' : 'none'}; border-radius: 4px; font-size: 13px;"><b>Notes:</b><br/> ${order.orderDetails}</div>` : ''}
 
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 60px;">الصورة</th>
                                 <th>${t.items}</th>
-                                <th>${t.qty}</th>
-                                <th>سعر الوحدة (${t.currency})</th>
-                                <th>المجموع (${t.currency})</th>
+                                <th style="width: 100px;">${t.qty}</th>
+                                <th style="width: 120px;">Prix U.</th>
+                                <th style="width: 120px;">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${order.items.map(item => `
                                 <tr>
-                                    <td>${item.image ? `<img src="${item.image}" class="item-img" />` : '-'}</td>
                                     <td>
-                                        ${item.name[t.langName] || item.name}
+                                        <strong>${item.name[t.langName === 'العربية' ? 'ar' : 'fr'] || item.name}</strong>
                                         ${item.selectedVariants && item.selectedVariants.length > 0 ? `
-                                            <div class="variants">
-                                                <ul>
-                                                    ${item.selectedVariants.map(v => `<li>${v.label}: ${v.value}</li>`).join('')}
-                                                </ul>
+                                            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
+                                                ${item.selectedVariants.map(v => `${v.label}: ${v.value}`).join(' | ')}
                                             </div>
                                         ` : ''}
                                     </td>
-                                    <td style="text-align: center;">${item.qty}</td>
-                                    <td>${formatPrice(item.price)}</td>
-                                    <td>${formatPrice(item.price * item.qty)}</td>
+                                    <td>${item.qty}</td>
+                                    <td>${formatPrice(item.price)} ${t.currency}</td>
+                                    <td>${formatPrice(item.price * item.qty)} ${t.currency}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
-                        <tfoot>
-                            <tr><td colspan="4">${t.subtotal}</td><td class="total-cell">${formatPrice(subtotal)} ${t.currency}</td></tr>
-                            <tr><td colspan="4">${t.deliveryFee}</td><td class="total-cell">${formatPrice(order.deliveryFee || 0)} ${t.currency}</td></tr>
-                            ${totalDiscount > 0 ? `<tr><td colspan="4">${t.discount}</td><td class="total-cell" style="color: #ef4444;">- ${formatPrice(totalDiscount)} ${t.currency}</td></tr>` : ''}
-                            <tr class="total-row"><td colspan="4">${t.total}</td><td class="total-cell">${formatPrice(order.total)} ${t.currency}</td></tr>
-                        </tfoot>
                     </table>
                     
-                    <div class="no-print" style="text-align: center; margin-top: 30px;">
-                        <button onclick="window.print()" style="padding: 10px 20px; background-color: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">${t.printInvoice}</button>
+                    <div class="total-section">
+                        <div class="total-row"><span>${t.subtotal}</span><span>${formatPrice(subtotal)} ${t.currency}</span></div>
+                        <div class="total-row"><span>${t.deliveryFee}</span><span>${formatPrice(order.deliveryFee || 0)} ${t.currency}</span></div>
+                        ${totalDiscount > 0 ? `<div class="total-row" style="color: #ef4444;"><span>${t.discount}</span><span>- ${formatPrice(totalDiscount)} ${t.currency}</span></div>` : ''}
+                        <div class="total-row final"><span>${t.total}</span><span>${formatPrice(order.total)} ${t.currency}</span></div>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Merci pour votre confiance. / شكراً لثقتكم بنا.</p>
+                        <p>L'Artisan Imprimeur © ${new Date().getFullYear()}</p>
                     </div>
 
+                    <div class="no-print" style="text-align: center; margin-top: 40px;">
+                        <button onclick="window.print()" style="padding: 12px 24px; background-color: #0f172a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;">🖨️ ${t.printInvoice}</button>
+                    </div>
                 </body>
                 </html>
             `;
             printWindow.document.write(htmlContent);
             printWindow.document.close();
-        };
-
-        const AdminChatList = ({ db, appId, onSelectChat, t }) => {
-            const [chats, setChats] = useState([]);
-            useEffect(() => {
-                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/chats`), window.firebase.orderBy('lastMessageTime', 'desc'));
-                const unsub = window.firebase.onSnapshot(q, (snap) => setChats(snap.docs.map(d => ({id: d.id, ...d.data()}))));
-                return () => unsub();
-            }, [db, appId]);
-            return chats.length === 0 ? <p className="text-center text-gray-400 py-10 ios-glass rounded-2xl">No active chats.</p> : chats.map(chat => (
-                <div key={chat.id} onClick={() => onSelectChat(chat.userId, chat.userName)} className="ios-glass p-4 rounded-2xl hover:border-blue-300 shadow-sm cursor-pointer transition flex gap-3 items-center group mb-3">
-                    <div className="w-12 h-12 bg-blue-50/80 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg group-hover:bg-blue-600 group-hover:text-white transition uppercase border border-blue-100 shadow-inner">
-                        {chat.userName ? chat.userName.charAt(0) : 'G'}
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                        <div className="flex justify-between items-center mb-1">
-                            <h4 className="font-bold text-slate-800 text-sm truncate">{chat.userName}</h4>
-                            <span className="text-[10px] text-slate-500 font-mono bg-white/50 border border-white/60 px-2 py-0.5 rounded-md">
-                                {chat.lastMessageTime?.toDate ? chat.lastMessageTime.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
-                            </span>
-                        </div>
-                        <p className="text-xs text-slate-500 truncate group-hover:text-blue-600 transition">{chat.lastMessage}</p>
-                    </div>
-                </div>
-            ));
         };
 
         const AdminDashboard = ({ db, appId, updateOrderStatus, lang, t, onOpenChat, showToast, user, ADMIN_EMAIL }) => {
@@ -974,26 +935,16 @@
                 const unsub = window.firebase.onSnapshot(codesRef, (snap) => {
                     setPromoCodes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
                 });
+                return () => unsub();
+            }, [db, appId]);
+            
+            useEffect(() => {
+                if (!db || !appId) return;
                 const unsubUi = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (doc) => {
                     if (doc.exists()) setUiConfig(doc.data());
                 });
-                return () => { unsub(); unsubUi(); };
+                return () => unsubUi();
             }, [db, appId]);
-
-            const chartData = useMemo(() => {
-                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                const data = [0, 0, 0, 0, 0, 0, 0];
-                orders.forEach(o => {
-                    if (o.createdAt && o.status !== 'Annulé' && o.status !== 'En attente') {
-                        const date = o.createdAt.toDate();
-                        if (Date.now() - date.getTime() < 7 * 24 * 60 * 60 * 1000) {
-                            data[date.getDay()] += o.total || 0;
-                        }
-                    }
-                });
-                const max = Math.max(...data, 1);
-                return { days, data, max };
-            }, [orders]);
 
             const addPromoCode = async (e) => {
                 e.preventDefault();
@@ -1007,7 +958,15 @@
                 if (!code || isNaN(discountValue)) return;
                 try {
                     await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, code), {
-                        code: code, discountType: data.get('discountType'), discountValue: discountValue, minAmount: minAmount, expiryDate: expiryDate || null, maxUses: maxUses || null, currentUses: 0, active: true, createdAt: window.firebase.Timestamp.now()
+                        code: code, 
+                        discountType: data.get('discountType'), 
+                        discountValue: discountValue, 
+                        minAmount: minAmount, 
+                        expiryDate: expiryDate || null,
+                        maxUses: maxUses || null,
+                        currentUses: 0,
+                        active: true, 
+                        createdAt: window.firebase.Timestamp.now()
                     });
                     e.target.reset(); showToast(t.codeAdded, 'success');
                 } catch (e) { showToast(t.err, 'error'); }
@@ -1020,7 +979,14 @@
             
             const deleteOrder = async (orderId) => {
                 if (!confirm(t.confirmDeleteOrder)) return;
-                try { await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`)); showToast(t.orderDeleted, 'success'); } catch (e) { showToast(t.err, 'error'); }
+                try { 
+                    const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
+                    await window.firebase.deleteDoc(window.firebase.doc(db, docPath)); 
+                    showToast(t.orderDeleted, 'success'); 
+                } catch (e) { 
+                    console.error("Error deleting order:", e);
+                    showToast(t.err, 'error'); 
+                }
             };
             
             const saveConfig = async (e) => {
@@ -1028,7 +994,11 @@
                 const formData = new FormData(e.target);
                 try {
                     await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), {
-                        ...uiConfig, announcementAr: formData.get('announcementAr'), announcementFr: formData.get('announcementFr'), showAnnouncement: formData.get('showAnnouncement') === 'on', maintenanceMode: formData.get('maintenanceMode') === 'on'
+                        ...uiConfig,
+                        announcementAr: formData.get('announcementAr'),
+                        announcementFr: formData.get('announcementFr'),
+                        showAnnouncement: formData.get('showAnnouncement') === 'on',
+                        maintenanceMode: formData.get('maintenanceMode') === 'on'
                     }, { merge: true });
                     showToast(t.statusUpdate, 'success');
                 } catch (e) { showToast(t.err, 'error'); }
@@ -1037,81 +1007,135 @@
             const addStory = async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                const newStory = { id: Date.now(), name: formData.get('name'), img: formData.get('img') };
-                try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { stories: [...(uiConfig.stories || []), newStory] }); e.target.reset(); } catch (e) { showToast(t.err, 'error'); }
+                const newStory = {
+                    id: Date.now(),
+                    name: formData.get('name'),
+                    img: formData.get('img')
+                };
+                try {
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), {
+                        stories: [...(uiConfig.stories || []), newStory]
+                    });
+                    e.target.reset();
+                } catch (e) { showToast(t.err, 'error'); }
             };
 
             const deleteStory = async (storyId) => {
-                try { const newStories = uiConfig.stories.filter(s => s.id !== storyId); await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { stories: newStories }); } catch (e) { showToast(t.err, 'error'); }
+                try {
+                    const newStories = uiConfig.stories.filter(s => s.id !== storyId);
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { stories: newStories });
+                } catch (e) { showToast(t.err, 'error'); }
             };
 
             const addOrUpdateOffer = async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
-                const offerData = { title: formData.get('title'), description: formData.get('description'), price: formData.get('price'), image: formData.get('image'), endDate: formData.get('endDate'), promoCode: formData.get('promoCode').trim().toUpperCase() };
-                let updatedOffers = [...(uiConfig.offers || [])];
-                if (editingOffer) updatedOffers = updatedOffers.map(o => o.id === editingOffer.id ? { ...o, ...offerData } : o);
-                else updatedOffers.push({ id: Date.now(), ...offerData });
+                
+                const offerData = {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    price: formData.get('price'),
+                    image: formData.get('image'),
+                    endDate: formData.get('endDate'),
+                    promoCode: formData.get('promoCode').trim().toUpperCase()
+                };
 
-                try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { offers: updatedOffers }); e.target.reset(); setEditingOffer(null); showToast(t.statusUpdate, 'success'); } catch (e) { showToast(t.err, 'error'); }
+                let updatedOffers = [...(uiConfig.offers || [])];
+
+                if (editingOffer) {
+                    updatedOffers = updatedOffers.map(o => o.id === editingOffer.id ? { ...o, ...offerData } : o);
+                } else {
+                    updatedOffers.push({ id: Date.now(), ...offerData });
+                }
+
+                try {
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), {
+                        offers: updatedOffers
+                    });
+                    e.target.reset();
+                    setEditingOffer(null);
+                    showToast(t.statusUpdate, 'success');
+                } catch (e) { showToast(t.err, 'error'); }
             };
 
-            const handleEditOffer = (offer) => { setEditingOffer(offer); document.querySelector('form[name="offerForm"]').scrollIntoView({ behavior: 'smooth' }); };
-            const cancelEdit = () => { setEditingOffer(null); document.querySelector('form[name="offerForm"]').reset(); };
+            const handleEditOffer = (offer) => {
+                setEditingOffer(offer);
+                document.querySelector('form[name="offerForm"]').scrollIntoView({ behavior: 'smooth' });
+            };
+
+            const cancelEdit = () => {
+                setEditingOffer(null);
+                document.querySelector('form[name="offerForm"]').reset();
+            };
+
             const deleteOffer = async (offerId) => {
-                try { const newOffers = uiConfig.offers.filter(o => o.id !== offerId); await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { offers: newOffers }); if (editingOffer && editingOffer.id === offerId) cancelEdit(); } catch (e) { showToast(t.err, 'error'); }
+                try {
+                    const newOffers = uiConfig.offers.filter(o => o.id !== offerId);
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/config/ui`), { offers: newOffers });
+                    if (editingOffer && editingOffer.id === offerId) cancelEdit();
+                } catch (e) { showToast(t.err, 'error'); }
             };
 
             const exportToCSV = () => {
                 const escapeCSV = (str) => `"${String(str).replace(/"/g, '""')}"`;
                 const header = ["Order ID", "Customer Name", "Phone", "Wilaya", "Status", "Total", "Date"];
-                const rows = orders.map(o => [ escapeCSV(o.id), escapeCSV(o.customerName), escapeCSV(o.phone), escapeCSV(o.wilaya), escapeCSV(o.status), escapeCSV(o.total), escapeCSV(o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : '') ]);
+                const rows = orders.map(o => [
+                    escapeCSV(o.id), 
+                    escapeCSV(o.customerName), 
+                    escapeCSV(o.phone), 
+                    escapeCSV(o.wilaya), 
+                    escapeCSV(o.status), 
+                    escapeCSV(o.total), 
+                    escapeCSV(o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : '')
+                ]);
                 const csvContent = "\uFEFF" + [header, ...rows].map(e => e.join(",")).join("\n");
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `orders_export_${new Date().toISOString().slice(0,10)}.csv`;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `orders_export_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             };
 
+            // حساب الإحصائيات للإدارة
+            const todayDate = new Date();
+            todayDate.setHours(0,0,0,0);
+            const todayOrders = orders.filter(o => o.createdAt?.toDate && o.createdAt.toDate() >= todayDate);
+            const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.status !== 'Annulé' ? (o.total || 0) : 0), 0);
+            const pendingCount = orders.filter(o => o.status === 'En attente').length;
             const revenue = orders.reduce((sum, o) => sum + (o.status !== 'En attente' && o.status !== 'Annulé' ? (o.total || 0) : 0), 0);
+            
             const filteredOrders = orders.filter(o => 
                 (filterStatus === "All" || o.status === filterStatus) &&
                 (o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || o.phone.includes(searchTerm) || o.id.includes(searchTerm))
             );
 
             return (
-                <div className="animate-fadeIn space-y-4 pt-4 pb-28">
+                <div className="animate-fadeIn space-y-4 pt-4">
                     {uiConfig.maintenanceMode && (
                         <div className="bg-red-500/90 text-white p-3 rounded-2xl shadow-lg mb-4 backdrop-blur-md animate-pulse font-bold flex items-center justify-center gap-2 border border-red-400">
                             <Icon name="alert-triangle" /> وضع الصيانة مفعل حالياً! لا يمكن للزبائن الطلب.
                         </div>
                     )}
                     
-                    <div className="ios-glass-dark text-white p-4 rounded-3xl shadow-lg border border-slate-700">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="font-bold flex items-center gap-2"><Icon name="layout-dashboard" /> {t.adminPanel}</h2>
-                            <span className="text-xs bg-slate-700/50 backdrop-blur px-2 py-1 rounded border border-slate-600">Admin</span>
+                    {/* تحسين عرض الإحصائيات */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-4 rounded-3xl shadow-lg border border-slate-700">
+                            <p className="text-xs text-slate-400 mb-1">{t.revenue} (الإجمالي)</p>
+                            <p className="text-xl font-black text-green-400">{formatPrice(revenue)} {t.currency}</p>
                         </div>
-                        <div className="flex gap-4">
-                            <div className="flex-1 bg-white/10 backdrop-blur p-3 rounded-2xl border border-white/5 shadow-inner">
-                                <p className="text-xs text-slate-300 mb-1">{t.revenue}</p>
-                                <p className="text-xl font-bold text-green-400">{formatPrice(revenue)} {t.currency}</p>
-                            </div>
-                            <div className="flex-1 bg-white/10 backdrop-blur p-3 rounded-2xl border border-white/5 shadow-inner">
-                                <p className="text-xs text-slate-300 mb-1">{t.orders}</p>
-                                <p className="text-xl font-bold">{orders.length}</p>
-                            </div>
+                        <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-4 rounded-3xl shadow-lg border border-blue-500">
+                            <p className="text-xs text-blue-200 mb-1">أرباح اليوم</p>
+                            <p className="text-xl font-black">{formatPrice(todayRevenue)} {t.currency}</p>
                         </div>
-
-                        <div className="mt-4 bg-white/5 p-4 rounded-2xl border border-white/10 h-32 flex items-end justify-between gap-1">
-                            {chartData.data.map((val, i) => (
-                                <div key={i} className="flex flex-col items-center flex-1 group relative">
-                                    <div className="w-full bg-blue-500/50 rounded-t-sm hover:bg-blue-400 transition-colors animate-chartGrow" style={{ height: `${(val / chartData.max) * 80}px` }}></div>
-                                    <span className="text-[9px] text-slate-400 mt-1">{chartData.days[i]}</span>
-                                    <div className="absolute -top-6 bg-slate-800 text-white text-[10px] py-0.5 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
-                                        {formatPrice(val)}
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="bg-white/60 backdrop-blur p-4 rounded-3xl shadow-sm border border-white/80">
+                            <p className="text-xs text-slate-500 mb-1">طلبات قيد الانتظار</p>
+                            <p className="text-xl font-black text-orange-500">{pendingCount}</p>
+                        </div>
+                        <div className="bg-white/60 backdrop-blur p-4 rounded-3xl shadow-sm border border-white/80">
+                            <p className="text-xs text-slate-500 mb-1">إجمالي الطلبات</p>
+                            <p className="text-xl font-black text-slate-800">{orders.length}</p>
                         </div>
                     </div>
                     
@@ -1135,7 +1159,7 @@
 
                     {tab === 'orders' ? (
                         loading ? <div className="flex justify-center py-10"><div className="loader"></div></div> : (
-                            <div className="space-y-4">
+                            <div className="space-y-4 pb-28">
                                 <div className="flex gap-2 mb-2">
                                     <input type="text" placeholder={t.search} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-1 p-3 rounded-xl ios-glass border-white/50 text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                     <button onClick={exportToCSV} className="bg-green-600/90 backdrop-blur text-white px-4 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm">{t.exportCSV}</button>
@@ -1150,11 +1174,16 @@
                                 {filteredOrders.length === 0 && <div className="text-center py-10 text-gray-400 ios-glass rounded-2xl">No orders found.</div>}
 
                                 {filteredOrders.map(order => (
-                                    <div key={order.id} className="ios-glass p-4 rounded-2xl shadow-sm hover:shadow-md transition">
+                                    <div key={order.id} className={`ios-glass p-4 rounded-2xl shadow-sm hover:shadow-md transition ${order.status === 'En attente' ? 'border-orange-300 bg-orange-50/30' : ''}`}>
                                         <div className="flex justify-between items-start border-b border-white/40 pb-3 mb-3">
                                             <div>
-                                                <div className="font-bold text-slate-800 text-lg">{order.customerName}</div>
-                                                <div className="text-xs text-slate-500 dir-ltr text-right font-mono mt-0.5">{order.phone}</div>
+                                                <div className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                                    {order.customerName}
+                                                </div>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <div className="text-xs text-slate-500 dir-ltr font-mono">{order.phone}</div>
+                                                    <button onClick={() => { navigator.clipboard.writeText(order.phone); showToast(lang === 'ar' ? 'تم النسخ' : 'Copié', 'success'); }} className="text-slate-400 hover:text-blue-600 bg-white/50 rounded p-1 shadow-sm"><Icon name="copy" size={12}/></button>
+                                                </div>
                                                 <div className="text-[10px] text-gray-500 mt-1 bg-white/50 inline-block px-2 py-0.5 rounded-md border border-white/60">{order.wilaya}</div>
                                             </div>
                                             <div className="text-right">
@@ -1162,14 +1191,6 @@
                                                 <div className="text-[10px] text-gray-400 font-mono mt-1">#{order.id.slice(-4)}</div>
                                             </div>
                                         </div>
-                                        
-                                        {order.rating && (
-                                            <div className="flex items-center gap-1 mb-3 bg-yellow-50/80 p-2 rounded-lg border border-yellow-200 w-max">
-                                                <Icon name="star" size={14} className="text-yellow-500 fill-yellow-500" />
-                                                <span className="text-xs font-bold text-yellow-700">{order.rating}/5 التقييم</span>
-                                            </div>
-                                        )}
-
                                         <div className="bg-white/40 p-3 rounded-xl text-xs text-slate-600 mb-3 border border-white/50 shadow-inner">
                                             <span className="font-bold block mb-1">{t.details}:</span>
                                             {order.orderDetails || "—"}
@@ -1188,24 +1209,37 @@
                             </div>
                         )
                     ) : tab === 'chats' ? (
-                        <div className="space-y-3">
-                            {window.firebase && <AdminChatList db={db} appId={appId} onSelectChat={onOpenChat} t={t} />}
+                        <div className="animate-fadeIn pb-28">
+                           <div className="space-y-3">
+                                {window.firebase && <AdminChatList db={db} appId={appId} onSelectChat={onOpenChat} t={t} />}
+                           </div>
                         </div>
                     ) : tab === 'codes' ? (
-                        <div className="space-y-4">
+                        <div className="animate-fadeIn space-y-4 pb-28">
                             <h3 className="font-bold text-lg px-2 text-slate-800">{t.createCode}</h3>
                             <form onSubmit={addPromoCode} className="ios-glass p-5 rounded-2xl shadow-sm space-y-3">
                                 <input required name="code" placeholder={t.codeName} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 uppercase dir-ltr shadow-inner font-bold"/>
                                 <div className="flex gap-3">
-                                    <select aria-label="Discount Type" name="discountType" required className="p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 w-1/3 shadow-inner font-bold"><option value="percent">%</option><option value="fixed">{t.currency}</option></select>
+                                    <select aria-label="Discount Type" name="discountType" required className="p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 w-1/3 shadow-inner font-bold">
+                                        <option value="percent">%</option>
+                                        <option value="fixed">{t.currency}</option>
+                                    </select>
                                     <input required name="discountValue" type="number" step="0.01" min="1" placeholder={t.discountValue} className="w-2/3 p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr shadow-inner"/>
                                 </div>
                                 <input name="minAmount" type="number" step="0.01" min="0" placeholder={t.minOrderAmount} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dir-ltr shadow-inner"/>
                                 <div className="flex gap-3">
-                                    <div className="w-1/2 relative"><label className="text-[10px] text-slate-500 font-bold ml-1">{t.expiryDate}</label><input name="expiryDate" type="date" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/></div>
-                                    <div className="w-1/2 relative"><label className="text-[10px] text-slate-500 font-bold ml-1">{t.maxUses}</label><input name="maxUses" type="number" min="1" placeholder="100" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/></div>
+                                    <div className="w-1/2 relative">
+                                        <label className="text-[10px] text-slate-500 font-bold ml-1">{t.expiryDate}</label>
+                                        <input name="expiryDate" type="date" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/>
+                                    </div>
+                                    <div className="w-1/2 relative">
+                                        <label className="text-[10px] text-slate-500 font-bold ml-1">{t.maxUses}</label>
+                                        <input name="maxUses" type="number" min="1" placeholder="مثال: 100" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/>
+                                    </div>
                                 </div>
-                                <button type="submit" className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2 mt-2 shadow-md"><Icon name="plus" size={18}/> {t.createCode}</button>
+                                <button type="submit" className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2 mt-2 shadow-md">
+                                    <Icon name="plus" size={18}/> {t.createCode}
+                                </button>
                             </form>
 
                             <h3 className="font-bold text-lg pt-4 px-2 flex justify-between items-center text-slate-800">{t.activeCodes} <span className="text-sm bg-slate-200/50 backdrop-blur text-slate-700 px-3 py-0.5 rounded-full border border-slate-300">{promoCodes.length}</span></h3>
@@ -1213,11 +1247,18 @@
                                 {promoCodes.map(code => (
                                     <div key={code.id} className="ios-glass p-4 rounded-2xl shadow-sm flex justify-between items-center group">
                                         <div>
-                                            <div className="font-black text-slate-900 text-lg dir-ltr flex items-center gap-2">{code.code}<button onClick={()=>{ navigator.clipboard.writeText(code.code); showToast(lang==='ar'?'تم النسخ':'Copié', 'success'); }} className="text-slate-400 hover:text-blue-500 transition"><Icon name="copy" size={14}/></button></div>
+                                            <div className="font-black text-slate-900 text-lg dir-ltr flex items-center gap-2">
+                                                {code.code}
+                                                <button onClick={()=>{ navigator.clipboard.writeText(code.code); showToast(lang==='ar'?'تم النسخ':'Copié', 'success'); }} className="text-slate-400 hover:text-blue-500 transition"><Icon name="copy" size={14}/></button>
+                                            </div>
                                             <div className="flex flex-wrap gap-1 mt-1">
-                                                <span className={`text-[10px] font-bold bg-white/50 border border-white/60 px-2 py-0.5 rounded-md ${code.discountType==='percent'?'text-red-600':'text-green-600'}`}>{code.discountType === 'percent' ? `${code.discountValue}%` : `${code.discountValue} ${t.currency}`}</span>
+                                                <span className={`text-[10px] font-bold bg-white/50 border border-white/60 px-2 py-0.5 rounded-md ${code.discountType==='percent'?'text-red-600':'text-green-600'}`}>
+                                                    {code.discountType === 'percent' ? `${code.discountValue}%` : `${code.discountValue} ${t.currency}`}
+                                                </span>
                                                 {code.expiryDate && <span className="text-[10px] font-bold text-slate-500 bg-white/50 border border-white/60 px-2 py-0.5 rounded-md flex items-center gap-1"><Icon name="clock" size={10}/> {code.expiryDate}</span>}
-                                                {code.maxUses && <span className="text-[10px] font-bold text-blue-600 bg-blue-50/50 border border-blue-100 px-2 py-0.5 rounded-md">{code.currentUses || 0}/{code.maxUses} {t.currentUses}</span>}
+                                                {code.maxUses && <span className="text-[10px] font-bold text-blue-600 bg-blue-50/50 border border-blue-100 px-2 py-0.5 rounded-md">
+                                                    {code.currentUses || 0}/{code.maxUses} {t.currentUses}
+                                                </span>}
                                             </div>
                                         </div>
                                         <button aria-label="Delete" onClick={() => deletePromoCode(code.id)} className="text-red-500 hover:text-red-700 p-2.5 bg-red-50/50 rounded-full transition border border-red-100 shadow-sm"><Icon name="trash" size={18}/></button>
@@ -1226,19 +1267,32 @@
                             </div>
                         </div>
                     ) : tab === 'offers' ? (
-                        <div className="space-y-6">
+                        <div className="animate-fadeIn space-y-6 pb-28">
                             <div className="ios-glass p-5 rounded-2xl shadow-sm">
-                                <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-slate-800"><Icon name="tag" size={18} className="text-orange-500"/> {editingOffer ? t.updateOffer : t.manageOffers}</h3>
+                                <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-slate-800">
+                                    <Icon name="tag" size={18} className="text-orange-500"/> {editingOffer ? t.updateOffer : t.manageOffers}
+                                </h3>
                                 <form name="offerForm" onSubmit={addOrUpdateOffer} className="space-y-3">
                                     <input aria-label="Title" required name="title" defaultValue={editingOffer?.title || ''} placeholder={t.offerTitle} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                     <input aria-label="Description" required name="description" defaultValue={editingOffer?.description || ''} placeholder={t.offerDesc} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                     <input aria-label="Price" required name="price" defaultValue={editingOffer?.price || ''} placeholder={t.offerPrice} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner font-bold text-orange-600"/>
                                     <input aria-label="Image URL" name="image" defaultValue={editingOffer?.image || ''} placeholder={t.addImage} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none dir-ltr shadow-inner"/>
                                     <input aria-label="Promo Code" name="promoCode" defaultValue={editingOffer?.promoCode || ''} placeholder={t.associatedPromo} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none dir-ltr uppercase shadow-inner"/>
-                                    <div className="flex gap-2 items-center text-sm text-slate-600 bg-white/60 p-2 rounded-xl border border-white/50 shadow-inner"><Icon name="calendar" size={16} className="ml-2 text-slate-400"/><label>{t.offerEndDate}:</label><input aria-label="End Date" name="endDate" defaultValue={editingOffer?.endDate || ''} type="datetime-local" className="bg-transparent outline-none flex-1"/></div>
+                                    
+                                    <div className="flex gap-2 items-center text-sm text-slate-600 bg-white/60 p-2 rounded-xl border border-white/50 shadow-inner">
+                                        <Icon name="calendar" size={16} className="ml-2 text-slate-400"/>
+                                        <label>{t.offerEndDate}:</label>
+                                        <input aria-label="End Date" name="endDate" defaultValue={editingOffer?.endDate || ''} type="datetime-local" className="bg-transparent outline-none flex-1"/>
+                                    </div>
                                     <div className="flex gap-2 pt-2">
-                                        <button type="submit" className={`flex-1 ${editingOffer ? 'bg-blue-600/90' : 'bg-orange-500/90'} backdrop-blur text-white py-3.5 rounded-xl font-bold flex justify-center gap-2 shadow-sm`}><Icon name={editingOffer ? "save" : "plus"} size={18}/> {editingOffer ? t.edit : t.addOffer}</button>
-                                        {editingOffer && <button type="button" onClick={cancelEdit} className="bg-slate-200/50 backdrop-blur text-slate-700 px-5 rounded-xl font-bold border border-slate-300/50 shadow-sm">{t.cancel}</button>}
+                                        <button type="submit" className={`flex-1 ${editingOffer ? 'bg-blue-600/90' : 'bg-orange-500/90'} backdrop-blur text-white py-3.5 rounded-xl font-bold flex justify-center gap-2 shadow-sm`}>
+                                            <Icon name={editingOffer ? "save" : "plus"} size={18}/> {editingOffer ? t.edit : t.addOffer}
+                                        </button>
+                                        {editingOffer && (
+                                            <button type="button" onClick={cancelEdit} className="bg-slate-200/50 backdrop-blur text-slate-700 px-5 rounded-xl font-bold border border-slate-300/50 shadow-sm">
+                                                {t.cancel}
+                                            </button>
+                                        )}
                                     </div>
                                 </form>
                             </div>
@@ -1246,7 +1300,13 @@
                             <div className="space-y-3">
                                 {uiConfig.offers && uiConfig.offers.map(offer => (
                                     <div key={offer.id} className={`ios-glass p-3 rounded-2xl shadow-sm flex gap-3 ${editingOffer?.id === offer.id ? 'border-blue-400 ring-2 ring-blue-100' : 'hover:shadow-md transition'}`}>
-                                        {offer.image ? <img src={offer.image} className="w-24 h-24 rounded-xl object-cover bg-white/50 border border-white/60"/> : <div className="w-24 h-24 rounded-xl bg-orange-100/50 text-orange-500 flex items-center justify-center font-bold text-xs p-1 text-center backdrop-blur border border-orange-200/50">{offer.price}</div>}
+                                        {offer.image ? (
+                                            <img src={offer.image} className="w-24 h-24 rounded-xl object-cover bg-white/50 border border-white/60"/>
+                                        ) : (
+                                            <div className="w-24 h-24 rounded-xl bg-orange-100/50 text-orange-500 flex items-center justify-center font-bold text-xs p-1 text-center backdrop-blur border border-orange-200/50">
+                                                {offer.price}
+                                            </div>
+                                        )}
                                         <div className="flex-1 py-1">
                                             <h4 className="font-bold text-sm text-slate-800 leading-tight">{offer.title}</h4>
                                             <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">{offer.description}</p>
@@ -1263,19 +1323,25 @@
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="animate-fadeIn space-y-6 pb-28">
                             <div className="ios-glass p-5 rounded-2xl shadow-sm">
                                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-slate-800"><Icon name="megaphone" size={18} className="text-yellow-600"/> {t.announcement}</h3>
                                 <form onSubmit={saveConfig} className="space-y-4">
                                     <div className="space-y-3">
                                         <input aria-label="Announcement AR" name="announcementAr" defaultValue={uiConfig.announcementAr} placeholder={t.textAr} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                         <input aria-label="Announcement FR" name="announcementFr" defaultValue={uiConfig.announcementFr} placeholder={t.textFr} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
-                                        <div className="flex items-center gap-2 bg-white/40 p-3 rounded-xl border border-white/50"><input type="checkbox" name="showAnnouncement" defaultChecked={uiConfig.showAnnouncement} id="showAnn" className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"/><label htmlFor="showAnn" className="text-sm font-bold text-slate-700 cursor-pointer">{t.show}</label></div>
+                                        <div className="flex items-center gap-2 bg-white/40 p-3 rounded-xl border border-white/50">
+                                            <input type="checkbox" name="showAnnouncement" defaultChecked={uiConfig.showAnnouncement} id="showAnn" className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"/>
+                                            <label htmlFor="showAnn" className="text-sm font-bold text-slate-700 cursor-pointer">{t.show}</label>
+                                        </div>
                                     </div>
+                                    
                                     <div className="border-t border-slate-200/50 pt-4">
                                         <div className={`flex items-center justify-between p-4 rounded-xl border backdrop-blur-sm transition-all ${uiConfig.maintenanceMode ? 'bg-red-500/10 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-white/40 border-white/50'}`}>
                                             <div>
-                                                <h4 className={`font-bold text-sm ${uiConfig.maintenanceMode ? 'text-red-700' : 'text-slate-700'}`}><Icon name="alert-triangle" size={16} className="inline mr-1 mb-0.5"/> {t.enableMaintenance}</h4>
+                                                <h4 className={`font-bold text-sm ${uiConfig.maintenanceMode ? 'text-red-700' : 'text-slate-700'}`}>
+                                                    <Icon name="alert-triangle" size={16} className="inline mr-1 mb-0.5"/> {t.enableMaintenance}
+                                                </h4>
                                                 <p className="text-[10px] text-slate-500 mt-1">عند التفعيل، لن يتمكن الزوار من الدخول.</p>
                                             </div>
                                             <label className="relative inline-flex items-center cursor-pointer">
@@ -1284,25 +1350,32 @@
                                             </label>
                                         </div>
                                     </div>
+
                                     <button className="w-full bg-slate-900/90 backdrop-blur text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 transition shadow-md">{t.statusUpdate}</button>
                                 </form>
                             </div>
 
                             <div className="ios-glass p-5 rounded-2xl shadow-sm">
                                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-slate-800"><Icon name="images" size={18} className="text-purple-500"/> {t.stories}</h3>
+                                
                                 <div className="flex gap-3 overflow-x-auto mb-5 pb-2 hide-scrollbar">
                                     {uiConfig.stories && uiConfig.stories.map(s => (
                                         <div key={s.id} className="relative shrink-0 w-20 group">
-                                            <div className="p-1 bg-white/50 rounded-2xl border border-white/60 shadow-sm"><img src={s.img} className="w-full h-18 rounded-xl object-cover"/></div>
+                                            <div className="p-1 bg-white/50 rounded-2xl border border-white/60 shadow-sm">
+                                                <img src={s.img} className="w-full h-18 rounded-xl object-cover"/>
+                                            </div>
                                             <button aria-label="Delete" onClick={()=>deleteStory(s.id)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:scale-110 transition border border-white"><Icon name="x" size={12}/></button>
                                             <div className="text-[10px] truncate text-center mt-1.5 font-bold text-slate-700">{s.name}</div>
                                         </div>
                                     ))}
                                 </div>
+
                                 <form onSubmit={addStory} className="space-y-3 pt-4 border-t border-white/40">
                                     <input aria-label="Name" required name="name" placeholder={t.storyName} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                     <input aria-label="Image URL" required name="img" placeholder={t.addImage} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none dir-ltr focus:ring-2 focus:ring-blue-400 shadow-inner"/>
-                                    <button className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold flex justify-center gap-2 hover:bg-blue-500 transition shadow-md"><Icon name="plus" size={18}/> {t.addStory}</button>
+                                    <button className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold flex justify-center gap-2 hover:bg-blue-500 transition shadow-md">
+                                        <Icon name="plus" size={18}/> {t.addStory}
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -1310,18 +1383,60 @@
                 </div>
             );
         };
+        
+        const AdminChatList = ({ db, appId, onSelectChat, t }) => {
+            const [chats, setChats] = useState([]);
+            useEffect(() => {
+                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/chats`), window.firebase.orderBy('lastMessageTime', 'desc'));
+                const unsub = window.firebase.onSnapshot(q, (snap) => setChats(snap.docs.map(d => ({id: d.id, ...d.data()}))));
+                return () => unsub();
+            }, [db, appId]);
+            return chats.length === 0 ? <p className="text-center text-gray-400 py-10 ios-glass rounded-2xl">No active chats.</p> : chats.map(chat => (
+                <div key={chat.id} onClick={() => onSelectChat(chat.userId, chat.userName)} className="ios-glass p-4 rounded-2xl hover:border-blue-300 shadow-sm cursor-pointer transition flex gap-3 items-center group mb-3">
+                    <div className="w-12 h-12 bg-blue-50/80 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg group-hover:bg-blue-600 group-hover:text-white transition uppercase border border-blue-100 shadow-inner">
+                        {chat.userName ? chat.userName.charAt(0) : 'G'}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <div className="flex justify-between items-center mb-1">
+                            <h4 className="font-bold text-slate-800 text-sm truncate">{chat.userName}</h4>
+                            <span className="text-[10px] text-slate-500 font-mono bg-white/50 border border-white/60 px-2 py-0.5 rounded-md">
+                                {chat.lastMessageTime?.toDate ? chat.lastMessageTime.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                            </span>
+                        </div>
+                        <p className="text-xs text-slate-500 truncate group-hover:text-blue-600 transition">{chat.lastMessage}</p>
+                    </div>
+                </div>
+            ));
+        };
 
         const MaintenanceScreen = ({ t, lang, onAdminClick }) => (
             <div className={`min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center relative overflow-hidden ${lang === 'ar' ? 'dir-rtl' : 'dir-ltr'}`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900 z-0"></div>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-pulse-glow"></div>
+                
                 <div className="relative z-10 w-full max-w-lg mx-auto bg-white/5 border border-white/10 p-10 rounded-3xl shadow-2xl backdrop-blur-xl animate-slideUp">
-                    <div className="w-24 h-24 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-500/30"><Icon name="settings" size={48} className="animate-spin-slow" /></div>
-                    <h1 className="text-3xl md:text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">{t.maintenanceTitle}</h1>
-                    <p className="text-slate-300 mb-8 leading-relaxed text-sm md:text-base">{t.maintenanceDesc}</p>
-                    <div className="flex flex-col items-center gap-4"><a href="https://wa.me/213549179000" target="_blank" className="bg-green-600 hover:bg-green-500 text-white px-8 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 w-full sm:w-auto"><Icon name="message-circle" size={20} /> {t.contactUsMsg}</a></div>
+                    <div className="w-24 h-24 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-500/30">
+                        <Icon name="settings" size={48} className="animate-spin-slow" />
+                    </div>
+                    
+                    <h1 className="text-3xl md:text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
+                        {t.maintenanceTitle}
+                    </h1>
+                    
+                    <p className="text-slate-300 mb-8 leading-relaxed text-sm md:text-base">
+                        {t.maintenanceDesc}
+                    </p>
+                    
+                    <div className="flex flex-col items-center gap-4">
+                        <a href="https://wa.me/213549179000" target="_blank" className="bg-green-600 hover:bg-green-500 text-white px-8 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 w-full sm:w-auto">
+                            <Icon name="message-circle" size={20} /> {t.contactUsMsg}
+                        </a>
+                    </div>
                 </div>
-                <button aria-label="Admin Login" onClick={onAdminClick} className="absolute bottom-8 text-slate-600 hover:text-slate-400 text-xs font-bold transition flex items-center gap-2 z-10 px-4 py-2 rounded-full border border-transparent hover:border-slate-700"><Icon name="lock" size={14} /> {t.maintenanceAdminLogin}</button>
+
+                <button aria-label="Admin Login" onClick={onAdminClick} className="absolute bottom-8 text-slate-600 hover:text-slate-400 text-xs font-bold transition flex items-center gap-2 z-10 px-4 py-2 rounded-full border border-transparent hover:border-slate-700">
+                    <Icon name="lock" size={14} /> {t.maintenanceAdminLogin}
+                </button>
             </div>
         );
 
@@ -1330,87 +1445,76 @@
             const [fabricCanvas, setFabricCanvas] = useState(null);
             const [activeObject, setActiveObject] = useState(null);
             const [objectColor, setObjectColor] = useState('#0f172a');
-            
-            // Undo / Redo States
-            const [history, setHistory] = useState([]);
-            const [historyStep, setHistoryStep] = useState(-1);
-            const isRestoring = useRef(false);
 
             useEffect(() => {
                 let canvas;
-                if (!window.fabric) return;
+                if (!window.fabric) {
+                    alert(lang === 'ar' ? 'جاري تحميل مكتبة التصميم...' : 'Chargement de la bibliothèque...');
+                    return;
+                }
                 try {
                     canvas = new window.fabric.Canvas(canvasRef.current, {
-                        backgroundColor: 'transparent', width: Math.min(window.innerWidth - 40, 800), height: 500, preserveObjectStacking: true
+                        backgroundColor: 'transparent',
+                        width: Math.min(window.innerWidth - 40, 800),
+                        height: 500,
+                        preserveObjectStacking: true
                     });
 
                     canvas.on('selection:created', (e) => updateTools(e.selected[0]));
                     canvas.on('selection:updated', (e) => updateTools(e.selected[0]));
                     canvas.on('selection:cleared', () => setActiveObject(null));
-                    
-                    canvas.on('object:added', () => saveHistory(canvas));
-                    canvas.on('object:modified', () => saveHistory(canvas));
-                    canvas.on('object:removed', () => saveHistory(canvas));
 
                     setFabricCanvas(canvas);
-                    saveHistory(canvas, true); 
-                } catch(e) {}
+                } catch(e) {
+                    console.error("Fabric Init Error", e);
+                }
                 
-                return () => { if (canvas) canvas.dispose(); };
+                return () => {
+                    if (canvas) {
+                        canvas.dispose();
+                    }
+                };
             }, []);
 
-            const saveHistory = (canvas, force = false) => {
-                if(isRestoring.current && !force) return;
-                const json = JSON.stringify(canvas.toJSON());
-                setHistory(prev => {
-                    const newHistory = prev.slice(0, historyStep + 1);
-                    newHistory.push(json);
-                    return newHistory;
-                });
-                setHistoryStep(prev => prev + 1);
+            const updateTools = (obj) => {
+                setActiveObject(obj);
+                if (obj && obj.fill && typeof obj.fill === 'string') setObjectColor(obj.fill);
             };
 
-            const handleUndo = () => {
-                if (historyStep > 0 && fabricCanvas) {
-                    isRestoring.current = true;
-                    setHistoryStep(prev => prev - 1);
-                    fabricCanvas.loadFromJSON(history[historyStep - 1], () => {
-                        fabricCanvas.renderAll();
-                        isRestoring.current = false;
-                    });
+            const changeColor = (e) => {
+                const newColor = e.target.value;
+                setObjectColor(newColor);
+                if (activeObject) {
+                    activeObject.set('fill', newColor);
+                    fabricCanvas.renderAll();
                 }
             };
-
-            const handleRedo = () => {
-                if (historyStep < history.length - 1 && fabricCanvas) {
-                    isRestoring.current = true;
-                    setHistoryStep(prev => prev + 1);
-                    fabricCanvas.loadFromJSON(history[historyStep + 1], () => {
-                        fabricCanvas.renderAll();
-                        isRestoring.current = false;
-                    });
-                }
-            };
-
-            const updateTools = (obj) => { setActiveObject(obj); if (obj && obj.fill && typeof obj.fill === 'string') setObjectColor(obj.fill); };
-            const changeColor = (e) => { const newColor = e.target.value; setObjectColor(newColor); if (activeObject) { activeObject.set('fill', newColor); fabricCanvas.renderAll(); saveHistory(fabricCanvas); } };
 
             const addText = () => {
                 if (!fabricCanvas) return;
-                const text = new window.fabric.IText(lang === 'ar' ? 'نص جديد' : 'Nouveau Texte', { left: 50, top: 50, fontFamily: 'Cairo', fill: '#0f172a', fontSize: 40 });
-                fabricCanvas.add(text); fabricCanvas.setActiveObject(text);
+                const text = new window.fabric.IText(lang === 'ar' ? 'نص جديد' : 'Nouveau Texte', {
+                    left: 50, top: 50, fontFamily: 'Cairo', fill: '#0f172a', fontSize: 40
+                });
+                fabricCanvas.add(text);
+                fabricCanvas.setActiveObject(text);
             };
 
             const addRectangle = () => {
                 if (!fabricCanvas) return;
-                const rect = new window.fabric.Rect({ left: 50, top: 150, fill: '#3b82f6', width: 100, height: 100, rx: 10, ry: 10 });
-                fabricCanvas.add(rect); fabricCanvas.setActiveObject(rect);
+                const rect = new window.fabric.Rect({
+                    left: 50, top: 150, fill: '#3b82f6', width: 100, height: 100, rx: 10, ry: 10    
+                });
+                fabricCanvas.add(rect);
+                fabricCanvas.setActiveObject(rect);
             };
 
             const addCircle = () => {
                 if (!fabricCanvas) return;
-                const circle = new window.fabric.Circle({ left: 100, top: 100, fill: '#10b981', radius: 50 });
-                fabricCanvas.add(circle); fabricCanvas.setActiveObject(circle);
+                const circle = new window.fabric.Circle({
+                    left: 100, top: 100, fill: '#10b981', radius: 50
+                });
+                fabricCanvas.add(circle);
+                fabricCanvas.setActiveObject(circle);
             };
 
             const handleImageUpload = (e) => {
@@ -1420,30 +1524,61 @@
                 reader.onload = (f) => {
                     const data = f.target.result;
                     window.fabric.Image.fromURL(data, (img) => {
-                        img.scaleToWidth(150); img.set({ left: 100, top: 100 });
-                        fabricCanvas.add(img); fabricCanvas.setActiveObject(img);
+                        img.scaleToWidth(150);
+                        img.set({ left: 100, top: 100 });
+                        fabricCanvas.add(img);
+                        fabricCanvas.setActiveObject(img);
                     });
                 };
-                reader.readAsDataURL(file); e.target.value = null; 
+                reader.readAsDataURL(file);
+                e.target.value = null; 
             };
 
-            const deleteActiveObject = () => { if (!fabricCanvas || !activeObject) return; fabricCanvas.remove(activeObject); fabricCanvas.discardActiveObject(); };
-            const bringForward = () => { if (activeObject) { fabricCanvas.bringForward(activeObject); saveHistory(fabricCanvas); } };
-            const sendBackwards = () => { if (activeObject) { fabricCanvas.sendBackwards(activeObject); saveHistory(fabricCanvas); } };
+            const deleteActiveObject = () => {
+                if (!fabricCanvas || !activeObject) return;
+                fabricCanvas.remove(activeObject);
+                fabricCanvas.discardActiveObject();
+            };
 
-            const clearCanvas = () => { if (!fabricCanvas) return; if(confirm(lang === 'ar' ? "هل أنت متأكد من مسح اللوحة؟" : "Effacer la zone de travail?")) { fabricCanvas.clear(); saveHistory(fabricCanvas); } };
+            const bringForward = () => { if (activeObject) fabricCanvas.bringForward(activeObject); };
+            const sendBackwards = () => { if (activeObject) fabricCanvas.sendBackwards(activeObject); };
+
+            const clearCanvas = () => {
+                if (!fabricCanvas) return;
+                if(confirm(lang === 'ar' ? "هل أنت متأكد من مسح اللوحة؟" : "Effacer la zone de travail?")) {
+                    fabricCanvas.clear();
+                }
+            };
+
+            const downloadImage = () => {
+                if (!fabricCanvas) return;
+                fabricCanvas.discardActiveObject(); 
+                fabricCanvas.renderAll();
+                const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'design_lartisan.png';
+                link.click();
+            };
 
             const handleAddToCart = () => {
                 if (!fabricCanvas) return;
-                fabricCanvas.discardActiveObject(); fabricCanvas.renderAll();
+                fabricCanvas.discardActiveObject();
+                fabricCanvas.renderAll();
                 const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
                 
                 const customProduct = {
-                    id: `custom-${Date.now()}`, name: { fr: "Design Personnalisé (Studio)", ar: "تصميم مخصص (الأستوديو)" },
-                    basePrice: 1500, price: 1500, image: dataURL, qty: 1,
+                    id: `custom-${Date.now()}`,
+                    name: { fr: "Design Personnalisé (Studio)", ar: "تصميم مخصص (الأستوديو)" },
+                    basePrice: 1500, 
+                    price: 1500,
+                    image: dataURL,
+                    qty: 1,
                     selectedVariants: [{ id: 'type', label: lang==='ar'?'المصدر':'Source', value: lang==='ar'?'أستوديو التصميم':'Studio de Design' }]
                 };
-                onAddToCart(customProduct); onClose();
+                
+                onAddToCart(customProduct);
+                onClose();
             };
 
             return (
@@ -1452,22 +1587,38 @@
                         <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
                             <Icon name="pen-tool" /> <span className="hidden sm:inline">{lang === 'ar' ? "أستوديو التصميم" : "Studio de Design"}</span>
                         </h3>
-                        <div className="flex gap-2 items-center">
-                            <div className="flex gap-1 bg-white/10 rounded-xl p-1 border border-white/10 mr-4">
-                                <button onClick={handleUndo} disabled={historyStep <= 0} className="p-2 text-white disabled:opacity-30 hover:bg-white/20 rounded-lg transition" title={t.undo}><Icon name="undo" size={16}/></button>
-                                <button onClick={handleRedo} disabled={historyStep >= history.length - 1} className="p-2 text-white disabled:opacity-30 hover:bg-white/20 rounded-lg transition" title={t.redo}><Icon name="redo" size={16}/></button>
-                            </div>
-                            <button onClick={handleAddToCart} className="bg-blue-600/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-blue-500 transition flex items-center gap-2 shadow-lg backdrop-blur border border-blue-400/30"><Icon name="shopping-cart" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "أضف للسلة" : "Ajouter au panier"}</span></button>
-                            <button onClick={onClose} className="bg-white/10 text-white p-2.5 rounded-2xl hover:bg-white/20 hover:text-red-400 transition backdrop-blur border border-white/10 shadow-sm"><Icon name="x" size={20}/></button>
+                        <div className="flex gap-2">
+                            <button onClick={handleAddToCart} className="bg-blue-600/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-blue-500 transition flex items-center gap-2 shadow-lg backdrop-blur border border-blue-400/30">
+                                <Icon name="shopping-cart" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "أضف للسلة" : "Ajouter au panier"}</span>
+                            </button>
+                            <button onClick={downloadImage} className="bg-green-500/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-green-400 transition flex items-center gap-2 shadow-lg backdrop-blur border border-green-400/30">
+                                <Icon name="download" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "تحميل" : "Télécharger"}</span>
+                            </button>
+                            <button onClick={onClose} className="bg-white/10 text-white p-2.5 rounded-2xl hover:bg-white/20 hover:text-red-400 transition backdrop-blur border border-white/10 shadow-sm">
+                                <Icon name="x" size={20}/>
+                            </button>
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row flex-1 gap-4 overflow-hidden mb-safe">
                         <div className="w-full md:w-64 bg-white/10 border border-white/20 backdrop-blur-md rounded-3xl p-4 shadow-lg flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0">
-                            <button onClick={addText} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm border border-white/10"><Icon name="type" size={16}/> {lang === 'ar' ? "نص" : "Texte"}</button>
-                            <button onClick={addRectangle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm border border-white/10"><Icon name="square" size={16}/> {lang === 'ar' ? "مربع" : "Carré"}</button>
-                            <button onClick={addCircle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm border border-white/10"><Icon name="circle" size={16}/> {lang === 'ar' ? "دائرة" : "Cercle"}</button>
-                            <label className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm cursor-pointer border border-white/10"><Icon name="image" size={16}/> {lang === 'ar' ? "صورة" : "Image"}<input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} /></label>
+                            
+                            <button onClick={addText} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur border border-white/10">
+                                <Icon name="type" size={16}/> {lang === 'ar' ? "نص" : "Texte"}
+                            </button>
+                            
+                            <button onClick={addRectangle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur border border-white/10">
+                                <Icon name="square" size={16}/> {lang === 'ar' ? "مربع" : "Carré"}
+                            </button>
+
+                            <button onClick={addCircle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur border border-white/10">
+                                <Icon name="circle" size={16}/> {lang === 'ar' ? "دائرة" : "Cercle"}
+                            </button>
+
+                            <label className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur cursor-pointer border border-white/10">
+                                <Icon name="image" size={16}/> {lang === 'ar' ? "صورة" : "Image"}
+                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                            </label>
 
                             {activeObject && (
                                 <div className="flex flex-row md:flex-col gap-2 md:mt-4 shrink-0 border-l md:border-l-0 md:border-t border-white/20 pl-3 md:pl-0 md:pt-4">
@@ -1475,21 +1626,33 @@
                                         <input type="color" value={objectColor} onChange={changeColor} className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
                                         <span className="text-white text-xs font-bold">{lang === 'ar' ? "اللون" : "Couleur"}</span>
                                     </div>
+                                    
                                     <div className="flex gap-2 shrink-0">
-                                        <button onClick={bringForward} title={lang === 'ar' ? "للأمام" : "Avancer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center"><Icon name="arrow-up" size={16}/></button>
-                                        <button onClick={sendBackwards} title={lang === 'ar' ? "للخلف" : "Reculer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center"><Icon name="arrow-down" size={16}/></button>
+                                        <button onClick={bringForward} title={lang === 'ar' ? "للأمام" : "Avancer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center backdrop-blur border border-white/10">
+                                            <Icon name="arrow-up" size={16}/>
+                                        </button>
+                                        <button onClick={sendBackwards} title={lang === 'ar' ? "للخلف" : "Reculer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center backdrop-blur border border-white/10">
+                                            <Icon name="arrow-down" size={16}/>
+                                        </button>
                                     </div>
-                                    <button onClick={deleteActiveObject} className="bg-red-500/80 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-red-500 transition text-sm flex justify-center gap-2 mt-1 border border-red-400/50"><Icon name="trash-2" size={16}/></button>
+
+                                    <button onClick={deleteActiveObject} className="bg-red-500/80 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-red-500 transition text-sm flex justify-center gap-2 backdrop-blur shrink-0 mt-1 shadow-md border border-red-400/50">
+                                        <Icon name="trash-2" size={16}/>
+                                    </button>
                                 </div>
                             )}
 
                             <div className="md:mt-auto md:pt-4 shrink-0 border-l md:border-l-0 md:border-t border-white/20 pl-3 md:pl-0">
-                                <button onClick={clearCanvas} className="text-red-300 w-full py-2.5 rounded-2xl font-bold hover:text-white hover:bg-red-500/50 transition text-sm flex justify-center gap-2 border border-transparent hover:border-red-400/50"><Icon name="trash" size={16}/> {lang === 'ar' ? "مسح اللوحة" : "Tout effacer"}</button>
+                                <button onClick={clearCanvas} className="text-red-300 w-full py-2.5 rounded-2xl font-bold hover:text-white hover:bg-red-500/50 transition text-sm flex justify-center gap-2 border border-transparent hover:border-red-400/50">
+                                    <Icon name="trash" size={16}/> {lang === 'ar' ? "مسح اللوحة" : "Tout effacer"}
+                                </button>
                             </div>
                         </div>
 
                         <div className="flex-1 bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl shadow-inner flex items-center justify-center overflow-auto pattern-dots p-4">
-                            <div className="shadow-2xl bg-white rounded-xl overflow-hidden flex-shrink-0 mx-auto ring-4 ring-white/20"><canvas ref={canvasRef} /></div>
+                            <div className="shadow-2xl bg-white rounded-xl overflow-hidden flex-shrink-0 mx-auto ring-4 ring-white/20">
+                                <canvas ref={canvasRef} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1581,8 +1744,13 @@
                                 { icon: 'truck', title: lang === 'ar' ? 'توصيل لكل الولايات' : 'Livraison 58 Wilayas', desc: lang === 'ar' ? 'نصلك أينما كنت' : 'Partout en Algérie', color: 'text-green-600', bg: 'bg-green-100/50' }
                             ].map((f, i) => (
                                 <div key={i} className="flex items-center gap-3 w-full md:w-auto p-2">
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/60 shadow-sm ${f.bg} ${f.color}`}><Icon name={f.icon} size={24} /></div>
-                                    <div><h4 className="font-bold text-slate-800 text-sm">{f.title}</h4><p className="text-xs text-slate-500">{f.desc}</p></div>
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/60 shadow-sm ${f.bg} ${f.color}`}>
+                                        <Icon name={f.icon} size={24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-800 text-sm">{f.title}</h4>
+                                        <p className="text-xs text-slate-500">{f.desc}</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -1593,11 +1761,23 @@
 
         function App() {
             const [showLanding, setShowLanding] = useState(true);
+
             const getInitialView = () => window.location.hash.substring(1).split('/')[0] || 'home';
             const [lang, setLang] = useState(() => localStorage.getItem('app_lang') || 'ar');
             const [view, setView] = useState(getInitialView());
-            const [cart, setCart] = useState(() => { try { return JSON.parse(localStorage.getItem('artisanCart')) || []; } catch { return []; } });
-            const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem('artisanFavs')) || []; } catch { return []; } });
+            const [cart, setCart] = useState(() => { 
+                try { 
+                    const storedCart = JSON.parse(localStorage.getItem('artisanCart')) || [];
+                    return storedCart.map(item => ({ 
+                        ...item, 
+                        price: item.price || item.basePrice || 0,
+                        totalPrice: item.totalPrice || (item.price * item.qty) || 0
+                    }));
+                } catch { return []; } 
+            });
+            const [favorites, setFavorites] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('artisanFavs')) || []; } catch { return []; }
+            });
             
             const [appliedPromo, setAppliedPromo] = useState(null); 
             const [promoCodeInput, setPromoCodeInput] = useState(''); 
@@ -1611,7 +1791,6 @@
             const [productModal, setProductModal] = useState(null);
             const [showQrModal, setShowQrModal] = useState(false);
             const [showDesignStudio, setShowDesignStudio] = useState(false);
-            const [showRatingModal, setShowRatingModal] = useState(null);
             const [uiConfig, setUiConfig] = useState({});
             const [bypassMaintenance, setBypassMaintenance] = useState(false);
             
@@ -1621,9 +1800,13 @@
             
             const [selectedWilayaZone, setSelectedWilayaZone] = useState(() => {
                 const savedW = localStorage.getItem('saved_wilaya');
-                if (savedW) { const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === savedW); return w ? w.zone : null; }
+                if (savedW) {
+                    const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === savedW);
+                    return w ? w.zone : null;
+                }
                 return null;
             });
+
             const [expandedOrderId, setExpandedOrderId] = useState(null);
 
             const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'l-artisan-imprimeur';
@@ -1634,15 +1817,24 @@
             const startVoiceSearch = () => {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) return showToast(lang === 'ar' ? "متصفحك لا يدعم البحث الصوتي" : "Recherche vocale non supportée", "error");
+                
                 try {
                     const recognition = new SpeechRecognition();
                     recognition.lang = lang === 'ar' ? 'ar-DZ' : 'fr-FR';
+                    
                     recognition.onstart = () => setIsListening(true);
-                    recognition.onresult = (e) => { setSearchTerm(e.results[0][0].transcript); setIsListening(false); };
+                    recognition.onresult = (e) => { 
+                        setSearchTerm(e.results[0][0].transcript); 
+                        setIsListening(false); 
+                    };
                     recognition.onerror = () => { setIsListening(false); };
                     recognition.onend = () => setIsListening(false);
+                    
                     recognition.start();
-                } catch (err) { setIsListening(false); showToast(lang === 'ar' ? "يرجى السماح بالوصول للميكروفون" : "Veuillez autoriser le microphone", "error"); }
+                } catch (err) {
+                    setIsListening(false);
+                    showToast(lang === 'ar' ? "يرجى السماح بالوصول للميكروفون" : "Veuillez autoriser le microphone", "error");
+                }
             };
 
             const calculateTotal = useCallback((currentCart, promo, zone) => {
@@ -1661,6 +1853,7 @@
             const applyPromoCode = async (code) => {
                 if (!db || !appId) return showToast(t.conn, "error");
                 if (!code) return showToast(t.promoEnter, 'info');
+                
                 try {
                     const q = window.firebase.query(
                         window.firebase.collection(db, `artifacts/${appId}/public/data/promoCodes`),
@@ -1670,46 +1863,89 @@
                     );
                     const snapshot = await window.firebase.getDocs(q);
                     
-                    if (snapshot.empty) { setAppliedPromo(null); showToast(t.promoInvalid, 'error'); return; }
+                    if (snapshot.empty) { 
+                        setAppliedPromo(null); 
+                        showToast(t.promoInvalid, 'error'); 
+                        return; 
+                    }
+                    
                     const promo = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-                    if (promo.expiryDate && new Date(promo.expiryDate) < new Date()) { showToast(t.expiredPromo, 'error'); setAppliedPromo(null); return; }
-                    if (promo.maxUses && promo.currentUses >= promo.maxUses) { showToast(t.limitReachedPromo, 'error'); setAppliedPromo(null); return; }
+                    
+                    if (promo.expiryDate && new Date(promo.expiryDate) < new Date()) {
+                        showToast(t.expiredPromo, 'error');
+                        setAppliedPromo(null);
+                        return;
+                    }
+                    
+                    if (promo.maxUses && promo.currentUses >= promo.maxUses) {
+                        showToast(t.limitReachedPromo, 'error');
+                        setAppliedPromo(null);
+                        return;
+                    }
 
                     const currentTotal = cart.reduce((s,i) => s + (i.price*i.qty), 0);
-                    if (promo.minAmount && currentTotal < promo.minAmount) { showToast(`${t.promoMinAmount} ${formatPrice(promo.minAmount)} ${t.currency}`, 'error'); setAppliedPromo(null); return; }
+                    if (promo.minAmount && currentTotal < promo.minAmount) {
+                         showToast(`${t.promoMinAmount} ${formatPrice(promo.minAmount)} ${t.currency}`, 'error');
+                         setAppliedPromo(null);
+                         return;
+                    }
                     
-                    setAppliedPromo(promo); showToast(t.promoApplied, 'success');
+                    setAppliedPromo(promo);
+                    showToast(t.promoApplied, 'success');
                 } catch (e) { showToast(t.err, "error"); }
             };
             
             const handleGetOffer = async (offer) => {
                 const cartItem = {
-                    id: `offer-${offer.id}`, name: { fr: offer.title, ar: offer.title }, 
-                    basePrice: parseFloat(offer.price) || 0, price: parseFloat(offer.price) || 0,
-                    image: offer.image, qty: 1, selectedVariants: [{ id: 'type', label: 'Type', value: 'Offre Spéciale' }]
+                    id: `offer-${offer.id}`,
+                    name: { fr: offer.title, ar: offer.title }, 
+                    basePrice: parseFloat(offer.price) || 0,
+                    price: parseFloat(offer.price) || 0,
+                    image: offer.image,
+                    qty: 1,
+                    selectedVariants: [{ id: 'type', label: 'Type', value: 'Offre Spéciale' }]
                 };
+                
                 setCart(prev => [...prev, { ...cartItem, cartId: `offer-${Date.now()}` }]);
                 if (offer.promoCode) await applyPromoCode(offer.promoCode);
-                navigate('cart'); showToast(t.addToCart, 'success');
+                
+                navigate('cart');
+                showToast(t.addToCart, 'success');
             };
 
             const toggleFavorite = (product) => {
                 let newFavs;
-                if (favorites.some(f => f.id === product.id)) { newFavs = favorites.filter(f => f.id !== product.id); showToast(t.removeFromFav); } 
-                else { newFavs = [...favorites, product]; showToast(t.addToFav, 'success'); }
-                setFavorites(newFavs); localStorage.setItem('artisanFavs', JSON.stringify(newFavs));
+                if (favorites.some(f => f.id === product.id)) {
+                    newFavs = favorites.filter(f => f.id !== product.id);
+                    showToast(t.removeFromFav);
+                } else {
+                    newFavs = [...favorites, product];
+                    showToast(t.addToFav, 'success');
+                }
+                setFavorites(newFavs);
+                localStorage.setItem('artisanFavs', JSON.stringify(newFavs));
             };
 
             const navigate = (newView, replace = false) => {
                 if (newView === view && !activeChat && !productModal && !showQrModal && !showDesignStudio) return;
-                setView(newView); setAppliedPromo(null); setActiveChat(null); setProductModal(null); setShowQrModal(false); setShowDesignStudio(false); setShowRatingModal(null);
+                setView(newView);
+                setAppliedPromo(null); 
+                setActiveChat(null); 
+                setProductModal(null);
+                setShowQrModal(false);
+                setShowDesignStudio(false);
                 const hash = newView;
                 if (replace) window.history.replaceState({ view: newView, chat: false }, '', `#${hash}`);
                 else window.history.pushState({ view: newView, chat: false }, '', `#${hash}`);
+                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            const openChat = (chatDetails) => { setActiveChat(chatDetails); window.history.pushState({ view: view, chat: true, userId: chatDetails?.userId, userName: chatDetails?.userName }, '', `#chat`); };
+            const openChat = (chatDetails) => {
+                setActiveChat(chatDetails);
+                window.history.pushState({ view: view, chat: true, userId: chatDetails?.userId, userName: chatDetails?.userName }, '', `#chat`);
+            };
+
             const closeChat = () => window.history.back();
             const openProductModal = (product) => setProductModal(product);
             const closeProductModal = () => setProductModal(null);
@@ -1717,22 +1953,41 @@
             useEffect(() => { document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = lang; localStorage.setItem('app_lang', lang); }, [lang]);
             const toggleLang = () => setLang(prev => prev === 'ar' ? 'fr' : 'ar');
             
-            useEffect(() => { localStorage.setItem('artisanCart', JSON.stringify(cart.map(i => ({ id: i.id, name: i.name, basePrice: i.basePrice, price: i.price, qty: i.qty, image: i.image, selectedVariants: i.selectedVariants || [] })))); }, [cart]);
+            useEffect(() => { 
+                localStorage.setItem('artisanCart', JSON.stringify(cart.map(i => ({
+                    id: i.id, 
+                    name: i.name, 
+                    basePrice: i.basePrice, 
+                    price: i.price,
+                    qty: i.qty, 
+                    image: i.image, 
+                    selectedVariants: i.selectedVariants || [] 
+                }))));
+            }, [cart]);
 
             useEffect(() => {
                 const handlePopState = (event) => {
                     const state = event.state;
-                    if (state && state.view) { setView(state.view); setActiveChat(state.chat ? { userId: state.userId, userName: state.userName } : null); } 
-                    else { setView(getInitialView()); setActiveChat(null); }
+                    if (state && state.view) {
+                        setView(state.view);
+                        setActiveChat(state.chat ? { userId: state.userId, userName: state.userName } : null);
+                    } else {
+                        setView(getInitialView());
+                        setActiveChat(null);
+                    }
                 };
                 window.addEventListener('popstate', handlePopState);
-                if (window.history.state === null) { const initialViewName = getInitialView(); window.history.replaceState({ view: initialViewName, chat: false }, '', `#${initialViewName}`); }
+                if (window.history.state === null) {
+                    const initialViewName = getInitialView();
+                    window.history.replaceState({ view: initialViewName, chat: false }, '', `#${initialViewName}`);
+                }
                 return () => window.removeEventListener('popstate', handlePopState);
             }, [view]);
 
             useEffect(() => {
                 const init = async () => {
                     if(!window.__firebase_config) return;
+                    
                     const checkFirebase = setInterval(async () => {
                         if (window.firebase && window.isFirebaseReady) {
                             clearInterval(checkFirebase); 
@@ -1741,9 +1996,19 @@
                                 const auth = window.firebase.getAuth(app);
                                 const firestore = window.firebase.getFirestore(app);
                                 setDb(firestore);
-                                if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
-                                window.firebase.onAuthStateChanged(auth, (u) => { setUser(u); setAuthLoading(false); });
-                            } catch (e) { setAuthLoading(false); }
+                                
+                                if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+                                    await window.firebase.signInWithCustomToken(auth, window.__initial_auth_token);
+                                }
+                                
+                                window.firebase.onAuthStateChanged(auth, (u) => { 
+                                    setUser(u); 
+                                    setAuthLoading(false); 
+                                });
+                            } catch (e) { 
+                                console.error("Firebase Init Error", e); 
+                                setAuthLoading(false); 
+                            }
                         }
                     }, 100); 
                 };
@@ -1752,7 +2017,10 @@
 
             useEffect(() => {
                 if (!user || !db || !appId) return;
-                if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission();
+                
+                if ("Notification" in window && Notification.permission !== "granted") {
+                    Notification.requestPermission();
+                }
 
                 const notifRef = window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`);
                 const unsubNotif = window.firebase.onSnapshot(window.firebase.query(notifRef, window.firebase.orderBy('date', 'desc')), (snap) => {
@@ -1762,13 +2030,20 @@
                     if (fresh) {
                         const msgText = typeof fresh.message === 'object' ? (fresh.message[lang] || fresh.message.fr) : fresh.message;
                         showToast(msgText, 'success');
-                        if ("Notification" in window && Notification.permission === "granted") new Notification(t.appTitle, { body: msgText });
+                        
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            new Notification(t.appTitle, { body: msgText });
+                        }
                     }
                 });
                 const ordersRef = window.firebase.collection(db, `artifacts/${appId}/public/data/orders`);
                 const unsubOrders = window.firebase.onSnapshot(window.firebase.query(ordersRef, window.firebase.where('customerUserId', '==', user.uid)), (snap) => {
                     const fetchedOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                    fetchedOrders.sort((a, b) => { const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0; const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0; return timeB - timeA; });
+                    fetchedOrders.sort((a, b) => {
+                        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                        return timeB - timeA;
+                    });
                     setMyOrders(fetchedOrders);
                 });
                 const unsubConfig = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (d) => { if(d.exists()) setUiConfig(d.data()); });
@@ -1778,12 +2053,19 @@
             const showToast = (msg, type='info') => { setToast({msg, type}); setTimeout(() => setToast(null), 3000); };
             
             const addToCart = (p) => { 
-                setCart(prev => { const cartItemId = `${p.id}-${Date.now()}`; const newItem = { ...p, cartId: cartItemId, price: p.price, qty: p.qty, selectedVariants: p.selectedVariants || [] }; return [...prev, newItem]; }); 
+                setCart(prev => {
+                    const cartItemId = `${p.id}-${Date.now()}`; 
+                    const newItem = { ...p, cartId: cartItemId, price: p.price, qty: p.qty, selectedVariants: p.selectedVariants || [] };
+                    return [...prev, newItem];
+                }); 
                 showToast(t.addToCart); 
             };
 
             const updateQty = (cartId, delta) => {
-                setCart(prev => prev.map(item => { if(item.cartId === cartId) { const newQty = Math.max(0, item.qty + delta); return {...item, qty: newQty}; } return item; }).filter(item => item.qty > 0));
+                setCart(prev => prev.map(item => {
+                    if(item.cartId === cartId) { const newQty = Math.max(0, item.qty + delta); return {...item, qty: newQty}; }
+                    return item;
+                }).filter(item => item.qty > 0));
             };
             
             const handleReorder = (order) => {
@@ -1798,84 +2080,143 @@
                 const formData = new FormData(e.target);
                 const phone = formData.get('phone') || '';
                 const name = formData.get('name') || '';
+                
                 if (phone.length < 9) return showToast(lang === 'ar' ? 'الرجاء إدخال رقم هاتف صحيح' : 'Veuillez entrer un numéro valide', 'error');
                 
                 const selectedWilayaString = formData.get('wilaya');
                 let currentZone = selectedWilayaZone;
-                if (selectedWilayaString) { const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === selectedWilayaString); if (w) currentZone = w.zone; }
+                if (selectedWilayaString) {
+                    const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === selectedWilayaString);
+                    if (w) currentZone = w.zone;
+                }
 
                 const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, currentZone); 
                 const customOrderId = Math.random().toString(36).substring(2, 11).toUpperCase();
                 
                 try {
                     const orderData = {
-                        id: customOrderId, customerUserId: user.uid, customerName: name, phone: phone, wilaya: selectedWilayaString || '', orderDetails: formData.get('orderDetails') || '',
-                        items: cart.map(i => ({ id: i.id || '', name: i.name || '', basePrice: i.basePrice || 0, price: i.price || 0, qty: i.qty || 1, image: i.image || '', selectedVariants: i.selectedVariants || [] })),
-                        subtotal: subtotal || 0, total: finalTotal || 0, discount: discount || 0, deliveryFee: delivery || 0,
-                        promoCode: appliedPromo ? { code: appliedPromo.code || '', value: discount || 0, type: appliedPromo.discountType || '' } : null,
-                        status: 'En attente', createdAt: window.firebase.Timestamp.now()
+                        id: customOrderId,
+                        customerUserId: user.uid,
+                        customerName: name,
+                        phone: phone,
+                        wilaya: selectedWilayaString || '',
+                        orderDetails: formData.get('orderDetails') || '',
+                        items: cart.map(i => ({ 
+                            id: i.id || '', 
+                            name: i.name || '', 
+                            basePrice: i.basePrice || 0, 
+                            price: i.price || 0, 
+                            qty: i.qty || 1, 
+                            image: i.image || '', 
+                            selectedVariants: i.selectedVariants || [] 
+                        })),
+                        subtotal: subtotal || 0,
+                        total: finalTotal || 0,
+                        discount: discount || 0,
+                        deliveryFee: delivery || 0,
+                        promoCode: appliedPromo ? { 
+                            code: appliedPromo.code || '', 
+                            value: discount || 0, 
+                            type: appliedPromo.discountType || '' 
+                        } : null,
+                        status: 'En attente',
+                        createdAt: window.firebase.Timestamp.now()
                     };
 
-                    localStorage.setItem('saved_phone', phone); localStorage.setItem('saved_wilaya', selectedWilayaString || '');
-                    await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${customOrderId}`), orderData);
+                    localStorage.setItem('saved_phone', phone);
+                    localStorage.setItem('saved_wilaya', selectedWilayaString || '');
+
+                    const documentPath = `artifacts/${appId}/public/data/orders/${customOrderId}`;
+                    await window.firebase.setDoc(window.firebase.doc(db, documentPath), orderData);
                     
                     if (appliedPromo && appliedPromo.id && window.firebase.increment) {
-                        await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes/${appliedPromo.id}`), { currentUses: window.firebase.increment(1) });
+                        const promoRef = window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes/${appliedPromo.id}`);
+                        await window.firebase.updateDoc(promoRef, { currentUses: window.firebase.increment(1) });
                     }
                     
-                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { message: { fr: "Commande reçue!", ar: "تم استلام الطلب!" }, date: window.firebase.Timestamp.now(), read: false, type: 'info' });
+                    let msg = { fr: "Commande reçue!", ar: "تم استلام الطلب!" };
+                    await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`), { 
+                        message: msg, 
+                        date: window.firebase.Timestamp.now(), 
+                        read: false, 
+                        type: 'info' 
+                    });
                     
-                    // Confetti Effect upon order completion
-                    if(window.confetti) {
-                        window.confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'] });
-                    }
+                    setCart([]); 
+                    setAppliedPromo(null); 
+                    setPromoCodeInput(''); 
+                    navigate('orders'); 
+                    showToast(t.orderSent, "success");
 
-                    setCart([]); setAppliedPromo(null); setPromoCodeInput(''); navigate('orders'); showToast(t.orderSent, "success");
-
-                } catch (e) { showToast(t.err, "error"); }
-            };
-
-            const submitOrderReview = async (orderId, rating) => {
-                if(!db || !appId) return;
-                try {
-                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`), { rating: rating });
-                    setShowRatingModal(null);
-                    showToast(t.reviewSubmitted, 'success');
-                } catch(e) { showToast(t.err, 'error'); }
+                } catch (e) { 
+                    console.error("Order Submit Error:", e); 
+                    showToast(t.err, "error"); 
+                }
             };
 
             const cancelOrder = async (orderId) => {
                 if (!confirm(lang === 'ar' ? "هل أنت متأكد من إلغاء هذا الطلب؟" : "Voulez-vous vraiment annuler cette commande ?")) return;
-                try { await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`), { status: 'Annulé' }); showToast(lang === 'ar' ? "تم إلغاء الطلب بنجاح" : "Commande annulée avec succès", "success"); } catch (error) { showToast(t.err, "error"); }
+                try {
+                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`), { status: 'Annulé' });
+                    showToast(lang === 'ar' ? "تم إلغاء الطلب بنجاح" : "Commande annulée avec succès", "success");
+                } catch (error) {
+                    console.error("Cancel Error:", error);
+                    showToast(t.err, "error");
+                }
             };
 
             const updateOrderStatus = async (orderId, newStatus, customerId) => {
                 if (!db || !appId || !isAdmin) return;
                 try {
-                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`), { status: newStatus });
+                    const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
+                    await window.firebase.updateDoc(window.firebase.doc(db, docPath), { status: newStatus });
+                    
                     showToast(t.statusUpdate);
+                    
                     if (customerId) {
                         const statusLabel = STATUS_OPTIONS.find(s => s.key === newStatus)?.label;
                         let msg = { fr: `Statut: ${statusLabel.fr}`, ar: `الحالة: ${statusLabel.ar}` }; 
                         if (newStatus === 'Prêt') msg = { fr: "Commande prête!", ar: "طلبك جاهز!" };
-                        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${customerId}/notifications`), { message: msg, date: window.firebase.Timestamp.now(), read: false, type: 'status', orderId });
+                        
+                        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${customerId}/notifications`), { 
+                            message: msg, 
+                            date: window.firebase.Timestamp.now(), 
+                            read: false, 
+                            type: 'status', 
+                            orderId 
+                        });
                     }
-                } catch (e) { showToast("Error updating status", "error"); }
+                } catch (e) { 
+                    console.error("Error updating status:", e);
+                    showToast("Error updating status", "error"); 
+                }
             };
             const markRead = async (id) => { if (db && appId) await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/users/${user.uid}/notifications`, id), {read: true}); };
             
             if (authLoading) return <div className="h-screen flex items-center justify-center bg-transparent"><div className="loader"></div></div>;
 
             const isMaintenanceActive = uiConfig?.maintenanceMode === true;
-            if (isMaintenanceActive && !bypassMaintenance && (!user || user.email !== ADMIN_EMAIL)) { return <MaintenanceScreen t={t} lang={lang} onAdminClick={() => setBypassMaintenance(true)} />; }
+            if (isMaintenanceActive && !bypassMaintenance && (!user || user.email !== ADMIN_EMAIL)) {
+                return <MaintenanceScreen t={t} lang={lang} onAdminClick={() => setBypassMaintenance(true)} />;
+            }
 
             if (!user) {
-                if (showLanding) return <LandingScreen t={t} lang={lang} toggleLang={toggleLang} onGetStarted={() => setShowLanding(false)} />;
+                if (showLanding) {
+                    return <LandingScreen 
+                        t={t} 
+                        lang={lang} 
+                        toggleLang={toggleLang} 
+                        onGetStarted={() => setShowLanding(false)} 
+                    />;
+                }
                 return <AuthScreen key={lang} t={t} lang={lang} toggleLang={toggleLang} />;
             }
             
             const unreadCount = notifications.filter(n => !n.read).length;
-            const filteredProducts = PRODUCTS_DATA.filter(p => p.name[lang].toLowerCase().includes(searchTerm.toLowerCase()) && (activeCategory === 'all' || p.category === activeCategory));
+            const filteredProducts = PRODUCTS_DATA.filter(p => 
+                p.name[lang].toLowerCase().includes(searchTerm.toLowerCase()) && 
+                (activeCategory === 'all' || p.category === activeCategory)
+            );
 
             return (
                 <div key={lang} className="min-h-screen h-full relative overflow-hidden">
@@ -1904,10 +2245,26 @@
                                 </h2>
                                 <div className="ios-glass p-6 rounded-3xl shadow-sm text-sm space-y-5 text-slate-700 leading-relaxed border border-white/60">
                                     <p>نحن في <strong>L'Artisan Imprimeur</strong> نأخذ خصوصيتك وأمان بياناتك على محمل الجد. توضح هذه السياسة كيفية تعاملنا مع معلوماتك.</p>
-                                    <div><h3 className="font-bold text-slate-900 mb-2">1. جمع البيانات (Data Collection)</h3><p>نقوم بجمع بياناتك الأساسية فقط (الاسم، رقم الهاتف، الولاية) لغرض واحد وهو معالجة طلبات الطباعة الخاصة بك وتوصيلها لك بشكل صحيح. لا نقوم بجمع أي بيانات حساسة أخرى.</p></div>
-                                    <div><h3 className="font-bold text-slate-900 mb-2">2. حماية وتشفير البيانات (Data Security)</h3><p>نستخدم البنية التحتية الآمنة لـ <strong>Google Firebase</strong>. يتم تشفير كلمات المرور تلقائياً، ولا يمكن لأي شخص (بما في ذلك الإدارة) رؤية كلمة المرور الخاصة بك.</p></div>
-                                    <div><h3 className="font-bold text-slate-900 mb-2">3. ملفات تعريف الارتباط (Cookies & Local Storage)</h3><p>نستخدم التخزين المحلي (Local Storage) في متصفحك لحفظ محتوى "سلة المشتريات"، تفضيلات اللغة، وحفظ معلومات التوصيل لنسهل عليك الطلب في المرات القادمة دون إزعاج.</p></div>
-                                    <div><h3 className="font-bold text-slate-900 mb-2">4. عدم المشاركة (No Third-Party Sharing)</h3><p>نتعهد بأننا لا نقوم ببيع أو مشاركة بياناتك الشخصية لأي طرف ثالث بأي شكل من الأشكال لأغراض إعلانية.</p></div>
+                                    
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">1. جمع البيانات (Data Collection)</h3>
+                                        <p>نقوم بجمع بياناتك الأساسية فقط (الاسم، رقم الهاتف، الولاية) لغرض واحد وهو معالجة طلبات الطباعة الخاصة بك وتوصيلها لك بشكل صحيح. لا نقوم بجمع أي بيانات حساسة أخرى.</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">2. حماية وتشفير البيانات (Data Security)</h3>
+                                        <p>نستخدم البنية التحتية الآمنة لـ <strong>Google Firebase</strong>. يتم تشفير كلمات المرور تلقائياً، ولا يمكن لأي شخص (بما في ذلك الإدارة) رؤية كلمة المرور الخاصة بك.</p>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">3. ملفات تعريف الارتباط (Cookies & Local Storage)</h3>
+                                        <p>نستخدم التخزين المحلي (Local Storage) في متصفحك لحفظ محتوى "سلة المشتريات"، تفضيلات اللغة، وحفظ معلومات التوصيل لنسهل عليك الطلب في المرات القادمة دون إزعاج.</p>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 mb-2">4. عدم المشاركة (No Third-Party Sharing)</h3>
+                                        <p>نتعهد بأننا لا نقوم ببيع أو مشاركة بياناتك الشخصية لأي طرف ثالث بأي شكل من الأشكال لأغراض إعلانية.</p>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -1918,15 +2275,32 @@
                                 
                                 <div className="mb-5 relative flex items-center gap-2">
                                     <div className="relative flex-1">
-                                        <input aria-label="Search" type="text" placeholder={isListening ? t.listening : t.search} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full p-4 pl-12 ios-glass rounded-2xl shadow-sm outline-none transition-all border border-white/60 ${isListening ? 'border-red-400 ring-2 ring-red-100' : 'focus:ring-2 focus:ring-blue-400 focus:bg-white/80'}`}/>
+                                        <input 
+                                            aria-label="Search"
+                                            type="text" 
+                                            placeholder={isListening ? t.listening : t.search} 
+                                            value={searchTerm} 
+                                            onChange={(e) => setSearchTerm(e.target.value)} 
+                                            className={`w-full p-4 pl-12 ios-glass rounded-2xl shadow-sm outline-none transition-all border border-white/60 ${isListening ? 'border-red-400 ring-2 ring-red-100' : 'focus:ring-2 focus:ring-blue-400 focus:bg-white/80'}`}
+                                        />
                                         <Icon name="search" className="absolute left-4 top-4 text-slate-400" size={20}/>
                                     </div>
-                                    <button aria-label="Voice Search" onClick={startVoiceSearch} className={`p-4 rounded-2xl shadow-sm transition-all flex items-center justify-center backdrop-blur-md border border-white/50 ${isListening ? 'bg-red-500/90 text-white animate-pulse shadow-red-500/30' : 'bg-white/60 text-blue-600 hover:bg-white/80'}`}><Icon name="mic" size={24}/></button>
+                                    <button 
+                                        aria-label="Voice Search"
+                                        onClick={startVoiceSearch} 
+                                        className={`p-4 rounded-2xl shadow-sm transition-all flex items-center justify-center backdrop-blur-md border border-white/50 ${isListening ? 'bg-red-500/90 text-white animate-pulse shadow-red-500/30' : 'bg-white/60 text-blue-600 hover:bg-white/80'}`}
+                                    >
+                                        <Icon name="mic" size={24}/>
+                                    </button>
                                 </div>
 
                                 <div className="flex gap-3 overflow-x-auto hide-scrollbar mb-6 pb-2">
                                     {[{id:'all', name:t.all, icon:'grid'}, {id:'cards', name:t.catCards, icon:'credit-card'}, {id:'flyers', name:t.catFlyers, icon:'file-text'}, {id:'goodies', name:t.catGoodies, icon:'gift'}].map(cat => (
-                                        <button key={cat.id} onClick={() => setActiveCategory(cat.id)} className={`flex items-center gap-1.5 px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all shadow-sm backdrop-blur-md border ${activeCategory === cat.id ? 'bg-blue-600/90 text-white border-blue-500 shadow-blue-600/30' : 'bg-white/60 text-slate-600 border-white/50 hover:bg-white/80 hover:scale-[1.02]'}`}>
+                                        <button 
+                                            key={cat.id} 
+                                            onClick={() => setActiveCategory(cat.id)}
+                                            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all shadow-sm backdrop-blur-md border ${activeCategory === cat.id ? 'bg-blue-600/90 text-white border-blue-500 shadow-blue-600/30' : 'bg-white/60 text-slate-600 border-white/50 hover:bg-white/80 hover:scale-[1.02]'}`}
+                                        >
                                             <Icon name="grid" size={16} /> {cat.name}
                                         </button>
                                     ))}
@@ -1956,13 +2330,24 @@
                                                     {uiConfig.offers.map(offer => (
                                                         <div key={offer.id} className="min-w-[260px] ios-glass rounded-3xl shadow-md overflow-hidden flex-shrink-0 group relative border border-white/60">
                                                             <div className="h-32 bg-white/40 relative overflow-hidden">
-                                                                {offer.image ? <img src={offer.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /> : <div className="w-full h-full flex items-center justify-center text-orange-400"><Icon name="image" size={32}/></div>}
+                                                                {offer.image ? (
+                                                                    <img src={offer.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center text-orange-400">
+                                                                        <Icon name="image" size={32}/>
+                                                                    </div>
+                                                                )}
                                                                 <span className="absolute top-3 right-3 bg-red-500/90 backdrop-blur text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-sm">{formatPrice(offer.price)}</span>
                                                             </div>
                                                             <div className="p-4 bg-white/40 backdrop-blur-sm">
                                                                 <h4 className="font-bold text-sm truncate">{offer.title}</h4>
                                                                 <p className="text-xs text-slate-500 line-clamp-2 mt-1">{offer.description}</p>
-                                                                {offer.endDate && <div className="mt-3 flex items-center justify-between"><span className="text-[10px] font-bold text-slate-400">{t.endsIn}:</span><CountdownTimer targetDate={offer.endDate} t={t} /></div>}
+                                                                {offer.endDate && (
+                                                                    <div className="mt-3 flex items-center justify-between">
+                                                                        <span className="text-[10px] font-bold text-slate-400">{t.endsIn}:</span>
+                                                                        <CountdownTimer targetDate={offer.endDate} t={t} />
+                                                                    </div>
+                                                                )}
                                                                 <button onClick={()=>handleGetOffer(offer)} className="w-full mt-4 bg-slate-900/90 backdrop-blur text-white py-2.5 rounded-xl text-xs font-bold hover:bg-slate-800 transition shadow-sm">{t.getOffer}</button>
                                                             </div>
                                                         </div>
@@ -2022,7 +2407,9 @@
                                         {favorites.map(p => (
                                             <div key={p.id} className="ios-glass p-3 rounded-3xl shadow-sm flex flex-col relative group border border-white/60">
                                                 <button aria-label="Remove from Favorites" onClick={() => toggleFavorite(p)} className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur rounded-full text-red-500 hover:bg-red-50 transition border border-white/50 shadow-sm"><Icon name="x" size={14}/></button>
-                                                <div className="rounded-2xl overflow-hidden mb-3 border border-white/50 bg-white/40"><ImageWithSkeleton src={p.image} className="w-full h-32 group-hover:scale-105 transition-transform duration-500"/></div>
+                                                <div className="rounded-2xl overflow-hidden mb-3 border border-white/50 bg-white/40">
+                                                    <ImageWithSkeleton src={p.image} className="w-full h-32 group-hover:scale-105 transition-transform duration-500"/>
+                                                </div>
                                                 <h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight group-hover:text-blue-600 transition">{p.name[lang]}</h3>
                                                 <div className="mt-auto flex justify-between items-center pt-2 border-t border-white/40">
                                                     <span className="text-blue-700 font-bold text-sm">{formatPrice(p.basePrice)} {t.currency}</span>
@@ -2044,7 +2431,9 @@
                                     <div className="space-y-4">
                                         {cart.map((i) => (
                                             <div key={i.cartId} className="ios-glass p-3 rounded-3xl shadow-sm flex gap-3 items-center hover:border-blue-300 transition group border border-white/60">
-                                                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/50 shrink-0 bg-white/40"><ImageWithSkeleton src={i.image} className="w-full h-full object-cover"/></div>
+                                                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/50 shrink-0 bg-white/40">
+                                                    <ImageWithSkeleton src={i.image} className="w-full h-full object-cover"/>
+                                                </div>
                                                 <div className="flex-1">
                                                     <h4 className="font-bold text-sm text-slate-800 mb-0.5">{i.name[lang]}</h4>
                                                     <div className="text-[11px] text-slate-500 mb-2 leading-tight">
@@ -2100,7 +2489,10 @@
                                                         <input aria-label="Name" required name="name" defaultValue={user.displayName || ''} placeholder={t.namePh} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition shadow-inner font-bold text-slate-800"/>
                                                         <input aria-label="Phone" required name="phone" type="tel" pattern="^(0)(5|6|7)[0-9]{8}$" title={t.phoneError} defaultValue={savedPhone} placeholder={t.phonePh} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition dir-ltr shadow-inner font-bold text-slate-800"/>
                                                         <div className="relative">
-                                                            <select aria-label="Wilaya" name="wilaya" required defaultValue={savedWilaya} onChange={(e) => { const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === e.target.value); setSelectedWilayaZone(w ? w.zone : null); }} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition appearance-none text-slate-800 shadow-inner font-bold cursor-pointer">
+                                                            <select aria-label="Wilaya" name="wilaya" required defaultValue={savedWilaya} onChange={(e) => {
+                                                                const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === e.target.value);
+                                                                setSelectedWilayaZone(w ? w.zone : null);
+                                                            }} className="w-full p-4 bg-white/60 border border-white/50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 transition appearance-none text-slate-800 shadow-inner font-bold cursor-pointer">
                                                                 <option value="">{t.selectWilaya}</option>
                                                                 {WILAYAS.map((w) => <option key={w.id} value={`${w.id} - ${w.name}`} className="text-black">{w.id} - {w.name}</option>)}
                                                             </select>
@@ -2125,7 +2517,8 @@
                                     const currentStatusIndex = STATUS_OPTIONS.findIndex(s => s.key === o.status);
                                     
                                     const orderDate = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-                                    const estDelivery = new Date(orderDate); estDelivery.setDate(estDelivery.getDate() + 3);
+                                    const estDelivery = new Date(orderDate);
+                                    estDelivery.setDate(estDelivery.getDate() + 3);
                                     
                                     return (
                                         <div key={o.id} className="ios-glass rounded-3xl shadow-sm overflow-hidden hover:shadow-md transition border border-white/60">
@@ -2133,9 +2526,13 @@
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold text-lg text-slate-800 bg-white/50 px-2 rounded-lg border border-white/60">#{o.id.slice(-6)}</span>
-                                                        <button onClick={() => { navigator.clipboard.writeText(o.id); showToast(lang === 'ar' ? 'تم نسخ رقم الطلب' : 'Numéro copié', 'success'); }} className="text-slate-400 hover:text-blue-600 transition bg-white/50 p-1.5 rounded-md border border-white/60 shadow-sm" title="نسخ المعرف"><Icon name="copy" size={14}/></button>
+                                                        <button onClick={() => { navigator.clipboard.writeText(o.id); showToast(lang === 'ar' ? 'تم نسخ رقم الطلب' : 'Numéro copié', 'success'); }} className="text-slate-400 hover:text-blue-600 transition bg-white/50 p-1.5 rounded-md border border-white/60 shadow-sm" title="نسخ المعرف">
+                                                            <Icon name="copy" size={14}/>
+                                                        </button>
                                                     </div>
-                                                    <span className="text-[11px] font-mono text-slate-500 block mt-1.5" dir="ltr">{o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString(lang === 'ar' ? 'ar-DZ' : 'fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : 'الآن'}</span>
+                                                    <span className="text-[11px] font-mono text-slate-500 block mt-1.5" dir="ltr">
+                                                        {o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString(lang === 'ar' ? 'ar-DZ' : 'fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : 'الآن'}
+                                                    </span>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="font-black text-blue-700 text-lg mb-1">{formatPrice(o.total)} {t.currency}</div>
@@ -2153,7 +2550,9 @@
                                                                 <div className={`absolute -left-[10px] top-1 w-4 h-4 rounded-full border-2 transition-all shadow-sm ${isCompleted ? (step.key === 'Annulé' ? 'bg-red-500 border-red-500' : 'bg-blue-600 border-blue-600') : 'bg-white/60 border-slate-300'}`}>
                                                                     {isCompleted && <Icon name={step.key === 'Annulé' ? "x" : "check"} size={10} className="text-white absolute top-[1px] left-[1px]"/>}
                                                                 </div>
-                                                                <p className={`text-xs font-bold transition-all ${isCurrent ? (step.key === 'Annulé' ? 'text-red-700' : 'text-blue-700') + ' scale-105' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>{step.label[lang]}</p>
+                                                                <p className={`text-xs font-bold transition-all ${isCurrent ? (step.key === 'Annulé' ? 'text-red-700' : 'text-blue-700') + ' scale-105' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>
+                                                                    {step.label[lang]}
+                                                                </p>
                                                             </div>
                                                         );
                                                     })}
@@ -2164,12 +2563,6 @@
                                                         {t.estimatedDelivery} <span className="text-slate-800 bg-white/60 px-2 py-0.5 rounded-md border border-white/60 shadow-sm">{estDelivery.toLocaleDateString()}</span>
                                                     </div>
                                                 )}
-                                                {o.rating && (
-                                                    <div className="mt-4 pt-3 border-t border-white/40 flex items-center gap-1.5 text-yellow-500">
-                                                        <Icon name="star" size={16} className="fill-yellow-400" />
-                                                        <span className="text-xs font-bold text-yellow-700">تقييمك: {o.rating}/5</span>
-                                                    </div>
-                                                )}
                                             </div>
 
                                             <div className="px-4 pb-4 flex justify-between items-center pt-3 border-t border-white/40">
@@ -2177,14 +2570,17 @@
                                                     {isExpanded ? <Icon name="chevron-up" size={14}/> : <Icon name="chevron-down" size={14}/>} {isExpanded ? 'Masquer' : t.showDetails}
                                                 </button>
                                                 <div className="flex gap-2 flex-wrap justify-end">
-                                                    {o.status === 'Prêt' && !o.rating && (
-                                                        <button onClick={() => setShowRatingModal(o)} className="text-xs bg-yellow-500/90 text-white px-3 py-1.5 rounded-xl font-bold hover:bg-yellow-500 transition flex items-center gap-1 shadow-sm backdrop-blur-sm">
-                                                            <Icon name="star" size={14}/> {t.rateOrder}
+                                                    <a href={`https://wa.me/213549179000?text=${encodeURIComponent(lang === 'ar' ? `مرحباً، أستفسر عن طلبي رقم #${o.id}` : `Bonjour, je me renseigne sur ma commande #${o.id}`)}`} target="_blank" className="text-xs bg-green-500/90 text-white px-3 py-1.5 rounded-xl font-bold hover:bg-green-500 transition flex items-center gap-1 shadow-sm backdrop-blur-sm border border-green-400">
+                                                        <Icon name="message-circle" size={14}/> {t.whatsapp}
+                                                    </a>
+                                                    {o.status === 'En attente' && (
+                                                        <button onClick={() => cancelOrder(o.id)} className="text-xs bg-red-50/80 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1 border border-red-200 backdrop-blur-sm shadow-sm">
+                                                            <Icon name="x-circle" size={14}/> {t.cancelOrder}
                                                         </button>
                                                     )}
-                                                    <a href={`https://wa.me/213549179000?text=${encodeURIComponent(lang === 'ar' ? `مرحباً، أستفسر عن طلبي رقم #${o.id}` : `Bonjour, je me renseigne sur ma commande #${o.id}`)}`} target="_blank" className="text-xs bg-green-500/90 text-white px-3 py-1.5 rounded-xl font-bold hover:bg-green-500 transition flex items-center gap-1 shadow-sm backdrop-blur-sm border border-green-400"><Icon name="message-circle" size={14}/> {t.whatsapp}</a>
-                                                    {o.status === 'En attente' && <button onClick={() => cancelOrder(o.id)} className="text-xs bg-red-50/80 text-red-600 px-3 py-1.5 rounded-xl font-bold hover:bg-red-100 transition flex items-center gap-1 border border-red-200 backdrop-blur-sm shadow-sm"><Icon name="x-circle" size={14}/> {t.cancelOrder}</button>}
-                                                    <button onClick={() => handleReorder(o)} className="text-xs bg-white/80 text-blue-600 px-3 py-1.5 rounded-xl font-bold hover:bg-white transition flex items-center gap-1 border border-white/60 shadow-sm backdrop-blur-sm"><Icon name="rotate-ccw" size={14}/> {t.reOrder}</button>
+                                                    <button onClick={() => handleReorder(o)} className="text-xs bg-white/80 text-blue-600 px-3 py-1.5 rounded-xl font-bold hover:bg-white transition flex items-center gap-1 border border-white/60 shadow-sm backdrop-blur-sm">
+                                                        <Icon name="rotate-ccw" size={14}/> {t.reOrder}
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -2193,7 +2589,10 @@
                                                     <p className="font-bold text-slate-800 mb-2">{t.details}:</p>
                                                     <ul className="space-y-2 mb-3">
                                                         {o.items.map((item, idx) => (
-                                                            <li key={idx} className="flex justify-between border-b border-white/50 pb-1.5 last:border-0"><span className="font-medium text-slate-700">{item.qty}x {item.name[lang] || item.name}</span><span className="font-mono font-bold text-slate-800">{formatPrice(item.price * item.qty)} {t.currency}</span></li>
+                                                            <li key={idx} className="flex justify-between border-b border-white/50 pb-1.5 last:border-0">
+                                                                <span className="font-medium text-slate-700">{item.qty}x {item.name[lang] || item.name}</span>
+                                                                <span className="font-mono font-bold text-slate-800">{formatPrice(item.price * item.qty)} {t.currency}</span>
+                                                            </li>
                                                         ))}
                                                     </ul>
                                                     {o.deliveryFee > 0 && <div className="flex justify-between text-slate-700 pt-2 border-t border-white/50 font-bold"><span>{t.deliveryFee}</span><span>{formatPrice(o.deliveryFee)} {t.currency}</span></div>}
@@ -2214,8 +2613,7 @@
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
-                    {showDesignStudio && <DesignStudio t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} onAddToCart={(p) => { addToCart(p); setView('cart'); }} />}
-                    {showRatingModal && <RatingModal t={t} order={showRatingModal} onClose={()=>setShowRatingModal(null)} onSubmitReview={submitOrderReview} />}
+                    {showDesignStudio && <DesignStudio t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
 
                     <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto ios-glass rounded-3xl flex justify-between px-2 py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.1)] safe-bottom border-t border-white/80">
                         <button aria-label="Home" onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='home'?'active text-blue-600':'text-slate-400'}`}><Icon name="home" size={22}/><span className="text-[10px] font-bold">{t.home}</span></button>
