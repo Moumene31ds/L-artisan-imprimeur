@@ -121,11 +121,10 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback, useMemo, memo } = React;
 
-        // --- إعدادات سحابة Cloudinary (قم بتغييرها ببيانات حسابك) ---
+        // --- إعدادات سحابة Cloudinary ---
         const CLOUDINARY_CLOUD_NAME = "dr8vldxd6"; 
         const CLOUDINARY_UPLOAD_PRESET = "L'Artisan imprimeur"; 
 
-        // دالة الرفع إلى سحابة Cloudinary
         const uploadFileToCloudinary = async (file) => {
             if (CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME") {
                 console.warn("Please configure Cloudinary credentials!");
@@ -317,11 +316,30 @@
         };
 
         const PRODUCTS_DATA = [
-            { id: 1, category: 'cards', name: { fr: "Cartes de Visite", ar: "بطاقات زيارة" }, basePrice: 2000, image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400", badge: 'bestSeller', rating: 4.8, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '250', price: 1500 }, { value: '500', price: 3000 }]}, { id: 'paper', label: { fr: "Type de Papier", ar: "نوع الورق" }, type: 'radio', options: [{ value: 'Matte (300g)', price: 0 }, { value: 'Brillant (350g)', price: 500 }]}, { id: 'finition', label: { fr: "Finition", ar: "التغليف" }, type: 'radio', options: [{ value: 'Standard', price: 0 }, { value: 'Pelliculage Mat', price: 800 }]}]},
-            { id: 2, category: 'flyers', name: { fr: "Flyers A5 (Publicité)", ar: "فلاير إعلاني A5" }, basePrice: 1500, image: "https://images.unsplash.com/photo-1562564055-71e051d33c19?w=400", badge: 'new', rating: 4.5, variants: [{ id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '500', price: 4000 }]}, { id: 'format', label: { fr: "Format", ar: "الشكل" }, type: 'radio', options: [{ value: 'A5', price: 0 }, { value: 'A4', price: 1500 }]}]},
-            { id: 3, category: 'cards', name: { fr: "Invitations Mariage", ar: "دعوات زفاف فاخرة" }, basePrice: 5000, image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400", rating: 5.0, variants: [] },
+            { 
+                id: 1, category: 'cards', name: { fr: "Cartes de Visite", ar: "بطاقات زيارة" }, basePrice: 2000, 
+                image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400", badge: 'bestSeller', rating: 4.8, 
+                designRatio: 85 / 55, // 85mm x 55mm
+                supportsDoubleSided: true,
+                variants: [
+                    { id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '250', price: 1500 }, { value: '500', price: 3000 }]}, 
+                    { id: 'paper', label: { fr: "Type de Papier", ar: "نوع الورق" }, type: 'radio', options: [{ value: 'Matte (300g)', price: 0 }, { value: 'Brillant (350g)', price: 500 }]}, 
+                    { id: 'finition', label: { fr: "Finition", ar: "التغليف" }, type: 'radio', options: [{ value: 'Standard', price: 0 }, { value: 'Pelliculage Mat', price: 800 }]}
+                ]
+            },
+            { 
+                id: 2, category: 'flyers', name: { fr: "Flyers A5 (Publicité)", ar: "فلاير إعلاني A5" }, basePrice: 1500, 
+                image: "https://images.unsplash.com/photo-1562564055-71e051d33c19?w=400", badge: 'new', rating: 4.5, 
+                designRatio: 148 / 210, // A5 Format
+                supportsDoubleSided: true,
+                variants: [
+                    { id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '500', price: 4000 }]}, 
+                    { id: 'format', label: { fr: "Format", ar: "الشكل" }, type: 'radio', options: [{ value: 'A5', price: 0 }, { value: 'A4', price: 1500 }]}
+                ]
+            },
+            { id: 3, category: 'cards', name: { fr: "Invitations Mariage", ar: "دعوات زفاف فاخرة" }, basePrice: 5000, image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400", rating: 5.0, designRatio: 1, supportsDoubleSided: true, variants: [] },
             { id: 5, category: 'goodies', name: { fr: "Tampon Encreur", ar: "ختم آلي (Cachet)" }, basePrice: 1200, image: "https://images.unsplash.com/photo-1590494165264-1ebe3602eb80?w=400", variants: [], badge: 'soon', comingSoon: true },
-            { id: 6, category: 'goodies', name: { fr: "Bloc-notes Personnalisé", ar: "مفكرة مخصصة" }, basePrice: 450, image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400", rating: 4.2, variants: [] }
+            { id: 6, category: 'goodies', name: { fr: "Bloc-notes Personnalisé", ar: "مفكرة مخصصة" }, basePrice: 450, image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=400", rating: 4.2, designRatio: 148 / 210, supportsDoubleSided: false, variants: [] }
         ];
         
         const FEATURED_PRODUCTS = [
@@ -392,21 +410,100 @@
             return total;
         };
 
-        const StoriesBar = memo(({ stories }) => {
-            if (!stories || stories.length === 0) return null;
+        const StoryViewer = ({ stories, initialIndex, onClose }) => {
+            const [currentIndex, setCurrentIndex] = useState(initialIndex);
+            const activeStory = stories[currentIndex];
+            
+            const isVideo = activeStory.img.match(/\.(mp4|webm|ogg)$/i) || activeStory.img.includes('video/upload');
+
+            useEffect(() => {
+                if (!isVideo) {
+                    const timer = setTimeout(() => nextStory(), 10000);
+                    return () => clearTimeout(timer);
+                }
+            }, [currentIndex, isVideo]);
+
+            const nextStory = () => {
+                if (currentIndex < stories.length - 1) setCurrentIndex(prev => prev + 1);
+                else onClose();
+            };
+
+            const prevStory = () => {
+                if (currentIndex > 0) setCurrentIndex(prev => prev - 1);
+            };
+
             return (
-                <div className="flex gap-4 overflow-x-auto hide-scrollbar mb-6 py-2 px-1">
-                    {stories.map((s, i) => (
-                        <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
-                            <div className="p-[2.5px] rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 shadow-md hover:scale-105 transition-transform cursor-pointer">
-                                <div className="p-0.5 bg-white/50 backdrop-blur-sm rounded-full w-16 h-16 overflow-hidden border-2 border-white/80">
-                                    <img src={s.img} className="w-full h-full object-cover rounded-full" loading="lazy" decoding="async" />
-                                </div>
+                <div className="fixed inset-0 z-[200] bg-black flex flex-col animate-fadeIn">
+                    <div className="absolute top-0 left-0 w-full p-4 flex gap-1 z-10">
+                        {stories.map((s, i) => (
+                            <div key={i} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
+                                <div className={`h-full bg-white transition-all duration-[10000ms] ${i < currentIndex ? 'w-full' : i === currentIndex && !isVideo ? 'w-full ease-linear' : 'w-0'}`} style={{transitionDuration: i === currentIndex && !isVideo ? '10s' : '0s'}} />
                             </div>
-                            <span className="text-[10px] font-bold text-slate-700 max-w-[64px] truncate">{s.name}</span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                    
+                    <div className="absolute top-8 right-4 z-10 flex items-center gap-4">
+                        <span className="text-white font-bold drop-shadow-md">{activeStory.name}</span>
+                        <button onClick={onClose} className="bg-black/50 text-white p-2 rounded-full backdrop-blur-md"><Icon name="x" size={24} /></button>
+                    </div>
+
+                    <div className="flex-1 relative flex items-center justify-center h-full">
+                        <div className="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer" onClick={prevStory}></div>
+                        <div className="absolute inset-y-0 right-0 w-2/3 z-10 cursor-pointer" onClick={nextStory}></div>
+
+                        {isVideo ? (
+                            <video 
+                                src={activeStory.img} 
+                                autoPlay 
+                                playsInline 
+                                onEnded={nextStory}
+                                className="w-full h-full object-contain"
+                            />
+                        ) : (
+                            <img src={activeStory.img} className="w-full h-full object-contain" />
+                        )}
+                    </div>
                 </div>
+            );
+        };
+
+        const StoriesBar = memo(({ stories }) => {
+            const [viewerOpen, setViewerOpen] = useState(false);
+            const [startIndex, setStartIndex] = useState(0);
+
+            if (!stories || stories.length === 0) return null;
+
+            const openStory = (index) => {
+                setStartIndex(index);
+                setViewerOpen(true);
+            };
+
+            return (
+                <>
+                    <div className="flex gap-4 overflow-x-auto hide-scrollbar mb-6 py-2 px-1">
+                        {stories.map((s, i) => {
+                            const isVideo = s.img.match(/\.(mp4|webm|ogg)$/i) || s.img.includes('video/upload');
+                            return (
+                                <div key={i} onClick={() => openStory(i)} className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group">
+                                    <div className="p-[2.5px] rounded-full bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 shadow-md group-hover:scale-105 transition-transform relative">
+                                        <div className="p-0.5 bg-white/50 backdrop-blur-sm rounded-full w-16 h-16 overflow-hidden border-2 border-white/80 relative">
+                                            {isVideo ? (
+                                                <>
+                                                    <video src={s.img} className="w-full h-full object-cover rounded-full" />
+                                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center"><Icon name="play" size={20} className="text-white fill-white"/></div>
+                                                </>
+                                            ) : (
+                                                <img src={s.img} className="w-full h-full object-cover rounded-full" loading="lazy" />
+                                            )}
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-slate-700 max-w-[64px] truncate">{s.name}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {viewerOpen && <StoryViewer stories={stories} initialIndex={startIndex} onClose={() => setViewerOpen(false)} />}
+                </>
             );
         });
 
@@ -503,7 +600,6 @@
                 if(!file) return;
                 setUploadQuality('checking');
                 
-                // استخدام Cloudinary لرفع التصميم
                 const uploadedUrl = await uploadFileToCloudinary(file);
                 
                 if (uploadedUrl) {
@@ -521,7 +617,6 @@
             const handleAdd = () => {
                 const selectedVariants = product.variants.map(v => ({ id: v.id, label: v.label[lang], value: selections[v.id], price: v.options.find(opt => opt.value === selections[v.id])?.price || 0 })).filter(v => v.value);
                 
-                // إضافة رابط التصميم المرفوع كخيار من الخيارات إن وجد
                 if (uploadedDesignUrl) {
                     selectedVariants.push({ id: 'design_url', label: lang === 'ar' ? 'التصميم المرفوع' : 'Design Uploadé', value: uploadedDesignUrl, price: 0 });
                 }
@@ -836,8 +931,9 @@
                         <div class="header-brand">
                             <h1>L'Artisan Imprimeur</h1>
                             <p>Imprimerie Numérique & Offset</p>
-                            <p>📍 Mostaganem, Algérie</p>
+                            <p>📍 Oran, Algérie</p>
                             <p>📞 +213 549 17 90 00</p>
+                            <p>✉️ attouabdelkarim2@gmail.com</p>
                         </div>
                         <div class="invoice-title">
                             <h2>${t.printInvoice}</h2>
@@ -1042,9 +1138,9 @@
                 const url = await uploadFileToCloudinary(file);
                 if (url) {
                     setStoryImgUrl(url);
-                    showToast("تم رفع الصورة بنجاح", "success");
+                    showToast("تم الرفع بنجاح", "success");
                 } else {
-                    showToast("فشل رفع الصورة", "error");
+                    showToast("فشل الرفع", "error");
                 }
             };
 
@@ -1054,7 +1150,7 @@
                 const finalUrl = formData.get('img') || storyImgUrl;
 
                 if (!finalUrl) {
-                    showToast("يجب إرفاق صورة", "error");
+                    showToast("يجب إرفاق ملف", "error");
                     return;
                 }
 
@@ -1263,14 +1359,19 @@
                                             <span className="font-bold block mb-1">{t.details}:</span>
                                             {order.orderDetails || "—"}
                                             
-                                            {/* إظهار روابط التصاميم المرفوعة في الطلب للإدارة */}
                                             {order.items && order.items.map((item, idx) => {
-                                                const designLink = item.selectedVariants?.find(v => v.id === 'design_url');
-                                                if(designLink) {
+                                                const designLinks = item.selectedVariants?.filter(v => v.id.includes('design_'));
+                                                if(designLinks && designLinks.length > 0) {
                                                     return (
-                                                        <div key={idx} className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded flex justify-between items-center">
+                                                        <div key={idx} className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded flex flex-col gap-2">
                                                             <span className="font-bold text-blue-700">{item.name[lang] || item.name}</span>
-                                                            <a href={designLink.value} target="_blank" className="text-xs bg-blue-600 text-white px-2 py-1 rounded shadow-sm hover:bg-blue-500">تحميل التصميم</a>
+                                                            <div className="flex gap-2">
+                                                                {designLinks.map((link, i) => (
+                                                                    <a key={i} href={link.value} target="_blank" className="text-xs bg-blue-600 text-white px-2 py-1 rounded shadow-sm hover:bg-blue-500">
+                                                                        {link.label}
+                                                                    </a>
+                                                                ))}
+                                                            </div>
                                                         </div>
                                                     )
                                                 }
@@ -1448,25 +1549,39 @@
                                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-slate-800"><Icon name="images" size={18} className="text-purple-500"/> {t.stories}</h3>
                                 
                                 <div className="flex gap-3 overflow-x-auto mb-5 pb-2 hide-scrollbar">
-                                    {uiConfig.stories && uiConfig.stories.map(s => (
-                                        <div key={s.id} className="relative shrink-0 w-20 group">
-                                            <div className="p-1 bg-white/50 rounded-2xl border border-white/60 shadow-sm">
-                                                <img src={s.img} className="w-full h-18 rounded-xl object-cover"/>
+                                    {uiConfig.stories && uiConfig.stories.map(s => {
+                                        const isVideo = s.img.match(/\.(mp4|webm|ogg)$/i) || s.img.includes('video/upload');
+                                        return (
+                                            <div key={s.id} className="relative shrink-0 w-20 group">
+                                                <div className="p-1 bg-white/50 rounded-2xl border border-white/60 shadow-sm relative overflow-hidden">
+                                                    {isVideo ? (
+                                                        <div className="relative w-full h-18 bg-black rounded-xl">
+                                                            <video src={s.img} className="w-full h-full object-cover" />
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/20"><Icon name="play" size={16} className="text-white fill-white"/></div>
+                                                        </div>
+                                                    ) : (
+                                                        <img src={s.img} className="w-full h-18 rounded-xl object-cover"/>
+                                                    )}
+                                                </div>
+                                                <button aria-label="Delete" onClick={()=>deleteStory(s.id)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:scale-110 transition border border-white"><Icon name="x" size={12}/></button>
+                                                <div className="text-[10px] truncate text-center mt-1.5 font-bold text-slate-700">{s.name}</div>
                                             </div>
-                                            <button aria-label="Delete" onClick={()=>deleteStory(s.id)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:scale-110 transition border border-white"><Icon name="x" size={12}/></button>
-                                            <div className="text-[10px] truncate text-center mt-1.5 font-bold text-slate-700">{s.name}</div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 <form onSubmit={addStory} className="space-y-3 pt-4 border-t border-white/40">
                                     <input aria-label="Name" required name="name" placeholder={t.storyName} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                     
                                     <div className="bg-white/40 p-2 rounded-xl border border-white/50 shadow-inner">
-                                        <label className="text-xs font-bold text-slate-700 mb-1 block">رفع صورة الستوري:</label>
-                                        <input type="file" accept="image/*" onChange={handleStoryUpload} className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                                        <label className="text-xs font-bold text-slate-700 mb-1 block">رفع صورة أو فيديو الستوري:</label>
+                                        <input type="file" accept="image/*,video/mp4,video/webm" onChange={handleStoryUpload} className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                                         <input type="hidden" name="img" value={storyImgUrl} />
-                                        {storyImgUrl && <img src={storyImgUrl} className="mt-2 h-16 rounded object-cover" />}
+                                        {storyImgUrl && (
+                                            storyImgUrl.match(/\.(mp4|webm|ogg)$/i) || storyImgUrl.includes('video/upload') 
+                                            ? <video src={storyImgUrl} className="mt-2 h-16 rounded object-cover bg-black" controls /> 
+                                            : <img src={storyImgUrl} className="mt-2 h-16 rounded object-cover" />
+                                        )}
                                     </div>
                                     
                                     <button className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold flex justify-center gap-2 hover:bg-blue-500 transition shadow-md" disabled={!storyImgUrl}>
@@ -1536,11 +1651,14 @@
             </div>
         );
 
-        const DesignStudio = ({ t, lang, onClose, onAddToCart }) => {
+        const DesignStudio = ({ t, lang, onClose, onAddToCart, product }) => {
             const canvasRef = useRef(null);
             const [fabricCanvas, setFabricCanvas] = useState(null);
             const [activeObject, setActiveObject] = useState(null);
             const [objectColor, setObjectColor] = useState('#0f172a');
+            
+            const [activeSide, setActiveSide] = useState('front');
+            const canvasDataRef = useRef({ front: null, back: null });
 
             useEffect(() => {
                 let canvas;
@@ -1548,13 +1666,26 @@
                     alert(lang === 'ar' ? 'جاري تحميل مكتبة التصميم...' : 'Chargement de la bibliothèque...');
                     return;
                 }
+
+                const maxWidth = Math.min(window.innerWidth - 40, 800);
+                const ratio = product?.designRatio || (85 / 55);
+                const canvasWidth = maxWidth;
+                const canvasHeight = maxWidth / ratio;
+
                 try {
                     canvas = new window.fabric.Canvas(canvasRef.current, {
-                        backgroundColor: 'transparent',
-                        width: Math.min(window.innerWidth - 40, 800),
-                        height: 500,
+                        backgroundColor: '#ffffff', 
+                        width: canvasWidth,
+                        height: canvasHeight,
                         preserveObjectStacking: true
                     });
+
+                    const safeArea = new window.fabric.Rect({
+                        left: 15, top: 15, width: canvasWidth - 30, height: canvasHeight - 30,
+                        fill: 'transparent', stroke: '#ef4444', strokeWidth: 1, strokeDashArray: [5, 5],
+                        selectable: false, evented: false, opacity: 0.5
+                    });
+                    canvas.add(safeArea);
 
                     canvas.on('selection:created', (e) => updateTools(e.selected[0]));
                     canvas.on('selection:updated', (e) => updateTools(e.selected[0]));
@@ -1570,7 +1701,7 @@
                         canvas.dispose();
                     }
                 };
-            }, []);
+            }, [product]);
 
             const updateTools = (obj) => {
                 setActiveObject(obj);
@@ -1643,6 +1774,13 @@
                 if (!fabricCanvas) return;
                 if(confirm(lang === 'ar' ? "هل أنت متأكد من مسح اللوحة؟" : "Effacer la zone de travail?")) {
                     fabricCanvas.clear();
+                    fabricCanvas.backgroundColor = '#ffffff';
+                    const safeArea = new window.fabric.Rect({
+                        left: 15, top: 15, width: fabricCanvas.width - 30, height: fabricCanvas.height - 30,
+                        fill: 'transparent', stroke: '#ef4444', strokeWidth: 1, strokeDashArray: [5, 5],
+                        selectable: false, evented: false, opacity: 0.5
+                    });
+                    fabricCanvas.add(safeArea);
                 }
             };
 
@@ -1653,8 +1791,30 @@
                 const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
                 const link = document.createElement('a');
                 link.href = dataURL;
-                link.download = 'design_lartisan.png';
+                link.download = `design_lartisan_${activeSide}.png`;
                 link.click();
+            };
+
+            const switchSide = (newSide) => {
+                if (activeSide === newSide || !fabricCanvas) return;
+                
+                canvasDataRef.current[activeSide] = fabricCanvas.toJSON();
+                
+                fabricCanvas.clear();
+                fabricCanvas.backgroundColor = '#ffffff';
+                
+                if (canvasDataRef.current[newSide]) {
+                    fabricCanvas.loadFromJSON(canvasDataRef.current[newSide], () => fabricCanvas.renderAll());
+                } else {
+                    const safeArea = new window.fabric.Rect({
+                        left: 15, top: 15, width: fabricCanvas.width - 30, height: fabricCanvas.height - 30,
+                        fill: 'transparent', stroke: '#ef4444', strokeWidth: 1, strokeDashArray: [5, 5],
+                        selectable: false, evented: false, opacity: 0.5
+                    });
+                    fabricCanvas.add(safeArea);
+                }
+                
+                setActiveSide(newSide);
             };
 
             const handleAddToCart = async () => {
@@ -1662,24 +1822,36 @@
                 fabricCanvas.discardActiveObject();
                 fabricCanvas.renderAll();
                 
-                const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
-                
-                // تحويل DataURL إلى ملف لرفعه إلى Cloudinary
-                const res = await fetch(dataURL);
-                const blob = await res.blob();
-                const file = new File([blob], "custom_design.png", { type: "image/png" });
-                
-                const uploadedUrl = await uploadFileToCloudinary(file);
-                const finalImage = uploadedUrl || dataURL;
+                canvasDataRef.current[activeSide] = fabricCanvas.toJSON();
+
+                let frontUrl = null, backUrl = null;
+
+                const uploadCanvasState = async (jsonState) => {
+                    if (!jsonState) return null;
+                    fabricCanvas.loadFromJSON(jsonState, () => fabricCanvas.renderAll());
+                    const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
+                    const res = await fetch(dataURL);
+                    const blob = await res.blob();
+                    const file = new File([blob], `design-${Date.now()}.png`, { type: "image/png" });
+                    return await uploadFileToCloudinary(file) || dataURL;
+                };
+
+                frontUrl = await uploadCanvasState(canvasDataRef.current.front || fabricCanvas.toJSON());
+                if (product?.supportsDoubleSided && canvasDataRef.current.back) {
+                    backUrl = await uploadCanvasState(canvasDataRef.current.back);
+                }
 
                 const customProduct = {
                     id: `custom-${Date.now()}`,
-                    name: { fr: "Design Personnalisé (Studio)", ar: "تصميم مخصص (الأستوديو)" },
-                    basePrice: 1500, 
-                    price: 1500,
-                    image: finalImage,
+                    name: { fr: `Design: ${product?.name?.fr || 'Personnalisé'}`, ar: `تصميم: ${product?.name?.ar || 'مخصص'}` },
+                    basePrice: product?.basePrice || 1500, 
+                    price: product?.basePrice || 1500,
+                    image: frontUrl,
                     qty: 1,
-                    selectedVariants: [{ id: 'design_url', label: lang==='ar'?'رابط التصميم':'Lien Design', value: finalImage }]
+                    selectedVariants: [
+                        { id: 'design_front', label: 'Face (الوجه)', value: frontUrl },
+                        ...(backUrl ? [{ id: 'design_back', label: 'Verso (الظهر)', value: backUrl }] : [])
+                    ]
                 };
                 
                 onAddToCart(customProduct);
@@ -1687,11 +1859,16 @@
             };
 
             return (
-                <div className="fixed inset-0 z-[140] bg-slate-900/80 backdrop-blur-xl flex flex-col p-2 md:p-6 animate-fadeIn">
+                <div className="fixed inset-0 z-[140] bg-slate-900/90 backdrop-blur-2xl flex flex-col p-2 md:p-6 animate-fadeIn">
                     <div className="flex justify-between items-center mb-4 bg-white/10 border border-white/20 p-3 md:px-6 rounded-3xl shadow-lg safe-top backdrop-blur-md">
-                        <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-                            <Icon name="pen-tool" /> <span className="hidden sm:inline">{lang === 'ar' ? "أستوديو التصميم" : "Studio de Design"}</span>
-                        </h3>
+                        <div>
+                            <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                                <Icon name="pen-tool" /> <span className="hidden sm:inline">{product?.name[lang] || (lang === 'ar' ? "أستوديو التصميم" : "Studio de Design")}</span>
+                            </h3>
+                            <p className="text-[10px] text-blue-300 mt-1">
+                                {lang === 'ar' ? 'الخط المتقطع يمثل هامش القص الآمن' : 'La ligne pointillée représente la marge de sécurité'}
+                            </p>
+                        </div>
                         <div className="flex gap-2">
                             <button onClick={handleAddToCart} className="bg-blue-600/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-blue-500 transition flex items-center gap-2 shadow-lg backdrop-blur border border-blue-400/30">
                                 <Icon name="shopping-cart" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "أضف للسلة" : "Ajouter au panier"}</span>
@@ -1704,6 +1881,19 @@
                             </button>
                         </div>
                     </div>
+
+                    {product?.supportsDoubleSided && (
+                        <div className="flex justify-center mb-4 z-10">
+                            <div className="bg-white/10 p-1 rounded-2xl backdrop-blur-md flex gap-2 border border-white/20">
+                                <button onClick={() => switchSide('front')} className={`px-6 py-2 rounded-xl font-bold transition-all ${activeSide === 'front' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10'}`}>
+                                    {lang === 'ar' ? 'الوجه (Recto)' : 'Recto (Face)'}
+                                </button>
+                                <button onClick={() => switchSide('back')} className={`px-6 py-2 rounded-xl font-bold transition-all ${activeSide === 'back' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10'}`}>
+                                    {lang === 'ar' ? 'الظهر (Verso)' : 'Verso (Dos)'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="flex flex-col md:flex-row flex-1 gap-4 overflow-hidden mb-safe">
                         <div className="w-full md:w-64 bg-white/10 border border-white/20 backdrop-blur-md rounded-3xl p-4 shadow-lg flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0">
@@ -1754,8 +1944,8 @@
                             </div>
                         </div>
 
-                        <div className="flex-1 bg-white/5 border border-white/10 backdrop-blur-sm rounded-3xl shadow-inner flex items-center justify-center overflow-auto pattern-dots p-4">
-                            <div className="shadow-2xl bg-white rounded-xl overflow-hidden flex-shrink-0 mx-auto ring-4 ring-white/20">
+                        <div className="flex-1 bg-slate-800/50 border border-white/10 backdrop-blur-sm rounded-3xl shadow-inner flex items-center justify-center overflow-auto pattern-dots p-4">
+                            <div className="shadow-2xl bg-white overflow-hidden flex-shrink-0 mx-auto ring-4 ring-white/10 transition-all duration-300" style={{aspectRatio: product?.designRatio || (85/55)}}>
                                 <canvas ref={canvasRef} />
                             </div>
                         </div>
@@ -1896,6 +2086,7 @@
             const [productModal, setProductModal] = useState(null);
             const [showQrModal, setShowQrModal] = useState(false);
             const [showDesignStudio, setShowDesignStudio] = useState(false);
+            const [selectedDesignProduct, setSelectedDesignProduct] = useState(null);
             const [uiConfig, setUiConfig] = useState({});
             const [bypassMaintenance, setBypassMaintenance] = useState(false);
             
@@ -2422,7 +2613,7 @@
                                                 <div className="flex gap-2 flex-wrap">
                                                     <button onClick={()=>navigate('cart')} className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 transition hover:scale-105">{t.orderNow}</button>
                                                     <button onClick={()=>setShowQrModal(true)} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="qr-code" size={16}/> {t.qrTool}</button>
-                                                    <button onClick={()=>setShowDesignStudio(true)} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="pen-tool" size={16}/> {lang === 'ar' ? 'أستوديو' : 'Studio'}</button>
+                                                    <button onClick={()=>{ setSelectedDesignProduct(null); setShowDesignStudio(true); }} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="pen-tool" size={16}/> {lang === 'ar' ? 'أستوديو' : 'Studio'}</button>
                                                 </div>
                                             </div>
                                             <Icon name="layers" size={160} className={`absolute -bottom-10 text-white opacity-[0.03] rotate-12 ${lang==='ar' ? '-left-10' : '-right-10'}`}/>
@@ -2496,7 +2687,10 @@
                                             <h3 className="font-bold text-sm text-slate-800 mb-2 leading-tight group-hover:text-blue-600 transition-colors">{p.name[lang]}</h3>
                                             <div className="mt-auto flex justify-between items-center pt-2 border-t border-white/40">
                                                 <span className={`text-blue-700 font-black text-sm ${p.comingSoon ? 'opacity-50' : ''}`}>{p.comingSoon ? '---' : `${formatPrice(p.basePrice)} ${t.currency}`}</span>
-                                                <button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 ${p.comingSoon ? 'bg-slate-200/50 text-slate-400 cursor-not-allowed' : 'bg-white/80 text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-500'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button>
+                                                <div className="flex gap-1">
+                                                    {!p.comingSoon && <button aria-label="Design Studio" onClick={()=> { setSelectedDesignProduct(p); setShowDesignStudio(true); }} className="p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 bg-white/80 text-slate-700 hover:bg-slate-900 hover:text-white"><Icon name="pen-tool" size={16}/></button>}
+                                                    <button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 ${p.comingSoon ? 'bg-slate-200/50 text-slate-400 cursor-not-allowed' : 'bg-white/80 text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-500'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -2542,9 +2736,9 @@
                                                 <div className="flex-1 overflow-hidden">
                                                     <h4 className="font-bold text-sm text-slate-800 mb-0.5">{i.name[lang]}</h4>
                                                     <div className="text-[11px] text-slate-500 mb-2 leading-tight w-full">
-                                                        {i.selectedVariants && i.selectedVariants.find(v=>v.id === 'design_url') && <span className="font-bold text-blue-600 block mb-0.5">(مخصص)</span>}
+                                                        {i.selectedVariants && i.selectedVariants.find(v=>v.id.includes('design_')) && <span className="font-bold text-blue-600 block mb-0.5">(تصميم مخصص)</span>}
                                                         {i.selectedVariants && i.selectedVariants.map(v => {
-                                                            if (v.id === 'design_url') return null;
+                                                            if (v.id.includes('design_')) return null;
                                                             return <span key={v.id} className="block truncate">{v.label}: {v.value}</span>;
                                                         })}
                                                     </div>
@@ -2705,7 +2899,7 @@
                                                     </ul>
                                                     {o.deliveryFee > 0 && <div className="flex justify-between text-slate-700 pt-2 border-t border-white/50 font-bold"><span>{t.deliveryFee}</span><span>{formatPrice(o.deliveryFee)} {t.currency}</span></div>}
                                                     <p className="mt-3 text-slate-600 italic bg-white/60 p-2.5 rounded-xl border border-white/50 shadow-inner">{o.orderDetails || "No additional notes."}</p>
-                                                    {o.items && o.items.some(i => i.selectedVariants?.find(v => v.id === 'design_url')) && (
+                                                    {o.items && o.items.some(i => i.selectedVariants?.find(v => v.id.includes('design_'))) && (
                                                         <div className="mt-3 p-2 bg-blue-50/50 rounded border border-blue-100 text-blue-600">هذا الطلب يحتوي على تصميم مرفوع خاص بك.</div>
                                                     )}
                                                 </div>
@@ -2724,7 +2918,7 @@
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
-                    {showDesignStudio && <DesignStudio t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
+                    {showDesignStudio && <DesignStudio product={selectedDesignProduct} t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
 
                     <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto ios-glass rounded-3xl flex justify-between px-2 py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.1)] safe-bottom border-t border-white/80">
                         <button aria-label="Home" onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='home'?'active text-blue-600':'text-slate-400'}`}><Icon name="home" size={22}/><span className="text-[10px] font-bold">{t.home}</span></button>
@@ -2749,4 +2943,4 @@
         root.render(<App />);
     </script>
 </body>
-</html>html>
+</html>
