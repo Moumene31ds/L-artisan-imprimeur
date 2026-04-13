@@ -49,7 +49,6 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js" defer></script>
 
     <script>
         if (typeof window.__app_id === 'undefined') window.__app_id = "l-artisan-imprimeur";
@@ -121,15 +120,10 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback, useMemo, memo } = React;
 
-        // --- إعدادات سحابة Cloudinary ---
         const CLOUDINARY_CLOUD_NAME = "dr8vldxd6"; 
         const CLOUDINARY_UPLOAD_PRESET = "L'Artisan imprimeur"; 
 
         const uploadFileToCloudinary = async (file) => {
-            if (CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME") {
-                console.warn("Please configure Cloudinary credentials!");
-                return null;
-            }
             const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
             const formData = new FormData();
             formData.append("file", file);
@@ -244,7 +238,8 @@
                 categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Goodies", share: "Partager", clearCart: "Vider",
                 maintenanceTitle: "Site en Maintenance", maintenanceDesc: "Nous mettons à niveau notre plateforme.", maintenanceAdminLogin: "Admin", contactUsMsg: "Nous contacter",
                 privacyPolicy: "Politique de Confidentialité", expiredPromo: "Code expiré", limitReachedPromo: "Limite d'utilisation atteinte", maxUses: "Utilisations max", expiryDate: "Date d'expiration", currentUses: "Utilisations actuelles", phoneError: "Entrez un numéro algérien valide",
-                newOrderAlert: "Nouvelle commande reçue !"
+                newOrderAlert: "Nouvelle commande reçue !",
+                aiStudio: "Générateur IA", aiPrompt: "Décrivez votre design (ex: Carte de visite minimaliste bleue)...", generateDesign: "Générer le Design", aiStyles: "Styles IA", stylePro: "Professionnel", styleCreative: "Créatif", styleMinimal: "Minimaliste", advancedOptions: "Options Avancées", upscale: "Amélioration (Upscale 4K)", removeBg: "Fond Transparent", generating: "Création de la magie...", applyDesign: "Utiliser ce design"
             },
             ar: {
                 appTitle: "الحرفي", appSubtitle: "للطباعة", home: "الرئيسية", cart: "السلة", orders: "طلباتي", admin: "الإدارة",
@@ -293,7 +288,8 @@
                 categories: "التصنيفات", catCards: "بطاقات", catFlyers: "مطويات", catGoodies: "إكسسوارات", share: "مشاركة", clearCart: "تفريغ السلة",
                 maintenanceTitle: "الموقع تحت الصيانة", maintenanceDesc: "نقوم بتحديث المنصة لخدمتكم بشكل أفضل.", maintenanceAdminLogin: "دخول الإدارة", contactUsMsg: "تواصل معنا",
                 privacyPolicy: "سياسة الخصوصية والأمان", expiredPromo: "انتهت صلاحية الكود", limitReachedPromo: "تم الوصول للحد الأقصى للاستخدام", maxUses: "الحد الأقصى للاستخدام", expiryDate: "تاريخ الانتهاء", currentUses: "الاستخدامات الحالية", phoneError: "يرجى إدخال رقم هاتف جزائري صحيح",
-                newOrderAlert: "تم استلام طلب جديد!"
+                newOrderAlert: "تم استلام طلب جديد!",
+                aiStudio: "المولد الذكي (AI)", aiPrompt: "صف التصميم الذي تريده (مثال: بطاقة عمل احترافية باللون الأزرق)...", generateDesign: "توليد التصميم", aiStyles: "الأنماط الفنية", stylePro: "احترافي", styleCreative: "إبداعي", styleMinimal: "بسيط ومودرن", advancedOptions: "ميزات متقدمة", upscale: "رفع الجودة (Upscale 4K)", removeBg: "إزالة الخلفية", generating: "جاري صنع السحر...", applyDesign: "اعتماد هذا التصميم"
             }
         };
         
@@ -330,7 +326,7 @@
             { 
                 id: 1, category: 'cards', name: { fr: "Cartes de Visite", ar: "بطاقات زيارة" }, basePrice: 2000, 
                 image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400", badge: 'bestSeller', rating: 4.8, 
-                designRatio: 85 / 55, // 85mm x 55mm
+                designRatio: 85 / 55, 
                 supportsDoubleSided: true,
                 variants: [
                     { id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '250', price: 1500 }, { value: '500', price: 3000 }]}, 
@@ -341,7 +337,7 @@
             { 
                 id: 2, category: 'flyers', name: { fr: "Flyers A5 (Publicité)", ar: "فلاير إعلاني A5" }, basePrice: 1500, 
                 image: "https://images.unsplash.com/photo-1562564055-71e051d33c19?w=400", badge: 'new', rating: 4.5, 
-                designRatio: 148 / 210, // A5 Format
+                designRatio: 148 / 210,
                 supportsDoubleSided: true,
                 variants: [
                     { id: 'qty', label: { fr: "Quantité", ar: "الكمية" }, type: 'radio', options: [{ value: '100', price: 0 }, { value: '500', price: 4000 }]}, 
@@ -870,7 +866,6 @@
             const [loading, setLoading] = useState(false);
             const isAnonymous = user.isAnonymous;
             const isAdmin = user.email === ADMIN_EMAIL;
-            const loyaltyPoints = Math.floor((totalSpent || 0) / 100);
             
             const handleUpdateProfile = async (e) => {
                 e.preventDefault(); 
@@ -890,7 +885,6 @@
                         photoURL: currentUser.photoURL
                     });
                     showToast(t.updateSuccess, 'success');
-                    setTimeout(() => window.location.reload(), 1000); 
                 } 
                 catch(e) { 
                     console.error(e);
@@ -1194,6 +1188,22 @@
                 }
             };
             
+            const bulkDeleteCancelled = async () => {
+                const cancelledOrders = orders.filter(o => o.status === 'Annulé');
+                if(cancelledOrders.length === 0) return showToast('لا توجد طلبات ملغاة للحذف', 'info');
+                if(!confirm(`هل أنت متأكد من حذف ${cancelledOrders.length} طلب ملغى دفعة واحدة؟`)) return;
+                
+                try {
+                    showToast('جاري الحذف...', 'info');
+                    for (const order of cancelledOrders) {
+                        await window.firebase.deleteDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${order.id}`));
+                    }
+                    showToast('تم التنظيف بنجاح!', 'success');
+                } catch(e) {
+                    showToast(t.err, 'error');
+                }
+            };
+
             const saveConfig = async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
@@ -1354,6 +1364,17 @@
                 (o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || o.phone.includes(searchTerm) || o.id.includes(searchTerm))
             );
 
+            // حساب أكثر الولايات طلباً للإحصائيات الجديدة
+            const wilayaStats = useMemo(() => {
+                const stats = {};
+                orders.forEach(o => {
+                    if(o.status !== 'Annulé' && o.wilaya) {
+                        stats[o.wilaya] = (stats[o.wilaya] || 0) + 1;
+                    }
+                });
+                return Object.entries(stats).sort((a,b)=>b[1]-a[1]).slice(0,3);
+            }, [orders]);
+
             return (
                 <div className="animate-fadeIn space-y-4 pt-4">
                     {uiConfig.maintenanceMode && (
@@ -1379,6 +1400,22 @@
                             <p className="text-xs text-slate-500 mb-1">إجمالي الطلبات</p>
                             <p className="text-xl font-black text-slate-800">{orders.length}</p>
                         </div>
+                    </div>
+
+                    <div className="ios-glass p-4 rounded-3xl mb-4 border border-white/60">
+                        <h4 className="font-bold text-sm text-slate-800 mb-2 flex items-center gap-2"><Icon name="map-pin" size={16} className="text-red-500"/> أكثر الولايات نشاطاً</h4>
+                        {wilayaStats.length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                                {wilayaStats.map(([wilaya, count], idx) => (
+                                    <div key={wilaya} className="flex justify-between items-center bg-white/50 px-3 py-1.5 rounded-lg border border-white/40">
+                                        <span className="text-xs font-bold text-slate-700 flex items-center gap-2">
+                                            <span className="bg-slate-200 text-slate-600 w-5 h-5 rounded-full flex items-center justify-center text-[10px]">{idx + 1}</span> {wilaya}
+                                        </span>
+                                        <span className="text-xs font-black text-blue-600">{count} طلب</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : <p className="text-xs text-slate-500">لا توجد بيانات كافية</p>}
                     </div>
                     
                     <div className="flex gap-2 ios-glass p-1.5 rounded-2xl shadow-sm overflow-x-auto">
@@ -1406,11 +1443,17 @@
                                     <input type="text" placeholder={t.search} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-1 p-3 rounded-xl ios-glass border-white/50 text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"/>
                                     <button onClick={exportToCSV} className="bg-green-600/90 backdrop-blur text-white px-4 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm">{t.exportCSV}</button>
                                 </div>
-                                <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
-                                    <button onClick={() => setFilterStatus("All")} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${filterStatus === "All" ? "bg-slate-800 text-white shadow-sm" : "bg-white/60 border border-white/40 text-slate-600"}`}>{t.all}</button>
-                                    {STATUS_OPTIONS.map(s => (
-                                        <button key={s.key} onClick={() => setFilterStatus(s.key)} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${filterStatus === s.key ? "bg-blue-600 text-white shadow-sm" : "bg-white/60 border border-white/40 text-slate-600"}`}>{s.label[lang]}</button>
-                                    ))}
+                                
+                                <div className="flex justify-between items-center">
+                                    <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+                                        <button onClick={() => setFilterStatus("All")} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${filterStatus === "All" ? "bg-slate-800 text-white shadow-sm" : "bg-white/60 border border-white/40 text-slate-600"}`}>{t.all}</button>
+                                        {STATUS_OPTIONS.map(s => (
+                                            <button key={s.key} onClick={() => setFilterStatus(s.key)} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${filterStatus === s.key ? "bg-blue-600 text-white shadow-sm" : "bg-white/60 border border-white/40 text-slate-600"}`}>{s.label[lang]}</button>
+                                        ))}
+                                    </div>
+                                    <button onClick={bulkDeleteCancelled} className="bg-red-50 text-red-600 p-2 rounded-xl text-xs font-bold whitespace-nowrap border border-red-200 shadow-sm hover:bg-red-100 mb-2 flex items-center gap-1">
+                                        <Icon name="trash-2" size={14}/> تنظيف
+                                    </button>
                                 </div>
 
                                 {filteredOrders.length === 0 && <div className="text-center py-10 text-gray-400 ios-glass rounded-2xl">No orders found.</div>}
@@ -1771,303 +1814,132 @@
             </div>
         );
 
-        const DesignStudio = ({ t, lang, onClose, onAddToCart, product }) => {
-            const canvasRef = useRef(null);
-            const [fabricCanvas, setFabricCanvas] = useState(null);
-            const [activeObject, setActiveObject] = useState(null);
-            const [objectColor, setObjectColor] = useState('#0f172a');
-            
-            const [activeSide, setActiveSide] = useState('front');
-            const canvasDataRef = useRef({ front: null, back: null });
+        // المولد الذكي للتصميم بالذكاء الاصطناعي بدلاً من الأستوديو القديم
+        const AIGenerator = ({ t, lang, onClose, onAddToCart, product }) => {
+            const [prompt, setPrompt] = useState("");
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [generatedImage, setGeneratedImage] = useState(null);
+            const [selectedStyle, setSelectedStyle] = useState('pro');
+            const [upscale, setUpscale] = useState(false);
+            const [removeBg, setRemoveBg] = useState(false);
 
-            useEffect(() => {
-                let canvas;
-                if (!window.fabric) {
-                    alert(lang === 'ar' ? 'جاري تحميل مكتبة التصميم...' : 'Chargement de la bibliothèque...');
-                    return;
-                }
-
-                const maxWidth = Math.min(window.innerWidth - 40, 800);
-                const ratio = product?.designRatio || (85 / 55);
-                const canvasWidth = maxWidth;
-                const canvasHeight = maxWidth / ratio;
-
-                try {
-                    canvas = new window.fabric.Canvas(canvasRef.current, {
-                        backgroundColor: '#ffffff', 
-                        width: canvasWidth,
-                        height: canvasHeight,
-                        preserveObjectStacking: true
-                    });
-
-                    const safeArea = new window.fabric.Rect({
-                        left: 15, top: 15, width: canvasWidth - 30, height: canvasHeight - 30,
-                        fill: 'transparent', stroke: '#ef4444', strokeWidth: 1, strokeDashArray: [5, 5],
-                        selectable: false, evented: false, opacity: 0.5
-                    });
-                    canvas.add(safeArea);
-
-                    canvas.on('selection:created', (e) => updateTools(e.selected[0]));
-                    canvas.on('selection:updated', (e) => updateTools(e.selected[0]));
-                    canvas.on('selection:cleared', () => setActiveObject(null));
-
-                    setFabricCanvas(canvas);
-                } catch(e) {
-                    console.error("Fabric Init Error", e);
-                }
+            const handleGenerate = (e) => {
+                e.preventDefault();
+                if(!prompt.trim()) return;
+                setIsGenerating(true);
                 
-                return () => {
-                    if (canvas) {
-                        canvas.dispose();
-                    }
-                };
-            }, [product]);
-
-            const updateTools = (obj) => {
-                setActiveObject(obj);
-                if (obj && obj.fill && typeof obj.fill === 'string') setObjectColor(obj.fill);
+                // محاكاة لعملية التوليد (يمكنك ربط الـ API الحقيقي هنا لاحقاً)
+                setTimeout(() => {
+                    setGeneratedImage("https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=80");
+                    setIsGenerating(false);
+                }, 3000);
             };
 
-            const changeColor = (e) => {
-                const newColor = e.target.value;
-                setObjectColor(newColor);
-                if (activeObject) {
-                    activeObject.set('fill', newColor);
-                    fabricCanvas.renderAll();
-                }
-            };
-
-            const addText = () => {
-                if (!fabricCanvas) return;
-                const text = new window.fabric.IText(lang === 'ar' ? 'نص جديد' : 'Nouveau Texte', {
-                    left: 50, top: 50, fontFamily: 'Cairo', fill: '#0f172a', fontSize: 40
-                });
-                fabricCanvas.add(text);
-                fabricCanvas.setActiveObject(text);
-            };
-
-            const addRectangle = () => {
-                if (!fabricCanvas) return;
-                const rect = new window.fabric.Rect({
-                    left: 50, top: 150, fill: '#3b82f6', width: 100, height: 100, rx: 10, ry: 10    
-                });
-                fabricCanvas.add(rect);
-                fabricCanvas.setActiveObject(rect);
-            };
-
-            const addCircle = () => {
-                if (!fabricCanvas) return;
-                const circle = new window.fabric.Circle({
-                    left: 100, top: 100, fill: '#10b981', radius: 50
-                });
-                fabricCanvas.add(circle);
-                fabricCanvas.setActiveObject(circle);
-            };
-
-            const handleImageUpload = (e) => {
-                const file = e.target.files[0];
-                if (!file || !fabricCanvas) return;
-                const reader = new FileReader();
-                reader.onload = (f) => {
-                    const data = f.target.result;
-                    window.fabric.Image.fromURL(data, (img) => {
-                        img.scaleToWidth(150);
-                        img.set({ left: 100, top: 100 });
-                        fabricCanvas.add(img);
-                        fabricCanvas.setActiveObject(img);
-                    });
-                };
-                reader.readAsDataURL(file);
-                e.target.value = null; 
-            };
-
-            const deleteActiveObject = () => {
-                if (!fabricCanvas || !activeObject) return;
-                fabricCanvas.remove(activeObject);
-                fabricCanvas.discardActiveObject();
-            };
-
-            const bringForward = () => { if (activeObject) fabricCanvas.bringForward(activeObject); };
-            const sendBackwards = () => { if (activeObject) fabricCanvas.sendBackwards(activeObject); };
-
-            const clearCanvas = () => {
-                if (!fabricCanvas) return;
-                if(confirm(lang === 'ar' ? "هل أنت متأكد من مسح اللوحة؟" : "Effacer la zone de travail?")) {
-                    fabricCanvas.clear();
-                    fabricCanvas.backgroundColor = '#ffffff';
-                    const safeArea = new window.fabric.Rect({
-                        left: 15, top: 15, width: fabricCanvas.width - 30, height: fabricCanvas.height - 30,
-                        fill: 'transparent', stroke: '#ef4444', strokeWidth: 1, strokeDashArray: [5, 5],
-                        selectable: false, evented: false, opacity: 0.5
-                    });
-                    fabricCanvas.add(safeArea);
-                }
-            };
-
-            const downloadImage = () => {
-                if (!fabricCanvas) return;
-                fabricCanvas.discardActiveObject(); 
-                fabricCanvas.renderAll();
-                const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = `design_lartisan_${activeSide}.png`;
-                link.click();
-            };
-
-            const switchSide = (newSide) => {
-                if (activeSide === newSide || !fabricCanvas) return;
-                
-                canvasDataRef.current[activeSide] = fabricCanvas.toJSON();
-                
-                fabricCanvas.clear();
-                fabricCanvas.backgroundColor = '#ffffff';
-                
-                if (canvasDataRef.current[newSide]) {
-                    fabricCanvas.loadFromJSON(canvasDataRef.current[newSide], () => fabricCanvas.renderAll());
-                } else {
-                    const safeArea = new window.fabric.Rect({
-                        left: 15, top: 15, width: fabricCanvas.width - 30, height: fabricCanvas.height - 30,
-                        fill: 'transparent', stroke: '#ef4444', strokeWidth: 1, strokeDashArray: [5, 5],
-                        selectable: false, evented: false, opacity: 0.5
-                    });
-                    fabricCanvas.add(safeArea);
-                }
-                
-                setActiveSide(newSide);
-            };
-
-            const handleAddToCart = async () => {
-                if (!fabricCanvas) return;
-                fabricCanvas.discardActiveObject();
-                fabricCanvas.renderAll();
-                
-                canvasDataRef.current[activeSide] = fabricCanvas.toJSON();
-
-                let frontUrl = null, backUrl = null;
-
-                const uploadCanvasState = async (jsonState) => {
-                    if (!jsonState) return null;
-                    fabricCanvas.loadFromJSON(jsonState, () => fabricCanvas.renderAll());
-                    const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
-                    const res = await fetch(dataURL);
-                    const blob = await res.blob();
-                    const file = new File([blob], `design-${Date.now()}.png`, { type: "image/png" });
-                    return await uploadFileToCloudinary(file) || dataURL;
-                };
-
-                frontUrl = await uploadCanvasState(canvasDataRef.current.front || fabricCanvas.toJSON());
-                if (product?.supportsDoubleSided && canvasDataRef.current.back) {
-                    backUrl = await uploadCanvasState(canvasDataRef.current.back);
-                }
-
+            const handleApply = () => {
+                if (!generatedImage) return;
                 const customProduct = {
-                    id: `custom-${Date.now()}`,
-                    name: { fr: `Design: ${product?.name?.fr || 'Personnalisé'}`, ar: `تصميم: ${product?.name?.ar || 'مخصص'}` },
+                    id: `ai-${Date.now()}`,
+                    name: { fr: `Design IA: ${product?.name?.fr || 'Personnalisé'}`, ar: `تصميم ذكي: ${product?.name?.ar || 'مخصص'}` },
                     basePrice: product?.basePrice || 1500, 
                     price: product?.basePrice || 1500,
-                    image: frontUrl,
+                    image: generatedImage,
                     qty: 1,
                     selectedVariants: [
-                        { id: 'design_front', label: 'Face (الوجه)', value: frontUrl },
-                        ...(backUrl ? [{ id: 'design_back', label: 'Verso (الظهر)', value: backUrl }] : [])
+                        { id: 'design_ai', label: lang === 'ar' ? 'تصميم ذكي' : 'Design IA', value: generatedImage }
                     ]
                 };
-                
                 onAddToCart(customProduct);
                 onClose();
             };
 
             return (
-                <div className="fixed inset-0 z-[140] bg-slate-900/90 backdrop-blur-2xl flex flex-col p-2 md:p-6 animate-fadeIn">
-                    <div className="flex justify-between items-center mb-4 bg-white/10 border border-white/20 p-3 md:px-6 rounded-3xl shadow-lg safe-top backdrop-blur-md">
-                        <div>
-                            <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-                                <Icon name="pen-tool" /> <span className="hidden sm:inline">{product?.name[lang] || (lang === 'ar' ? "أستوديو التصميم" : "Studio de Design")}</span>
-                            </h3>
-                            <p className="text-[10px] text-blue-300 mt-1">
-                                {lang === 'ar' ? 'الخط المتقطع يمثل هامش القص الآمن' : 'La ligne pointillée représente la marge de sécurité'}
-                            </p>
-                        </div>
-                        <div className="flex gap-2">
-                            <button onClick={handleAddToCart} className="bg-blue-600/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-blue-500 transition flex items-center gap-2 shadow-lg backdrop-blur border border-blue-400/30">
-                                <Icon name="shopping-cart" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "أضف للسلة" : "Ajouter au panier"}</span>
-                            </button>
-                            <button onClick={downloadImage} className="bg-green-500/90 text-white px-3 md:px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-green-400 transition flex items-center gap-2 shadow-lg backdrop-blur border border-green-400/30">
-                                <Icon name="download" size={16}/> <span className="hidden sm:inline">{lang === 'ar' ? "تحميل" : "Télécharger"}</span>
-                            </button>
-                            <button onClick={onClose} className="bg-white/10 text-white p-2.5 rounded-2xl hover:bg-white/20 hover:text-red-400 transition backdrop-blur border border-white/10 shadow-sm">
-                                <Icon name="x" size={20}/>
-                            </button>
-                        </div>
-                    </div>
-
-                    {product?.supportsDoubleSided && (
-                        <div className="flex justify-center mb-4 z-10">
-                            <div className="bg-white/10 p-1 rounded-2xl backdrop-blur-md flex gap-2 border border-white/20">
-                                <button onClick={() => switchSide('front')} className={`px-6 py-2 rounded-xl font-bold transition-all ${activeSide === 'front' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10'}`}>
-                                    {lang === 'ar' ? 'الوجه (Recto)' : 'Recto (Face)'}
-                                </button>
-                                <button onClick={() => switchSide('back')} className={`px-6 py-2 rounded-xl font-bold transition-all ${activeSide === 'back' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10'}`}>
-                                    {lang === 'ar' ? 'الظهر (Verso)' : 'Verso (Dos)'}
+                <div className="fixed inset-0 z-[140] bg-slate-900/60 backdrop-blur-2xl flex items-center justify-center p-4 animate-fadeIn">
+                    <div className="ios-glass w-full max-w-5xl rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.3)] border border-white/50 flex flex-col md:flex-row h-[90vh] md:h-[75vh] animate-slideUp">
+                        
+                        <div className="w-full md:w-5/12 bg-white/40 p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/40 overflow-y-auto hide-scrollbar">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                                    <span className="bg-gradient-to-tr from-blue-600 to-purple-600 text-transparent bg-clip-text"><Icon name="sparkles" size={28} className="text-blue-600"/> {t.aiStudio}</span>
+                                </h3>
+                                <button onClick={onClose} className="bg-white/50 text-slate-600 p-2.5 rounded-2xl hover:bg-red-500 hover:text-white transition backdrop-blur shadow-sm">
+                                    <Icon name="x" size={20}/>
                                 </button>
                             </div>
-                        </div>
-                    )}
 
-                    <div className="flex flex-col md:flex-row flex-1 gap-4 overflow-hidden mb-safe">
-                        <div className="w-full md:w-64 bg-white/10 border border-white/20 backdrop-blur-md rounded-3xl p-4 shadow-lg flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar shrink-0">
-                            
-                            <button onClick={addText} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur border border-white/10">
-                                <Icon name="type" size={16}/> {lang === 'ar' ? "نص" : "Texte"}
-                            </button>
-                            
-                            <button onClick={addRectangle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur border border-white/10">
-                                <Icon name="square" size={16}/> {lang === 'ar' ? "مربع" : "Carré"}
-                            </button>
+                            <form onSubmit={handleGenerate} className="flex-1 flex flex-col gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700 block ml-1">{t.aiPrompt}</label>
+                                    <textarea 
+                                        value={prompt} 
+                                        onChange={(e)=>setPrompt(e.target.value)} 
+                                        placeholder={t.aiPrompt} 
+                                        rows="4" 
+                                        className="w-full p-4 bg-white/60 border border-white/80 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner resize-none font-medium placeholder:text-slate-400"
+                                    ></textarea>
+                                </div>
 
-                            <button onClick={addCircle} className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur border border-white/10">
-                                <Icon name="circle" size={16}/> {lang === 'ar' ? "دائرة" : "Cercle"}
-                            </button>
-
-                            <label className="shrink-0 bg-white/20 text-white px-4 py-2.5 rounded-2xl font-bold hover:bg-white/30 transition flex items-center gap-2 text-sm backdrop-blur cursor-pointer border border-white/10">
-                                <Icon name="image" size={16}/> {lang === 'ar' ? "صورة" : "Image"}
-                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                            </label>
-
-                            {activeObject && (
-                                <div className="flex flex-row md:flex-col gap-2 md:mt-4 shrink-0 border-l md:border-l-0 md:border-t border-white/20 pl-3 md:pl-0 md:pt-4">
-                                    <div className="flex items-center gap-2 bg-white/10 p-2 rounded-2xl shrink-0 border border-white/10">
-                                        <input type="color" value={objectColor} onChange={changeColor} className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
-                                        <span className="text-white text-xs font-bold">{lang === 'ar' ? "اللون" : "Couleur"}</span>
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-700 block ml-1">{t.aiStyles}</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[{id:'pro', label: t.stylePro, icon:'briefcase'}, {id:'creative', label: t.styleCreative, icon:'palette'}, {id:'minimal', label: t.styleMinimal, icon:'layout'}].map(style => (
+                                            <button 
+                                                key={style.id} 
+                                                type="button" 
+                                                onClick={() => setSelectedStyle(style.id)}
+                                                className={`p-3 rounded-2xl text-xs font-bold transition flex flex-col items-center gap-2 border ${selectedStyle === style.id ? 'bg-blue-600/90 text-white border-blue-500 shadow-lg shadow-blue-500/30' : 'bg-white/50 text-slate-600 border-white/60 hover:bg-white/80'}`}
+                                            >
+                                                <Icon name={style.icon} size={18}/> {style.label}
+                                            </button>
+                                        ))}
                                     </div>
+                                </div>
+
+                                <div className="space-y-3 bg-white/30 p-4 rounded-3xl border border-white/50 shadow-inner">
+                                    <label className="text-sm font-bold text-slate-700 block ml-1 flex items-center gap-2"><Icon name="sliders" size={16}/> {t.advancedOptions}</label>
                                     
-                                    <div className="flex gap-2 shrink-0">
-                                        <button onClick={bringForward} title={lang === 'ar' ? "للأمام" : "Avancer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center backdrop-blur border border-white/10">
-                                            <Icon name="arrow-up" size={16}/>
-                                        </button>
-                                        <button onClick={sendBackwards} title={lang === 'ar' ? "للخلف" : "Reculer"} className="flex-1 bg-white/10 text-white py-2.5 rounded-xl hover:bg-white/30 transition flex justify-center backdrop-blur border border-white/10">
-                                            <Icon name="arrow-down" size={16}/>
-                                        </button>
-                                    </div>
+                                    <label className="flex items-center justify-between cursor-pointer p-2 hover:bg-white/40 rounded-xl transition">
+                                        <span className="text-xs font-bold text-slate-600">{t.upscale}</span>
+                                        <input type="checkbox" checked={upscale} onChange={(e)=>setUpscale(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white/50 border-white/60 rounded focus:ring-blue-500 focus:ring-2" />
+                                    </label>
+                                    
+                                    <label className="flex items-center justify-between cursor-pointer p-2 hover:bg-white/40 rounded-xl transition">
+                                        <span className="text-xs font-bold text-slate-600">{t.removeBg}</span>
+                                        <input type="checkbox" checked={removeBg} onChange={(e)=>setRemoveBg(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white/50 border-white/60 rounded focus:ring-blue-500 focus:ring-2" />
+                                    </label>
+                                </div>
 
-                                    <button onClick={deleteActiveObject} className="bg-red-500/80 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-red-500 transition text-sm flex justify-center gap-2 backdrop-blur shrink-0 mt-1 shadow-md border border-red-400/50">
-                                        <Icon name="trash-2" size={16}/>
-                                    </button>
+                                <button 
+                                    type="submit" 
+                                    disabled={!prompt.trim() || isGenerating} 
+                                    className="mt-auto w-full bg-slate-900/90 backdrop-blur-md text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-slate-900/20 transition hover:bg-slate-800 flex justify-center items-center gap-3 disabled:opacity-50"
+                                >
+                                    {isGenerating ? <><div className="loader border-white/30 border-t-white w-5 h-5"></div> {t.generating}</> : <><Icon name="wand-2" size={20}/> {t.generateDesign}</>}
+                                </button>
+                            </form>
+                        </div>
+
+                        <div className="w-full md:w-7/12 bg-slate-800/5 relative flex items-center justify-center p-6 pattern-dots overflow-hidden">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 pointer-events-none"></div>
+                            
+                            {generatedImage ? (
+                                <div className="relative z-10 w-full max-w-md animate-fadeIn flex flex-col items-center">
+                                    <div className="relative group w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/40 bg-white">
+                                        <img src={generatedImage} alt="AI Generated" className="w-full h-full object-cover transition duration-700 group-hover:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-6">
+                                            <button onClick={handleApply} className="bg-blue-600/90 backdrop-blur-md text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 hover:bg-blue-500 transition transform hover:-translate-y-1">
+                                                <Icon name="check-circle" size={20}/> {t.applyDesign}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center text-slate-400 relative z-10">
+                                    <div className="w-24 h-24 bg-white/50 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-white/60 shadow-inner">
+                                        <Icon name="image" size={40} className="opacity-50"/>
+                                    </div>
+                                    <p className="font-bold text-sm">التصميم المولد سيظهر هنا</p>
                                 </div>
                             )}
-
-                            <div className="md:mt-auto md:pt-4 shrink-0 border-l md:border-l-0 md:border-t border-white/20 pl-3 md:pl-0">
-                                <button onClick={clearCanvas} className="text-red-300 w-full py-2.5 rounded-2xl font-bold hover:text-white hover:bg-red-500/50 transition text-sm flex justify-center gap-2 border border-transparent hover:border-red-400/50">
-                                    <Icon name="trash" size={16}/> {lang === 'ar' ? "مسح اللوحة" : "Tout effacer"}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 bg-slate-800/50 border border-white/10 backdrop-blur-sm rounded-3xl shadow-inner flex items-center justify-center overflow-auto pattern-dots p-4">
-                            <div className="shadow-2xl bg-white overflow-hidden flex-shrink-0 mx-auto ring-4 ring-white/10 transition-all duration-300" style={{aspectRatio: product?.designRatio || (85/55)}}>
-                                <canvas ref={canvasRef} />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -2204,7 +2076,7 @@
             const [activeChat, setActiveChat] = useState(null);
             const [productModal, setProductModal] = useState(null);
             const [showQrModal, setShowQrModal] = useState(false);
-            const [showDesignStudio, setShowDesignStudio] = useState(false);
+            const [showAIGenerator, setShowAIGenerator] = useState(false);
             const [selectedDesignProduct, setSelectedDesignProduct] = useState(null);
             const [uiConfig, setUiConfig] = useState({});
             const [bypassMaintenance, setBypassMaintenance] = useState(false);
@@ -2342,13 +2214,13 @@
             };
 
             const navigate = (newView, replace = false) => {
-                if (newView === view && !activeChat && !productModal && !showQrModal && !showDesignStudio) return;
+                if (newView === view && !activeChat && !productModal && !showQrModal && !showAIGenerator) return;
                 setView(newView);
                 setAppliedPromo(null); 
                 setActiveChat(null); 
                 setProductModal(null);
                 setShowQrModal(false);
-                setShowDesignStudio(false);
+                setShowAIGenerator(false);
                 const hash = newView;
                 if (replace) window.history.replaceState({ view: newView, chat: false }, '', `#${hash}`);
                 else window.history.pushState({ view: newView, chat: false }, '', `#${hash}`);
@@ -2491,14 +2363,28 @@
             const submitOrder = async (e) => {
                 e.preventDefault(); 
                 if (!user || !db) return showToast(t.conn, "error");
+
+                // ميزة الحماية: منع الطلبات المزعجة المتتالية (معدل الانتظار: دقيقتين)
+                if (myOrders.length > 0) {
+                    const lastOrderTime = myOrders[0].createdAt?.toMillis ? myOrders[0].createdAt.toMillis() : 0;
+                    if (Date.now() - lastOrderTime < 120000) {
+                        return showToast(lang === 'ar' ? 'يرجى الانتظار قليلاً قبل إرسال طلب جديد' : 'Veuillez patienter avant de passer une autre commande', 'error');
+                    }
+                }
                 
                 const formData = new FormData(e.target);
                 const phone = formData.get('phone') || '';
                 const name = formData.get('name') || '';
                 
-                if (phone.length < 9) return showToast(lang === 'ar' ? 'الرجاء إدخال رقم هاتف صحيح' : 'Veuillez entrer un numéro valide', 'error');
+                // ميزة الحماية: التحقق الصارم من صحة رقم الهاتف الجزائري
+                const phoneRegex = /^(0)(5|6|7)[0-9]{8}$/;
+                if (!phoneRegex.test(phone)) {
+                    return showToast(t.phoneError, 'error');
+                }
                 
                 const selectedWilayaString = formData.get('wilaya');
+                if(!selectedWilayaString) return showToast(t.err, 'error');
+
                 let currentZone = selectedWilayaZone;
                 if (selectedWilayaString) {
                     const w = WILAYAS.find(wil => `${wil.id} - ${wil.name}` === selectedWilayaString);
@@ -2733,7 +2619,7 @@
                                                 <div className="flex gap-2 flex-wrap">
                                                     <button onClick={()=>navigate('cart')} className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 transition hover:scale-105">{t.orderNow}</button>
                                                     <button onClick={()=>setShowQrModal(true)} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="qr-code" size={16}/> {t.qrTool}</button>
-                                                    <button onClick={()=>{ setSelectedDesignProduct(null); setShowDesignStudio(true); }} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="pen-tool" size={16}/> {lang === 'ar' ? 'أستوديو' : 'Studio'}</button>
+                                                    <button onClick={()=>{ setSelectedDesignProduct(null); setShowAIGenerator(true); }} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="wand-2" size={16}/> {lang === 'ar' ? 'المولد الذكي' : 'Générateur IA'}</button>
                                                 </div>
                                             </div>
                                             <Icon name="layers" size={160} className={`absolute -bottom-10 text-white opacity-[0.03] rotate-12 ${lang==='ar' ? '-left-10' : '-right-10'}`}/>
@@ -2808,7 +2694,7 @@
                                             <div className="mt-auto flex justify-between items-center pt-2 border-t border-white/40">
                                                 <span className={`text-blue-700 font-black text-sm ${p.comingSoon ? 'opacity-50' : ''}`}>{p.comingSoon ? '---' : `${formatPrice(p.basePrice)} ${t.currency}`}</span>
                                                 <div className="flex gap-1">
-                                                    {!p.comingSoon && <button aria-label="Design Studio" onClick={()=> { setSelectedDesignProduct(p); setShowDesignStudio(true); }} className="p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 bg-white/80 text-slate-700 hover:bg-slate-900 hover:text-white"><Icon name="pen-tool" size={16}/></button>}
+                                                    {!p.comingSoon && <button aria-label="AIGenerator" onClick={()=> { setSelectedDesignProduct(p); setShowAIGenerator(true); }} className="p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 bg-white/80 text-slate-700 hover:bg-slate-900 hover:text-white"><Icon name="wand-2" size={16}/></button>}
                                                     <button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 ${p.comingSoon ? 'bg-slate-200/50 text-slate-400 cursor-not-allowed' : 'bg-white/80 text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-500'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button>
                                                 </div>
                                             </div>
@@ -3023,7 +2909,7 @@
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
-                    {showDesignStudio && <DesignStudio product={selectedDesignProduct} t={t} lang={lang} onClose={()=>setShowDesignStudio(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
+                    {showAIGenerator && <AIGenerator product={selectedDesignProduct} t={t} lang={lang} onClose={()=>setShowAIGenerator(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
 
                     <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto ios-glass rounded-3xl flex justify-between px-2 py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.1)] safe-bottom border-t border-white/80">
                         <button aria-label="Home" onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='home'?'active text-blue-600':'text-slate-400'}`}><Icon name="home" size={22}/><span className="text-[10px] font-bold">{t.home}</span></button>
