@@ -123,6 +123,12 @@
         const CLOUDINARY_CLOUD_NAME = "dr8vldxd6"; 
         const CLOUDINARY_UPLOAD_PRESET = "L'Artisan imprimeur"; 
 
+        // ------------------ التعديل هنا: قائمة المدراء والشركاء ------------------
+        const ADMIN_EMAILS = [
+            'attouabdelkarim2@gmail.com',
+            'partner_email@gmail.com' // قم بتعديل هذا الإيميل لإيميل شريكك
+        ];
+
         const uploadFileToCloudinary = async (file) => {
             const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
             const formData = new FormData();
@@ -208,12 +214,15 @@
                 profile: "Profil", accountType: "Type de Compte", anonymous: "Invité (Anonyme)", standardUser: "Utilisateur Standard", 
                 updateProfile: "Mettre à jour le Profil", updateSuccess: "Profil mis à jour", updateFailed: "Échec de la mise à jour",
                 accessDenied: "Accès Refusé", loyaltyPoints: "Points de fidélité",
-                estimatedDelivery: "Livraison estimée:",
+                chat: "Discussion", chatWithUs: "Discuter avec nous", typeMessage: "Écrivez votre message...", send: "Envoyer",
+                conversations: "Conversations", noMessages: "Aucun message.", managerName: "Service Client",
+                online: "En ligne", lastMsg: "Dernier message", chatList: "Messages", estimatedDelivery: "Livraison estimée:",
                 promoPh: "Code Promo", promoApply: "Appliquer", promoApplied: "Code promo appliqué!", promoInvalid: "Code invalide.", 
                 promoMinAmount: "Montant minimum", promoEnter: "Entrez le code", discount: "Réduction", subtotal: "Sous-total",
                 discounts: "Réductions", createCode: "Créer Code Promo", codeName: "Nom du Code", discountValue: "Valeur", minOrderAmount: "Montant Min.",
                 activeCodes: "Codes Actifs", noActiveCodes: "Aucun code actif.", fixedDiscount: "Fixe", minOrder: "Min",
                 codeAdded: "Code ajouté!", codeDeleted: "Code supprimé.", confirmDeleteCode: "Supprimer ce code ?",
+                chatRegisterPrompt: "Enregistrez-vous pour sauvegarder vos messages.", chatRegisterTitle: "Sauvegarder !",
                 confirmDeleteOrder: "Supprimer cette commande ?", orderDeleted: "Commande supprimée.",
                 whatsapp: "WhatsApp", 
                 stats: "Statistiques", revenue: "Revenus", new: "Nouveau", bestSeller: "Best Seller", soon: "Bientôt",
@@ -229,14 +238,15 @@
                 manageOffers: "Gérer Offres", specialOffers: "Offres Spéciales", endsIn: "Se termine dans", offerEndDate: "Date fin",
                 edit: "Modifier", updateOffer: "Mettre à jour l'offre", cancel: "Annuler", getOffer: "Obtenir l'offre",
                 associatedPromo: "Code Promo Associé", printReceipt: "Imprimer", fileUpload: "Fichier Design (Image/PDF)", uploading: "Téléchargement...",
-                voiceSearch: "Recherche vocale", listening: "Écoute...", qualityCheck: "Vérification...", 
+                voiceSearch: "Recherche vocale", listening: "Écoute...", qualityCheck: "Analyse IA...", 
                 qualityGood: "Excellente qualité", qualityBad: "Basse résolution", uploadDesign: "Uploader Design",
                 qrTool: "QR Code", qrText: "Lien/Texte", generateQR: "Générer", downloadQR: "Télécharger", qrDesc: "Créez votre QR Code",
                 categories: "Catégories", catCards: "Cartes", catFlyers: "Flyers", catGoodies: "Goodies", share: "Partager", clearCart: "Vider",
                 maintenanceTitle: "Site en Maintenance", maintenanceDesc: "Nous mettons à niveau notre plateforme.", maintenanceAdminLogin: "Admin", contactUsMsg: "Nous contacter",
                 privacyPolicy: "Politique de Confidentialité", expiredPromo: "Code expiré", limitReachedPromo: "Limite d'utilisation atteinte", maxUses: "Utilisations max", expiryDate: "Date d'expiration", currentUses: "Utilisations actuelles", phoneError: "Entrez un numéro algérien valide",
                 newOrderAlert: "Nouvelle commande reçue !",
-                wallet: "Portefeuille Intelligent", walletBalance: "Solde", useWallet: "Utiliser le solde", designChoice: "Option de Design", uploadDesignOpt: "J'ai mon design", createDesignOpt: "Créez le design pour moi (+200 DA)", rateOrder: "Évaluer la commande", cashbackMsg: "5% de Cashback ajouté au portefeuille!"
+                aiStudio: "Générateur IA", aiPrompt: "Décrivez votre design (ex: Carte de visite minimaliste bleue)...", generateDesign: "Générer le Design", aiStyles: "Styles IA", stylePro: "Professionnel", styleCreative: "Créatif", styleMinimal: "Minimaliste", advancedOptions: "Options Avancées", upscale: "Amélioration (Upscale 4K)", removeBg: "Fond Transparent", generating: "Création de la magie...", applyDesign: "Utiliser ce design",
+                partners: "Partenaires", partnerName: "Nom du Partenaire", commission: "Commission %", partnerStats: "Gains Partenaires", totalCommission: "Commission Totale"
             },
             ar: {
                 appTitle: "الحرفي", appSubtitle: "للطباعة", home: "الرئيسية", cart: "السلة", orders: "طلباتي", admin: "الإدارة",
@@ -255,12 +265,15 @@
                 profile: "الملف الشخصي", accountType: "نوع الحساب", anonymous: "ضيف (بدون تسجيل)", standardUser: "مستخدم مسجل",
                 updateProfile: "تحديث الملف الشخصي", updateSuccess: "تم تحديث البيانات", updateFailed: "فشل التحديث",
                 accessDenied: "الوصول مرفوض", loyaltyPoints: "نقاط الولاء",
-                estimatedDelivery: "التوصيل المتوقع:",
+                chat: "المحادثة", chatWithUs: "تحدث مع المدير", typeMessage: "اكتب رسالتك هنا...", send: "إرسال",
+                conversations: "المحادثات الجارية", noMessages: "لا توجد رسائل.", managerName: "خدمة الزبائن",
+                online: "متصل الآن", lastMsg: "آخر رسالة", chatList: "الرسائل", estimatedDelivery: "التوصيل المتوقع:",
                 promoPh: "كود الخصم", promoApply: "تطبيق", promoApplied: "تم تطبيق الخصم!", promoInvalid: "كود غير صحيح.",
                 promoMinAmount: "الحد الأدنى", promoEnter: "أدخل الكود", discount: "الخصم", subtotal: "المجموع الفرعي",
                 discounts: "خصومات", createCode: "إنشاء كود خصم", codeName: "اسم الكود", discountValue: "قيمة الخصم", minOrderAmount: "الحد الأدنى",
                 activeCodes: "الأكواد النشطة", noActiveCodes: "لا توجد أكواد.", fixedDiscount: "خصم ثابت", minOrder: "الحد الأدنى",
                 codeAdded: "تمت إضافة الكود!", codeDeleted: "تم حذف الكود.", confirmDeleteCode: "حذف هذا الكود؟",
+                chatRegisterPrompt: "سجّل دخولك لحفظ المحادثة.", chatRegisterTitle: "تنبيه!",
                 confirmDeleteOrder: "حذف هذا الطلب؟", orderDeleted: "تم حذف الطلب.",
                 whatsapp: "واتساب", 
                 stats: "الإحصائيات", revenue: "الإيرادات", new: "جديد", bestSeller: "الأكثر طلباً", soon: "قريباً",
@@ -276,14 +289,15 @@
                 manageOffers: "إدارة العروض", specialOffers: "عروض حصرية", endsIn: "ينتهي خلال", offerEndDate: "تاريخ الانتهاء",
                 edit: "تعديل", updateOffer: "تحديث العرض", cancel: "إلغاء", getOffer: "أطلب العرض",
                 associatedPromo: "كود الخصم المرتبط (اختياري)", printReceipt: "طباعة الوصل", fileUpload: "ملف التصميم (اختياري)", uploading: "جاري الرفع للأنظمة...",
-                voiceSearch: "بحث صوتي", listening: "جاري الاستماع...", qualityCheck: "جاري الفحص...", 
+                voiceSearch: "بحث صوتي", listening: "جاري الاستماع...", qualityCheck: "جاري الفحص بالذكاء الاصطناعي...", 
                 qualityGood: "تم رفع التصميم بنجاح", qualityBad: "دقة ضعيفة، قد تظهر ضبابية", uploadDesign: "ارفع تصميمك",
                 qrTool: "صانع QR الذكي", qrText: "أدخل رابط أو نص", generateQR: "توليد الكود", downloadQR: "تحميل الصورة", qrDesc: "أنشئ كود QR مجاني",
                 categories: "التصنيفات", catCards: "بطاقات", catFlyers: "مطويات", catGoodies: "إكسسوارات", share: "مشاركة", clearCart: "تفريغ السلة",
                 maintenanceTitle: "الموقع تحت الصيانة", maintenanceDesc: "نقوم بتحديث المنصة لخدمتكم بشكل أفضل.", maintenanceAdminLogin: "دخول الإدارة", contactUsMsg: "تواصل معنا",
                 privacyPolicy: "سياسة الخصوصية والأمان", expiredPromo: "انتهت صلاحية الكود", limitReachedPromo: "تم الوصول للحد الأقصى للاستخدام", maxUses: "الحد الأقصى للاستخدام", expiryDate: "تاريخ الانتهاء", currentUses: "الاستخدامات الحالية", phoneError: "يرجى إدخال رقم هاتف جزائري صحيح",
                 newOrderAlert: "تم استلام طلب جديد!",
-                wallet: "المحفظة الذكية", walletBalance: "الرصيد", useWallet: "خصم من رصيد المحفظة", designChoice: "التصميم", uploadDesignOpt: "سأقوم بإرفاق التصميم", createDesignOpt: "أريد تصميم من الإدارة (+200 د.ج)", rateOrder: "كيف كانت تجربتك؟ قيم الطلب", cashbackMsg: "تم إضافة 5% كاش باك لمحفظتك!"
+                aiStudio: "المولد الذكي (AI)", aiPrompt: "صف التصميم الذي تريده (مثال: بطاقة عمل احترافية باللون الأزرق)...", generateDesign: "توليد التصميم", aiStyles: "الأنماط الفنية", stylePro: "احترافي", styleCreative: "إبداعي", styleMinimal: "بسيط ومودرن", advancedOptions: "ميزات متقدمة", upscale: "رفع الجودة (Upscale 4K)", removeBg: "إزالة الخلفية", generating: "جاري صنع السحر...", applyDesign: "اعتماد هذا التصميم",
+                partners: "الشركاء", partnerName: "اسم الشريك (للتسويق)", commission: "نسبة العمولة %", partnerStats: "أرباح الشركاء", totalCommission: "إجمالي العمولات"
             }
         };
         
@@ -617,7 +631,6 @@
             const initialSelections = product.variants.reduce((acc, v) => ({ ...acc, [v.id]: v.options.length > 0 ? v.options[0].value : null }), {});
             const [selections, setSelections] = useState(initialSelections);
             const [qty, setQty] = useState(1);
-            const [designOption, setDesignOption] = useState('upload'); // 'upload' | 'create'
             
             const [uploadQuality, setUploadQuality] = useState(null); 
             const [uploadedDesignUrl, setUploadedDesignUrl] = useState(null);
@@ -655,22 +668,14 @@
             };
 
             const handleSelect = (variantId, value) => setSelections(prev => ({ ...prev, [variantId]: value }));
-            let unitPrice = calculateVariantPrice(product, selections);
-            if (designOption === 'create') unitPrice += 200;
+            const unitPrice = calculateVariantPrice(product, selections);
             const finalTotal = unitPrice * qty;
             
             const handleAdd = () => {
                 const selectedVariants = product.variants.map(v => ({ id: v.id, label: v.label[lang], value: selections[v.id], price: v.options.find(opt => opt.value === selections[v.id])?.price || 0 })).filter(v => v.value);
                 
-                selectedVariants.push({ 
-                    id: 'design_opt', 
-                    label: lang === 'ar' ? 'التصميم' : 'Design', 
-                    value: designOption === 'create' ? (lang === 'ar' ? 'تصميم من طرف الإدارة' : 'Créé par l\'admin') : (lang === 'ar' ? 'مرفق من الزبون' : 'Fourni par le client'), 
-                    price: designOption === 'create' ? 200 : 0 
-                });
-
-                if (designOption === 'upload' && uploadedDesignUrl) {
-                    selectedVariants.push({ id: 'design_url', label: lang === 'ar' ? 'ملف التصميم' : 'Fichier Design', value: uploadedDesignUrl, price: 0 });
+                if (uploadedDesignUrl) {
+                    selectedVariants.push({ id: 'design_url', label: lang === 'ar' ? 'التصميم المرفوع' : 'Design Uploadé', value: uploadedDesignUrl, price: 0 });
                 }
 
                 onAdd({ ...product, price: unitPrice, qty: qty, totalPrice: finalTotal, selectedVariants: selectedVariants });
@@ -708,34 +713,17 @@
                                 <ImageWithSkeleton src={product.image} className="w-full h-full object-cover pointer-events-none" alt="Product Preview" />
                             </div>
 
-                            <div className="pb-4 border-b border-slate-200/50 mb-4">
-                                <h4 className="font-bold text-slate-700 mb-2 text-sm">{t.designChoice}</h4>
-                                <div className="flex flex-col gap-2">
-                                    <label className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition ${designOption === 'upload' ? 'bg-blue-50 border-blue-500 shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
-                                        <input type="radio" name="designOpt" checked={designOption === 'upload'} onChange={() => setDesignOption('upload')} className="w-4 h-4 text-blue-600" />
-                                        <span className="text-sm font-bold text-slate-700">{t.uploadDesignOpt}</span>
-                                    </label>
-                                    
-                                    {designOption === 'upload' && (
-                                        <div className="ml-7 mb-2 bg-white/40 p-4 rounded-xl border border-dashed border-slate-300/60 hover:bg-white/60 transition shadow-inner">
-                                            <label className="flex items-center justify-between cursor-pointer">
-                                                <span className="font-bold text-sm text-slate-700 flex items-center gap-2">
-                                                    <Icon name="upload-cloud" size={18} className="text-blue-500"/> {t.uploadDesign}
-                                                </span>
-                                                <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileUpload}/>
-                                                <span className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md cursor-pointer hover:bg-blue-500 transition-colors">Upload</span>
-                                            </label>
-                                            {uploadQuality === 'checking' && <div className="mt-3 text-xs text-blue-600 flex items-center gap-2 animate-pulse"><div className="loader w-3 h-3"></div> {t.uploading}</div>}
-                                            {uploadQuality === 'good' && <div className="mt-3 text-xs text-green-600 flex items-center gap-2"><Icon name="check-circle" size={14}/> {t.qualityGood}</div>}
-                                            {uploadQuality === 'bad' && <div className="mt-3 text-xs text-red-500 flex items-center gap-2"><Icon name="alert-triangle" size={14}/> حدث خطأ أثناء الرفع</div>}
-                                        </div>
-                                    )}
-
-                                    <label className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition ${designOption === 'create' ? 'bg-blue-50 border-blue-500 shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
-                                        <input type="radio" name="designOpt" checked={designOption === 'create'} onChange={() => setDesignOption('create')} className="w-4 h-4 text-blue-600" />
-                                        <span className="text-sm font-bold text-slate-700">{t.createDesignOpt}</span>
-                                    </label>
-                                </div>
+                            <div className="mb-4 bg-white/40 p-4 rounded-xl border border-dashed border-slate-300/60 hover:bg-white/60 transition shadow-inner">
+                                <label className="flex items-center justify-between cursor-pointer">
+                                    <span className="font-bold text-sm text-slate-700 flex items-center gap-2">
+                                        <Icon name="upload-cloud" size={18} className="text-blue-500"/> {t.uploadDesign}
+                                    </span>
+                                    <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileUpload}/>
+                                    <span className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md cursor-pointer hover:bg-blue-500 transition-colors">Upload</span>
+                                </label>
+                                {uploadQuality === 'checking' && <div className="mt-3 text-xs text-blue-600 flex items-center gap-2 animate-pulse"><div className="loader w-3 h-3"></div> {t.uploading}</div>}
+                                {uploadQuality === 'good' && <div className="mt-3 text-xs text-green-600 flex items-center gap-2"><Icon name="check-circle" size={14}/> {t.qualityGood}</div>}
+                                {uploadQuality === 'bad' && <div className="mt-3 text-xs text-red-500 flex items-center gap-2"><Icon name="alert-triangle" size={14}/> حدث خطأ أثناء الرفع</div>}
                             </div>
 
                             {product.variants.map(v => (
@@ -762,6 +750,66 @@
                             <div className="flex justify-between items-center mb-3"><span className="text-lg font-bold text-slate-600">{t.finalPrice}:</span><span className="text-2xl font-black text-blue-700 bg-blue-50/50 px-3 py-1 rounded-xl border border-blue-100">{formatPrice(finalTotal)} <span className="text-sm">{t.currency}</span></span></div>
                             <button onClick={handleAdd} disabled={!isFormComplete || qty < 1 || uploadQuality === 'checking'} className="w-full bg-blue-600/90 hover:bg-blue-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-600/30 transition flex justify-center gap-2 disabled:opacity-50 active:scale-95 backdrop-blur-md"><Icon name="shopping-cart" size={18}/> {t.add} ({qty})</button>
                         </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const MessageBubble = memo(({ msg, isMe, lang }) => (
+            <div className={`flex flex-col mb-3 ${isMe ? 'items-end' : 'items-start'} animate-slideUp`}>
+                <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl shadow-sm text-sm relative break-words backdrop-blur-sm ${isMe ? 'bg-blue-600/90 text-white rounded-br-none' : 'bg-white/80 border border-white text-slate-800 rounded-bl-none'}`}>{msg.content}</div>
+                <span className="text-[10px] text-slate-400 mt-1 px-1 font-mono">{msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...'}</span>
+            </div>
+        ));
+
+        const ChatScreen = ({ user, db, appId, targetUserId, targetUserName, lang, t, onBack }) => {
+            const [messages, setMessages] = useState([]);
+            const [text, setText] = useState("");
+            const dummy = useRef();
+            const chatId = targetUserId || user.uid; 
+            const isAdmin = ADMIN_EMAILS.includes(user.email);
+            
+            useEffect(() => {
+                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/chats/${chatId}/messages`), window.firebase.orderBy('createdAt', 'asc'));
+                const unsub = window.firebase.onSnapshot(q, (snap) => { 
+                    setMessages(snap.docs.map(d => ({id: d.id, ...d.data()}))); 
+                });
+                return () => unsub();
+            }, [chatId]);
+
+            useEffect(() => {
+                setTimeout(() => dummy.current?.scrollIntoView({ behavior: 'smooth' }), 200);
+            }, [messages]);
+
+            const sendMessage = async (e) => {
+                e.preventDefault();
+                if(!text.trim()) return;
+                const safeText = text.trim();
+                const msgData = { content: safeText, senderId: user.uid, createdAt: window.firebase.Timestamp.now(), read: false };
+                await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/chats/${chatId}/messages`), msgData);
+                await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/chats/${chatId}`), { lastMessage: safeText, lastMessageTime: window.firebase.Timestamp.now(), userName: isAdmin ? targetUserName : (user.displayName || 'Guest'), userId: chatId }, { merge: true });
+                setText("");
+            };
+            return (
+                <div className="fixed inset-0 z-[100] bg-slate-50 flex flex-col h-full animate-fadeIn pattern-dots">
+                    <div className="ios-glass-nav p-3 px-4 shadow-sm flex items-center gap-3 sticky top-0 z-10 safe-top">
+                        <button aria-label="Back" onClick={onBack} className="p-2 -ml-2 hover:bg-slate-200/50 rounded-full transition"><Icon name={lang==='ar'?"arrow-right":"arrow-left"} /></button>
+                        <div className="relative">
+                            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">{isAdmin ? <Icon name="user" size={20}/> : <Icon name="headset" size={20}/>}</div>
+                            {!isAdmin && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>}
+                        </div>
+                        <div><h3 className="font-bold text-slate-800 leading-tight">{isAdmin ? targetUserName : t.managerName}</h3><p className="text-xs text-blue-600 font-bold flex items-center gap-1">{!isAdmin && <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>} {isAdmin ? 'Client' : t.online}</p></div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 pb-24 scroll-smooth">
+                        {messages.length === 0 && <div className="text-center py-20 opacity-50"><div className="bg-white/60 backdrop-blur-md p-4 rounded-full inline-block mb-3 shadow-sm"><Icon name="message-circle" size={32} className="text-blue-400"/></div><p>{t.noMessages}</p></div>}
+                        {messages.map(msg => <MessageBubble key={msg.id} msg={msg} isMe={msg.senderId === user.uid} lang={lang} />)}
+                        <div ref={dummy}></div>
+                    </div>
+                    <div className="ios-glass p-3 safe-bottom border-t border-white/50">
+                        <form onSubmit={sendMessage} className="flex items-end gap-2 max-w-4xl mx-auto">
+                            <input value={text} onChange={e => setText(e.target.value)} placeholder={t.typeMessage} className="flex-1 bg-white/70 border border-white/60 rounded-2xl px-5 py-3.5 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none resize-none shadow-inner" />
+                            <button aria-label="Send" disabled={!text.trim()} type="submit" className="bg-blue-600/90 hover:bg-blue-700 disabled:opacity-50 text-white p-3.5 rounded-full shadow-lg shadow-blue-600/20 transition-all transform active:scale-95"><Icon name={lang === 'ar' ? "send-horizontal" : "send"} className={lang === 'ar' ? "rotate-180" : ""} /></button>
+                        </form>
                     </div>
                 </div>
             );
@@ -821,11 +869,11 @@
             );
         };
 
-        const ProfileScreen = ({ user, t, navigate, showToast, setView, ADMIN_EMAIL, setUser, totalSpent, userData }) => {
+        const ProfileScreen = ({ user, t, navigate, showToast, setView, setUser, totalSpent }) => {
             const [displayName, setDisplayName] = useState(user.displayName || '');
             const [loading, setLoading] = useState(false);
             const isAnonymous = user.isAnonymous;
-            const isAdmin = user.email === ADMIN_EMAIL;
+            const isAdmin = ADMIN_EMAILS.includes(user.email);
             
             const handleUpdateProfile = async (e) => {
                 e.preventDefault(); 
@@ -862,19 +910,6 @@
             return (
                 <div className="animate-fadeIn max-w-md mx-auto pb-10">
                     <h2 className="font-bold text-xl mb-6 flex items-center gap-2"><Icon name="user-circle" size={24}/> {t.profile}</h2>
-                    
-                    {!isAnonymous && (
-                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-[2rem] shadow-lg mb-6 flex justify-between items-center transform transition hover:scale-[1.02]">
-                            <div>
-                                <p className="text-sm font-bold opacity-90 mb-1">{t.wallet}</p>
-                                <p className="text-3xl font-black">{formatPrice(userData?.walletBalance || 0)} <span className="text-lg">{t.currency}</span></p>
-                            </div>
-                            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-inner">
-                                <Icon name="wallet" size={32} className="text-white" />
-                            </div>
-                        </div>
-                    )}
-
                     <div className="ios-glass p-6 rounded-[2rem] shadow-lg mb-6 text-center">
                         <div className="w-20 h-20 bg-blue-100/50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-md border border-white/60"><Icon name={isAnonymous ? "ghost" : "user"} size={40} /></div>
                         <h3 className="text-xl font-bold text-slate-900 mb-1">{user.displayName || (isAnonymous ? t.anonymous : t.email)}</h3>
@@ -939,7 +974,6 @@
             const printWindow = window.open('', '_blank');
             const totalDiscount = order.discount || 0;
             const subtotal = order.subtotal || 0;
-            const walletUsed = order.walletUsed || 0;
             const printDate = new Date().toLocaleString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
             const langDir = t.langName === 'العربية' ? 'rtl' : 'ltr';
 
@@ -979,7 +1013,6 @@
                             <p>Imprimerie Numérique & Offset</p>
                             <p>📍 Oran, Algérie</p>
                             <p>📞 +213 549 17 90 00</p>
-                            <p>✉️ attouabdelkarim2@gmail.com</p>
                         </div>
                         <div class="invoice-title">
                             <h2>${t.printInvoice}</h2>
@@ -1037,7 +1070,6 @@
                         <div class="total-row"><span>${t.subtotal}</span><span>${formatPrice(subtotal)} ${t.currency}</span></div>
                         <div class="total-row"><span>${t.deliveryFee}</span><span>${formatPrice(order.deliveryFee || 0)} ${t.currency}</span></div>
                         ${totalDiscount > 0 ? `<div class="total-row" style="color: #ef4444;"><span>${t.discount}</span><span>- ${formatPrice(totalDiscount)} ${t.currency}</span></div>` : ''}
-                        ${walletUsed > 0 ? `<div class="total-row" style="color: #10b981;"><span>${t.useWallet}</span><span>- ${formatPrice(walletUsed)} ${t.currency}</span></div>` : ''}
                         <div class="total-row final"><span>${t.total}</span><span>${formatPrice(order.total)} ${t.currency}</span></div>
                     </div>
                     
@@ -1056,7 +1088,7 @@
             printWindow.document.close();
         };
 
-        const AdminDashboard = ({ db, appId, updateOrderStatus, lang, t, showToast, user, ADMIN_EMAIL }) => {
+        const AdminDashboard = ({ db, appId, updateOrderStatus, lang, t, onOpenChat, showToast, user }) => {
             const [orders, setOrders] = useState([]);
             const [promoCodes, setPromoCodes] = useState([]);
             const [uiConfig, setUiConfig] = useState({ showAnnouncement: false, announcementAr: "", announcementFr: "", stories: [], offers: [], maintenanceMode: false });
@@ -1071,7 +1103,7 @@
 
             const audioRef = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'));
 
-            if (user?.email !== ADMIN_EMAIL) {
+            if (!user || !ADMIN_EMAILS.includes(user.email)) {
                 return <div className="text-center py-20 text-red-500 font-bold">{t.accessDenied}</div>;
             }
 
@@ -1129,6 +1161,9 @@
                 const expiryDate = data.get('expiryDate');
                 const maxUses = parseInt(data.get('maxUses')) || 0;
                 
+                const partnerName = data.get('partnerName')?.trim() || null;
+                const commissionRate = parseFloat(data.get('commissionRate')) || 0;
+
                 if (!code || isNaN(discountValue)) return;
                 try {
                     await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/promoCodes`, code), {
@@ -1139,6 +1174,8 @@
                         expiryDate: expiryDate || null,
                         maxUses: maxUses || null,
                         currentUses: 0,
+                        partnerName: partnerName,
+                        commissionRate: commissionRate,
                         active: true, 
                         createdAt: window.firebase.Timestamp.now()
                     });
@@ -1339,6 +1376,7 @@
                 (o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || o.phone.includes(searchTerm) || o.id.includes(searchTerm))
             );
 
+            // حساب أكثر الولايات طلباً للإحصائيات الجديدة
             const wilayaStats = useMemo(() => {
                 const stats = {};
                 orders.forEach(o => {
@@ -1347,6 +1385,21 @@
                     }
                 });
                 return Object.entries(stats).sort((a,b)=>b[1]-a[1]).slice(0,3);
+            }, [orders]);
+
+            // حساب إحصائيات الشركاء
+            const partnerStats = useMemo(() => {
+                const stats = {};
+                orders.forEach(o => {
+                    if(o.status !== 'Annulé' && o.promoCode && o.promoCode.partnerName) {
+                        const pName = o.promoCode.partnerName;
+                        if(!stats[pName]) stats[pName] = { count: 0, revenue: 0, commission: 0 };
+                        stats[pName].count += 1;
+                        stats[pName].revenue += o.total;
+                        stats[pName].commission += ((o.subtotal || 0) * (o.promoCode.commissionRate / 100));
+                    }
+                });
+                return Object.entries(stats).map(([name, data]) => ({ name, ...data })).sort((a,b) => b.revenue - a.revenue);
             }, [orders]);
 
             return (
@@ -1392,12 +1445,18 @@
                         ) : <p className="text-xs text-slate-500">لا توجد بيانات كافية</p>}
                     </div>
                     
-                    <div className="flex gap-2 ios-glass p-1.5 rounded-2xl shadow-sm overflow-x-auto">
+                    <div className="flex gap-2 ios-glass p-1.5 rounded-2xl shadow-sm overflow-x-auto hide-scrollbar">
                         <button onClick={()=>setTab('orders')} className={`flex-1 min-w-[80px] py-2.5 rounded-xl font-bold text-xs transition ${tab==='orders' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:bg-white/50'}`}>
                             <span className="flex items-center justify-center gap-1"><Icon name="shopping-bag" size={14}/> {t.orders}</span>
                         </button>
+                        <button onClick={()=>setTab('chats')} className={`flex-1 min-w-[80px] py-2.5 rounded-xl font-bold text-xs transition ${tab==='chats' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-white/50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="message-circle" size={14}/> {t.chatList}</span>
+                        </button>
                         <button onClick={()=>setTab('codes')} className={`flex-1 min-w-[80px] py-2.5 rounded-xl font-bold text-xs transition ${tab==='codes' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:bg-white/50'}`}>
                             <span className="flex items-center justify-center gap-1"><Icon name="percent" size={14}/> {t.discounts}</span>
+                        </button>
+                        <button onClick={()=>setTab('partners')} className={`flex-1 min-w-[80px] py-2.5 rounded-xl font-bold text-xs transition ${tab==='partners' ? 'bg-green-600 text-white shadow-md' : 'text-slate-600 hover:bg-white/50'}`}>
+                            <span className="flex items-center justify-center gap-1"><Icon name="users" size={14}/> {t.partners}</span>
                         </button>
                         <button onClick={()=>setTab('content')} className={`flex-1 min-w-[80px] py-2.5 rounded-xl font-bold text-xs transition ${tab==='content' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-white/50'}`}>
                             <span className="flex items-center justify-center gap-1"><Icon name="edit-3" size={14}/> {t.manageContent}</span>
@@ -1440,14 +1499,10 @@
                                                     <div className="text-xs text-slate-500 dir-ltr font-mono">{order.phone}</div>
                                                     <button onClick={() => { navigator.clipboard.writeText(order.phone); showToast(lang === 'ar' ? 'تم النسخ' : 'Copié', 'success'); }} className="text-slate-400 hover:text-blue-600 bg-white/50 rounded p-1 shadow-sm"><Icon name="copy" size={12}/></button>
                                                 </div>
-                                                <div className="text-[10px] text-gray-500 mt-1 bg-white/50 inline-block px-2 py-0.5 rounded-md border border-white/60">{order.wilaya}</div>
-                                                {order.rating && (
-                                                    <div className="flex gap-1 mt-2 text-yellow-500">
-                                                        {[1,2,3,4,5].map(star => (
-                                                            <Icon key={star} name="star" size={12} fill={order.rating >= star ? 'currentColor' : 'none'}/>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                                <div className="text-[10px] text-gray-500 mt-1 flex gap-1">
+                                                    <span className="bg-white/50 inline-block px-2 py-0.5 rounded-md border border-white/60">{order.wilaya}</span>
+                                                    {order.promoCode && order.promoCode.partnerName && <span className="bg-green-50 text-green-700 inline-block px-2 py-0.5 rounded-md border border-green-200">شريك: {order.promoCode.partnerName}</span>}
+                                                </div>
                                             </div>
                                             <div className="text-right">
                                                 <div className="font-bold text-slate-900 bg-blue-50/50 px-2 rounded-lg border border-blue-100">{formatPrice(order.total)} {t.currency}</div>
@@ -1459,29 +1514,29 @@
                                             {order.orderDetails || "—"}
                                             
                                             {order.items && order.items.map((item, idx) => {
-                                                const designLinks = item.selectedVariants?.filter(v => v.id.includes('design_url'));
-                                                const hasAdminDesignOpt = item.selectedVariants?.some(v => v.id === 'design_opt' && v.price > 0);
-                                                return (
-                                                    <div key={idx} className={`mt-2 p-2 rounded border flex flex-col gap-2 ${hasAdminDesignOpt ? 'bg-purple-50 border-purple-200' : 'bg-blue-50 border-blue-100'}`}>
-                                                        <span className={`font-bold ${hasAdminDesignOpt ? 'text-purple-700' : 'text-blue-700'}`}>{item.name[lang] || item.name}</span>
-                                                        {hasAdminDesignOpt && <span className="text-[10px] font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded w-fit">يطلب تصميم من الإدارة (+200 دج)</span>}
-                                                        {designLinks && designLinks.length > 0 && (
+                                                const designLinks = item.selectedVariants?.filter(v => v.id.includes('design_'));
+                                                if(designLinks && designLinks.length > 0) {
+                                                    return (
+                                                        <div key={idx} className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded flex flex-col gap-2">
+                                                            <span className="font-bold text-blue-700">{item.name[lang] || item.name}</span>
                                                             <div className="flex gap-2">
                                                                 {designLinks.map((link, i) => (
                                                                     <a key={i} href={link.value} target="_blank" className="text-xs bg-blue-600 text-white px-2 py-1 rounded shadow-sm hover:bg-blue-500">
-                                                                        رابط التصميم المرفق
+                                                                        {link.label}
                                                                     </a>
                                                                 ))}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                )
+                                                        </div>
+                                                    )
+                                                }
+                                                return null;
                                             })}
                                         </div>
 
                                         <div className="flex items-center gap-2 flex-wrap">
+                                            <button aria-label="Chat" onClick={() => onOpenChat(order.customerUserId, order.customerName)} className="bg-blue-50/50 backdrop-blur border border-blue-100 text-blue-600 p-2.5 rounded-xl hover:bg-blue-100 transition shadow-sm"><Icon name="message-circle" size={18}/></button>
                                             <button aria-label="Print" onClick={() => printInvoice(order, t)} className="bg-green-50/50 backdrop-blur border border-green-100 text-green-600 p-2.5 rounded-xl hover:bg-green-100 transition shadow-sm"><Icon name="printer" size={18}/></button>
-                                            <select aria-label="Status" value={order.status} onChange={(e) => updateOrderStatus(order, e.target.value)} className={`flex-1 min-w-[120px] p-2.5 rounded-xl text-xs font-bold outline-none border border-white/50 backdrop-blur-sm shadow-sm ${lang==='ar'?'text-right':''} ${STATUS_COLORS[order.status] || ''}`}>
+                                            <select aria-label="Status" value={order.status} onChange={(e) => updateOrderStatus(order.id, e.target.value, order.customerUserId)} className={`flex-1 min-w-[120px] p-2.5 rounded-xl text-xs font-bold outline-none border border-white/50 backdrop-blur-sm shadow-sm ${lang==='ar'?'text-right':''} ${STATUS_COLORS[order.status] || ''}`}>
                                                 {STATUS_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label[lang]}</option>)}
                                             </select>
                                             <button aria-label="Delete" onClick={() => deleteOrder(order.id)} className="bg-red-50/50 backdrop-blur border border-red-100 text-red-600 p-2.5 rounded-xl hover:bg-red-100 transition shadow-sm"><Icon name="trash" size={18}/></button>
@@ -1490,6 +1545,42 @@
                                 ))}
                             </div>
                         )
+                    ) : tab === 'chats' ? (
+                        <div className="animate-fadeIn pb-28">
+                           <div className="space-y-3">
+                                {window.firebase && <AdminChatList db={db} appId={appId} onSelectChat={onOpenChat} t={t} />}
+                           </div>
+                        </div>
+                    ) : tab === 'partners' ? (
+                        <div className="animate-fadeIn space-y-4 pb-28">
+                            <div className="bg-gradient-to-br from-green-600 to-green-800 text-white p-5 rounded-3xl shadow-lg border border-green-500 mb-6">
+                                <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><Icon name="trending-up" size={20}/> {t.partnerStats}</h3>
+                                <p className="text-sm text-green-100">لوحة تتبع مبيعات وأرباح الشركاء عبر أكواد الخصم الخاصة بهم.</p>
+                            </div>
+
+                            {partnerStats.length === 0 ? <p className="text-center text-slate-500 py-10 ios-glass rounded-3xl">لا توجد أرباح مسجلة للشركاء بعد.</p> : (
+                                <div className="space-y-4">
+                                    {partnerStats.map((stat, idx) => (
+                                        <div key={idx} className="ios-glass p-4 rounded-2xl shadow-sm border border-white/60">
+                                            <div className="flex justify-between items-center border-b border-white/40 pb-3 mb-3">
+                                                <h4 className="font-black text-slate-800 text-lg flex items-center gap-2"><Icon name="user" size={18} className="text-green-600"/> {stat.name}</h4>
+                                                <span className="bg-white/50 text-slate-600 text-xs font-bold px-3 py-1 rounded-full border border-white/60">{stat.count} طلبات</span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="bg-white/40 p-3 rounded-xl border border-white/50">
+                                                    <p className="text-[10px] text-slate-500 font-bold mb-1">إجمالي المبيعات</p>
+                                                    <p className="text-sm font-black text-slate-800">{formatPrice(stat.revenue)} {t.currency}</p>
+                                                </div>
+                                                <div className="bg-green-50/50 p-3 rounded-xl border border-green-100">
+                                                    <p className="text-[10px] text-green-600 font-bold mb-1">{t.totalCommission}</p>
+                                                    <p className="text-sm font-black text-green-700">{formatPrice(stat.commission)} {t.currency}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     ) : tab === 'codes' ? (
                         <div className="animate-fadeIn space-y-4 pb-28">
                             <h3 className="font-bold text-lg px-2 text-slate-800">{t.createCode}</h3>
@@ -1513,6 +1604,13 @@
                                         <input name="maxUses" type="number" min="1" placeholder="مثال: 100" className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"/>
                                     </div>
                                 </div>
+
+                                <div className="pt-3 border-t border-white/50 mt-2 space-y-3">
+                                    <h4 className="text-xs font-bold text-slate-700">إعدادات الشريك (Affiliate) - اختياري</h4>
+                                    <input name="partnerName" placeholder={t.partnerName} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500 shadow-inner"/>
+                                    <input name="commissionRate" type="number" step="0.1" min="0" placeholder={t.commission} className="w-full p-3 bg-white/60 border border-white/50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500 shadow-inner dir-ltr"/>
+                                </div>
+
                                 <button type="submit" className="w-full bg-blue-600/90 backdrop-blur text-white py-3.5 rounded-xl font-bold transition hover:bg-blue-500 flex justify-center items-center gap-2 mt-2 shadow-md">
                                     <Icon name="plus" size={18}/> {t.createCode}
                                 </button>
@@ -1536,6 +1634,11 @@
                                                     {code.currentUses || 0}/{code.maxUses} {t.currentUses}
                                                 </span>}
                                             </div>
+                                            {code.partnerName && (
+                                                <div className="mt-2 text-[10px] font-bold text-green-700 bg-green-50/80 inline-block px-2 py-1 rounded-md border border-green-200">
+                                                    شريك: {code.partnerName} | عمولة: {code.commissionRate || 0}%
+                                                </div>
+                                            )}
                                         </div>
                                         <button aria-label="Delete" onClick={() => deletePromoCode(code.id)} className="text-red-500 hover:text-red-700 p-2.5 bg-red-50/50 rounded-full transition border border-red-100 shadow-sm"><Icon name="trash" size={18}/></button>
                                     </div>
@@ -1729,6 +1832,31 @@
                 </div>
             );
         };
+        
+        const AdminChatList = ({ db, appId, onSelectChat, t }) => {
+            const [chats, setChats] = useState([]);
+            useEffect(() => {
+                const q = window.firebase.query(window.firebase.collection(db, `artifacts/${appId}/chats`), window.firebase.orderBy('lastMessageTime', 'desc'));
+                const unsub = window.firebase.onSnapshot(q, (snap) => setChats(snap.docs.map(d => ({id: d.id, ...d.data()}))));
+                return () => unsub();
+            }, [db, appId]);
+            return chats.length === 0 ? <p className="text-center text-gray-400 py-10 ios-glass rounded-2xl">No active chats.</p> : chats.map(chat => (
+                <div key={chat.id} onClick={() => onSelectChat(chat.userId, chat.userName)} className="ios-glass p-4 rounded-2xl hover:border-blue-300 shadow-sm cursor-pointer transition flex gap-3 items-center group mb-3">
+                    <div className="w-12 h-12 bg-blue-50/80 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg group-hover:bg-blue-600 group-hover:text-white transition uppercase border border-blue-100 shadow-inner">
+                        {chat.userName ? chat.userName.charAt(0) : 'G'}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <div className="flex justify-between items-center mb-1">
+                            <h4 className="font-bold text-slate-800 text-sm truncate">{chat.userName}</h4>
+                            <span className="text-[10px] text-slate-500 font-mono bg-white/50 border border-white/60 px-2 py-0.5 rounded-md">
+                                {chat.lastMessageTime?.toDate ? chat.lastMessageTime.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                            </span>
+                        </div>
+                        <p className="text-xs text-slate-500 truncate group-hover:text-blue-600 transition">{chat.lastMessage}</p>
+                    </div>
+                </div>
+            ));
+        };
 
         const MaintenanceScreen = ({ t, lang, onAdminClick, uiConfig }) => (
             <div className={`min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center relative overflow-hidden ${lang === 'ar' ? 'dir-rtl' : 'dir-ltr'}`}>
@@ -1760,6 +1888,138 @@
                 </button>
             </div>
         );
+
+        // المولد الذكي للتصميم بالذكاء الاصطناعي بدلاً من الأستوديو القديم
+        const AIGenerator = ({ t, lang, onClose, onAddToCart, product }) => {
+            const [prompt, setPrompt] = useState("");
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [generatedImage, setGeneratedImage] = useState(null);
+            const [selectedStyle, setSelectedStyle] = useState('pro');
+            const [upscale, setUpscale] = useState(false);
+            const [removeBg, setRemoveBg] = useState(false);
+
+            const handleGenerate = (e) => {
+                e.preventDefault();
+                if(!prompt.trim()) return;
+                setIsGenerating(true);
+                
+                // محاكاة لعملية التوليد (يمكنك ربط الـ API الحقيقي هنا لاحقاً)
+                setTimeout(() => {
+                    setGeneratedImage("https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=80");
+                    setIsGenerating(false);
+                }, 3000);
+            };
+
+            const handleApply = () => {
+                if (!generatedImage) return;
+                const customProduct = {
+                    id: `ai-${Date.now()}`,
+                    name: { fr: `Design IA: ${product?.name?.fr || 'Personnalisé'}`, ar: `تصميم ذكي: ${product?.name?.ar || 'مخصص'}` },
+                    basePrice: product?.basePrice || 1500, 
+                    price: product?.basePrice || 1500,
+                    image: generatedImage,
+                    qty: 1,
+                    selectedVariants: [
+                        { id: 'design_ai', label: lang === 'ar' ? 'تصميم ذكي' : 'Design IA', value: generatedImage }
+                    ]
+                };
+                onAddToCart(customProduct);
+                onClose();
+            };
+
+            return (
+                <div className="fixed inset-0 z-[140] bg-slate-900/60 backdrop-blur-2xl flex items-center justify-center p-4 animate-fadeIn">
+                    <div className="ios-glass w-full max-w-5xl rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.3)] border border-white/50 flex flex-col md:flex-row h-[90vh] md:h-[75vh] animate-slideUp">
+                        
+                        <div className="w-full md:w-5/12 bg-white/40 p-6 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-white/40 overflow-y-auto hide-scrollbar">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                                    <span className="bg-gradient-to-tr from-blue-600 to-purple-600 text-transparent bg-clip-text"><Icon name="sparkles" size={28} className="text-blue-600"/> {t.aiStudio}</span>
+                                </h3>
+                                <button onClick={onClose} className="bg-white/50 text-slate-600 p-2.5 rounded-2xl hover:bg-red-500 hover:text-white transition backdrop-blur shadow-sm">
+                                    <Icon name="x" size={20}/>
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleGenerate} className="flex-1 flex flex-col gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700 block ml-1">{t.aiPrompt}</label>
+                                    <textarea 
+                                        value={prompt} 
+                                        onChange={(e)=>setPrompt(e.target.value)} 
+                                        placeholder={t.aiPrompt} 
+                                        rows="4" 
+                                        className="w-full p-4 bg-white/60 border border-white/80 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner resize-none font-medium placeholder:text-slate-400"
+                                    ></textarea>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-700 block ml-1">{t.aiStyles}</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[{id:'pro', label: t.stylePro, icon:'briefcase'}, {id:'creative', label: t.styleCreative, icon:'palette'}, {id:'minimal', label: t.styleMinimal, icon:'layout'}].map(style => (
+                                            <button 
+                                                key={style.id} 
+                                                type="button" 
+                                                onClick={() => setSelectedStyle(style.id)}
+                                                className={`p-3 rounded-2xl text-xs font-bold transition flex flex-col items-center gap-2 border ${selectedStyle === style.id ? 'bg-blue-600/90 text-white border-blue-500 shadow-lg shadow-blue-500/30' : 'bg-white/50 text-slate-600 border-white/60 hover:bg-white/80'}`}
+                                            >
+                                                <Icon name={style.icon} size={18}/> {style.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 bg-white/30 p-4 rounded-3xl border border-white/50 shadow-inner">
+                                    <label className="text-sm font-bold text-slate-700 block ml-1 flex items-center gap-2"><Icon name="sliders" size={16}/> {t.advancedOptions}</label>
+                                    
+                                    <label className="flex items-center justify-between cursor-pointer p-2 hover:bg-white/40 rounded-xl transition">
+                                        <span className="text-xs font-bold text-slate-600">{t.upscale}</span>
+                                        <input type="checkbox" checked={upscale} onChange={(e)=>setUpscale(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white/50 border-white/60 rounded focus:ring-blue-500 focus:ring-2" />
+                                    </label>
+                                    
+                                    <label className="flex items-center justify-between cursor-pointer p-2 hover:bg-white/40 rounded-xl transition">
+                                        <span className="text-xs font-bold text-slate-600">{t.removeBg}</span>
+                                        <input type="checkbox" checked={removeBg} onChange={(e)=>setRemoveBg(e.target.checked)} className="w-4 h-4 text-blue-600 bg-white/50 border-white/60 rounded focus:ring-blue-500 focus:ring-2" />
+                                    </label>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    disabled={!prompt.trim() || isGenerating} 
+                                    className="mt-auto w-full bg-slate-900/90 backdrop-blur-md text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-slate-900/20 transition hover:bg-slate-800 flex justify-center items-center gap-3 disabled:opacity-50"
+                                >
+                                    {isGenerating ? <><div className="loader border-white/30 border-t-white w-5 h-5"></div> {t.generating}</> : <><Icon name="wand-2" size={20}/> {t.generateDesign}</>}
+                                </button>
+                            </form>
+                        </div>
+
+                        <div className="w-full md:w-7/12 bg-slate-800/5 relative flex items-center justify-center p-6 pattern-dots overflow-hidden">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 pointer-events-none"></div>
+                            
+                            {generatedImage ? (
+                                <div className="relative z-10 w-full max-w-md animate-fadeIn flex flex-col items-center">
+                                    <div className="relative group w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/40 bg-white">
+                                        <img src={generatedImage} alt="AI Generated" className="w-full h-full object-cover transition duration-700 group-hover:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end justify-center pb-6">
+                                            <button onClick={handleApply} className="bg-blue-600/90 backdrop-blur-md text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 hover:bg-blue-500 transition transform hover:-translate-y-1">
+                                                <Icon name="check-circle" size={20}/> {t.applyDesign}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center text-slate-400 relative z-10">
+                                    <div className="w-24 h-24 bg-white/50 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-white/60 shadow-inner">
+                                        <Icon name="image" size={40} className="opacity-50"/>
+                                    </div>
+                                    <p className="font-bold text-sm">التصميم المولد سيظهر هنا</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const LandingScreen = ({ t, lang, toggleLang, onGetStarted, uiConfig }) => {
             return (
@@ -1883,16 +2143,16 @@
             const [appliedPromo, setAppliedPromo] = useState(null); 
             const [promoCodeInput, setPromoCodeInput] = useState(''); 
             const [user, setUser] = useState(null);
-            const [userData, setUserData] = useState({ walletBalance: 0 });
-            const [useWallet, setUseWallet] = useState(false);
-            
             const [authLoading, setAuthLoading] = useState(true); 
             const [db, setDb] = useState(null);
             const [notifications, setNotifications] = useState([]);
             const [myOrders, setMyOrders] = useState([]);
             const [toast, setToast] = useState(null);
+            const [activeChat, setActiveChat] = useState(null);
             const [productModal, setProductModal] = useState(null);
             const [showQrModal, setShowQrModal] = useState(false);
+            const [showAIGenerator, setShowAIGenerator] = useState(false);
+            const [selectedDesignProduct, setSelectedDesignProduct] = useState(null);
             const [uiConfig, setUiConfig] = useState({});
             const [bypassMaintenance, setBypassMaintenance] = useState(false);
             
@@ -1913,8 +2173,9 @@
 
             const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'l-artisan-imprimeur';
             const t = TRANSLATIONS[lang];
-            const ADMIN_EMAIL = 'attouabdelkarim2@gmail.com';
-            const isAdmin = user && user.email === ADMIN_EMAIL;
+            
+            // متغير للتحقق هل المستخدم الحالي ضمن قائمة المدراء/الشركاء
+            const isAdmin = user && ADMIN_EMAILS.includes(user.email);
             
             const startVoiceSearch = () => {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1939,7 +2200,7 @@
                 }
             };
 
-            const calculateTotal = useCallback((currentCart, promo, zone, applyWallet = false, walletBal = 0) => {
+            const calculateTotal = useCallback((currentCart, promo, zone) => {
                 const subtotal = currentCart.reduce((s,i) => s + (i.price*i.qty), 0);
                 let discount = 0;
                 if (promo) {
@@ -1948,15 +2209,8 @@
                     discount = Math.min(discount, subtotal);
                 }
                 const delivery = zone ? (DELIVERY_FEES[zone] || 0) : 0;
-                let preWalletTotal = Math.max(0, subtotal - discount + delivery);
-                
-                let walletDiscount = 0;
-                if (applyWallet && walletBal > 0) {
-                    walletDiscount = Math.min(walletBal, preWalletTotal);
-                }
-                
-                const finalTotal = preWalletTotal - walletDiscount;
-                return { subtotal, discount, delivery, walletDiscount, finalTotal };
+                const finalTotal = subtotal - discount + delivery;
+                return { subtotal, discount, delivery, finalTotal: Math.max(0, finalTotal) };
             }, []);
 
             const applyPromoCode = async (code) => {
@@ -2036,21 +2290,28 @@
             };
 
             const navigate = (newView, replace = false) => {
-                if (newView === view && !productModal && !showQrModal) return;
+                if (newView === view && !activeChat && !productModal && !showQrModal && !showAIGenerator) return;
                 setView(newView);
                 setAppliedPromo(null); 
-                setUseWallet(false);
+                setActiveChat(null); 
                 setProductModal(null);
                 setShowQrModal(false);
+                setShowAIGenerator(false);
                 const hash = newView;
-                if (replace) window.history.replaceState({ view: newView }, '', `#${hash}`);
-                else window.history.pushState({ view: newView }, '', `#${hash}`);
+                if (replace) window.history.replaceState({ view: newView, chat: false }, '', `#${hash}`);
+                else window.history.pushState({ view: newView, chat: false }, '', `#${hash}`);
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            const closeProductModal = () => setProductModal(null);
+            const openChat = (chatDetails) => {
+                setActiveChat(chatDetails);
+                window.history.pushState({ view: view, chat: true, userId: chatDetails?.userId, userName: chatDetails?.userName }, '', `#chat`);
+            };
+
+            const closeChat = () => window.history.back();
             const openProductModal = (product) => setProductModal(product);
+            const closeProductModal = () => setProductModal(null);
 
             useEffect(() => { document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = lang; localStorage.setItem('app_lang', lang); }, [lang]);
             const toggleLang = () => setLang(prev => prev === 'ar' ? 'fr' : 'ar');
@@ -2072,14 +2333,16 @@
                     const state = event.state;
                     if (state && state.view) {
                         setView(state.view);
+                        setActiveChat(state.chat ? { userId: state.userId, userName: state.userName } : null);
                     } else {
                         setView(getInitialView());
+                        setActiveChat(null);
                     }
                 };
                 window.addEventListener('popstate', handlePopState);
                 if (window.history.state === null) {
                     const initialViewName = getInitialView();
-                    window.history.replaceState({ view: initialViewName }, '', `#${initialViewName}`);
+                    window.history.replaceState({ view: initialViewName, chat: false }, '', `#${initialViewName}`);
                 }
                 return () => window.removeEventListener('popstate', handlePopState);
             }, [view]);
@@ -2122,16 +2385,6 @@
                     Notification.requestPermission();
                 }
 
-                // Sync Wallet
-                const userRef = window.firebase.doc(db, `artifacts/${appId}/users/${user.uid}`);
-                const unsubUser = window.firebase.onSnapshot(userRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        setUserData(docSnap.data());
-                    } else {
-                        setUserData({ walletBalance: 0 });
-                    }
-                });
-
                 const notifRef = window.firebase.collection(db, `artifacts/${appId}/users/${user.uid}/notifications`);
                 const unsubNotif = window.firebase.onSnapshot(window.firebase.query(notifRef, window.firebase.orderBy('date', 'desc')), (snap) => {
                     const list = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -2157,7 +2410,7 @@
                     setMyOrders(fetchedOrders);
                 });
                 const unsubConfig = window.firebase.onSnapshot(window.firebase.doc(db, `artifacts/${appId}/config/ui`), (d) => { if(d.exists()) setUiConfig(d.data()); });
-                return () => { unsubUser(); unsubNotif(); unsubOrders(); unsubConfig(); };
+                return () => { unsubNotif(); unsubOrders(); unsubConfig(); };
             }, [user, db, lang, appId, t]);
 
             const showToast = (msg, type='info') => { setToast({msg, type}); setTimeout(() => setToast(null), 3000); };
@@ -2181,14 +2434,6 @@
             const handleReorder = (order) => {
                 const reorderedItems = order.items.map(item => ({ ...item, cartId: `${item.id}-${Date.now()}-${Math.random()}`, name: item.name, price: item.price, qty: item.qty, image: item.image, selectedVariants: item.selectedVariants || [] }));
                 setCart(prev => [...prev, ...reorderedItems]); showToast(t.addToCart); navigate('cart');
-            };
-
-            const rateOrder = async (orderId, rating) => {
-                if (!db || !appId) return;
-                try {
-                    await window.firebase.updateDoc(window.firebase.doc(db, `artifacts/${appId}/public/data/orders/${orderId}`), { rating });
-                    showToast(lang === 'ar' ? 'شكراً لتقييمك!' : 'Merci pour votre évaluation!', 'success');
-                } catch (e) { showToast(t.err, 'error'); }
             };
 
             const submitOrder = async (e) => {
@@ -2220,17 +2465,10 @@
                     if (w) currentZone = w.zone;
                 }
 
-                const { subtotal, finalTotal, discount, delivery, walletDiscount } = calculateTotal(cart, appliedPromo, currentZone, useWallet, userData.walletBalance); 
+                const { subtotal, finalTotal, discount, delivery } = calculateTotal(cart, appliedPromo, currentZone); 
                 const customOrderId = Math.random().toString(36).substring(2, 11).toUpperCase();
                 
                 try {
-                    // Deduct Wallet Balance if used
-                    if (useWallet && walletDiscount > 0) {
-                        await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/users/${user.uid}`), {
-                            walletBalance: window.firebase.increment(-walletDiscount)
-                        }, { merge: true });
-                    }
-
                     const orderData = {
                         id: customOrderId,
                         customerUserId: user.uid,
@@ -2251,11 +2489,12 @@
                         total: finalTotal || 0,
                         discount: discount || 0,
                         deliveryFee: delivery || 0,
-                        walletUsed: walletDiscount || 0,
                         promoCode: appliedPromo ? { 
                             code: appliedPromo.code || '', 
                             value: discount || 0, 
-                            type: appliedPromo.discountType || '' 
+                            type: appliedPromo.discountType || '',
+                            partnerName: appliedPromo.partnerName || null,
+                            commissionRate: appliedPromo.commissionRate || 0
                         } : null,
                         status: 'En attente',
                         createdAt: window.firebase.Timestamp.now()
@@ -2282,7 +2521,6 @@
                     
                     setCart([]); 
                     setAppliedPromo(null); 
-                    setUseWallet(false);
                     setPromoCodeInput(''); 
                     navigate('orders'); 
                     showToast(t.orderSent, "success");
@@ -2304,44 +2542,25 @@
                 }
             };
 
-            const updateOrderStatus = async (order, newStatus) => {
+            const updateOrderStatus = async (orderId, newStatus, customerId) => {
                 if (!db || !appId || !isAdmin) return;
                 try {
-                    const docPath = `artifacts/${appId}/public/data/orders/${order.id}`;
-                    let updates = { status: newStatus };
-
-                    // Cashback System
-                    if (newStatus === 'Prêt' && order.status !== 'Prêt' && !order.cashbackAwarded) {
-                        const cashback = order.total * 0.05; // 5% Cashback
-                        updates.cashbackAwarded = true;
-                        updates.cashbackAmount = cashback;
-                        
-                        await window.firebase.setDoc(window.firebase.doc(db, `artifacts/${appId}/users/${order.customerUserId}`), {
-                            walletBalance: window.firebase.increment(cashback)
-                        }, { merge: true });
-
-                        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${order.customerUserId}/notifications`), { 
-                            message: t.cashbackMsg, 
-                            date: window.firebase.Timestamp.now(), 
-                            read: false, 
-                            type: 'success', 
-                        });
-                    }
-
-                    await window.firebase.updateDoc(window.firebase.doc(db, docPath), updates);
+                    const docPath = `artifacts/${appId}/public/data/orders/${orderId}`;
+                    await window.firebase.updateDoc(window.firebase.doc(db, docPath), { status: newStatus });
+                    
                     showToast(t.statusUpdate);
                     
-                    if (order.customerUserId) {
+                    if (customerId) {
                         const statusLabel = STATUS_OPTIONS.find(s => s.key === newStatus)?.label;
                         let msg = { fr: `Statut: ${statusLabel.fr}`, ar: `الحالة: ${statusLabel.ar}` }; 
                         if (newStatus === 'Prêt') msg = { fr: "Commande prête!", ar: "طلبك جاهز!" };
                         
-                        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${order.customerUserId}/notifications`), { 
+                        await window.firebase.addDoc(window.firebase.collection(db, `artifacts/${appId}/users/${customerId}/notifications`), { 
                             message: msg, 
                             date: window.firebase.Timestamp.now(), 
                             read: false, 
                             type: 'status', 
-                            orderId: order.id
+                            orderId 
                         });
                     }
                 } catch (e) { 
@@ -2354,7 +2573,7 @@
             if (authLoading) return <div className="h-screen flex items-center justify-center bg-transparent"><div className="loader"></div></div>;
 
             const isMaintenanceActive = uiConfig?.maintenanceMode === true;
-            if (isMaintenanceActive && !bypassMaintenance && (!user || user.email !== ADMIN_EMAIL)) {
+            if (isMaintenanceActive && !bypassMaintenance && (!user || !ADMIN_EMAILS.includes(user.email))) {
                 return <MaintenanceScreen t={t} lang={lang} onAdminClick={() => setBypassMaintenance(true)} uiConfig={uiConfig} />;
             }
 
@@ -2476,6 +2695,7 @@
                                                 <div className="flex gap-2 flex-wrap">
                                                     <button onClick={()=>navigate('cart')} className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 transition hover:scale-105">{t.orderNow}</button>
                                                     <button onClick={()=>setShowQrModal(true)} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="qr-code" size={16}/> {t.qrTool}</button>
+                                                    <button onClick={()=>{ setSelectedDesignProduct(null); setShowAIGenerator(true); }} className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2.5 rounded-xl font-bold text-sm transition border border-white/10 flex items-center gap-1.5"><Icon name="wand-2" size={16}/> {lang === 'ar' ? 'المولد الذكي' : 'Générateur IA'}</button>
                                                 </div>
                                             </div>
                                             <Icon name="layers" size={160} className={`absolute -bottom-10 text-white opacity-[0.03] rotate-12 ${lang==='ar' ? '-left-10' : '-right-10'}`}/>
@@ -2549,7 +2769,10 @@
                                             <h3 className="font-bold text-sm text-slate-800 mb-2 leading-tight group-hover:text-blue-600 transition-colors">{p.name[lang]}</h3>
                                             <div className="mt-auto flex justify-between items-center pt-2 border-t border-white/40">
                                                 <span className={`text-blue-700 font-black text-sm ${p.comingSoon ? 'opacity-50' : ''}`}>{p.comingSoon ? '---' : `${formatPrice(p.basePrice)} ${t.currency}`}</span>
-                                                <button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 ${p.comingSoon ? 'bg-slate-200/50 text-slate-400 cursor-not-allowed' : 'bg-white/80 text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-500'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button>
+                                                <div className="flex gap-1">
+                                                    {!p.comingSoon && <button aria-label="AIGenerator" onClick={()=> { setSelectedDesignProduct(p); setShowAIGenerator(true); }} className="p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 bg-white/80 text-slate-700 hover:bg-slate-900 hover:text-white"><Icon name="wand-2" size={16}/></button>}
+                                                    <button aria-label="Add to Cart" onClick={()=> !p.comingSoon && openProductModal(p)} disabled={p.comingSoon} className={`p-2.5 rounded-xl shadow-sm transition backdrop-blur-sm border border-white/50 ${p.comingSoon ? 'bg-slate-200/50 text-slate-400 cursor-not-allowed' : 'bg-white/80 text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-500'}`}><Icon name={p.comingSoon ? "clock" : "plus"} size={16}/></button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -2595,8 +2818,9 @@
                                                 <div className="flex-1 overflow-hidden">
                                                     <h4 className="font-bold text-sm text-slate-800 mb-0.5">{i.name[lang]}</h4>
                                                     <div className="text-[11px] text-slate-500 mb-2 leading-tight w-full">
+                                                        {i.selectedVariants && i.selectedVariants.find(v=>v.id.includes('design_')) && <span className="font-bold text-blue-600 block mb-0.5">(تصميم مخصص)</span>}
                                                         {i.selectedVariants && i.selectedVariants.map(v => {
-                                                            if (v.id.includes('design_url')) return null;
+                                                            if (v.id.includes('design_')) return null;
                                                             return <span key={v.id} className="block truncate">{v.label}: {v.value}</span>;
                                                         })}
                                                     </div>
@@ -2614,7 +2838,7 @@
                                         ))}
                                         
                                         {(() => {
-                                            const { subtotal, discount, finalTotal, delivery, walletDiscount } = calculateTotal(cart, appliedPromo, selectedWilayaZone, useWallet, userData.walletBalance); 
+                                            const { subtotal, discount, finalTotal, delivery } = calculateTotal(cart, appliedPromo, selectedWilayaZone); 
                                             const savedPhone = localStorage.getItem('saved_phone') || '';
                                             const savedWilaya = localStorage.getItem('saved_wilaya') || '';
 
@@ -2635,26 +2859,10 @@
                                                         )}
                                                     </div>
                                                     
-                                                    {userData?.walletBalance > 0 && (
-                                                        <div className="pb-4 border-b border-white/40 mb-4">
-                                                            <label className={`flex items-center justify-between p-3 border rounded-xl cursor-pointer transition shadow-sm ${useWallet ? 'bg-blue-50 border-blue-400' : 'bg-white/60 border-white/50 hover:bg-white/80'}`}>
-                                                                <div className="flex items-center gap-2">
-                                                                    <Icon name="wallet" size={18} className="text-blue-600"/>
-                                                                    <div>
-                                                                        <span className="text-sm font-bold text-slate-700 block leading-tight">{t.useWallet}</span>
-                                                                        <span className="text-[10px] text-slate-500">{t.walletBalance}: {formatPrice(userData.walletBalance)} {t.currency}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <input type="checkbox" checked={useWallet} onChange={(e) => setUseWallet(e.target.checked)} className="w-4 h-4 text-blue-600" />
-                                                            </label>
-                                                        </div>
-                                                    )}
-
                                                     <div className="space-y-2.5 text-sm mb-3 text-slate-600 font-medium">
                                                         <div className="flex justify-between"><span>{t.subtotal}</span><span>{formatPrice(subtotal)} {t.currency}</span></div>
                                                         {delivery > 0 && <div className="flex justify-between text-slate-800 font-bold bg-white/40 p-1.5 rounded-lg -mx-1.5 px-1.5 border border-white/50"><span>{t.deliveryFee}</span><span>+ {formatPrice(delivery)} {t.currency}</span></div>}
                                                         {discount > 0 && <div className="flex justify-between text-green-700 font-bold bg-green-50/80 p-1.5 rounded-lg -mx-1.5 px-1.5 border border-green-100"><span>{t.discount}</span><span>- {formatPrice(discount)} {t.currency}</span></div>}
-                                                        {useWallet && walletDiscount > 0 && <div className="flex justify-between text-blue-700 font-bold bg-blue-50/80 p-1.5 rounded-lg -mx-1.5 px-1.5 border border-blue-100"><span>{t.useWallet}</span><span>- {formatPrice(walletDiscount)} {t.currency}</span></div>}
                                                     </div>
                                                     <div className="flex justify-between items-center font-bold border-t border-white/50 pt-4 mb-6">
                                                         <span className="text-lg text-slate-800">{t.total}</span>
@@ -2724,26 +2932,6 @@
                                                         {t.estimatedDelivery} <span className="text-slate-800 bg-white/60 px-2 py-0.5 rounded-md border border-white/60 shadow-sm">{estDelivery.toLocaleDateString()}</span>
                                                     </div>
                                                 )}
-
-                                                {o.status === 'Prêt' && !o.rating && (
-                                                    <div className="mt-4 bg-white/60 p-3 rounded-2xl border border-white/50 shadow-sm text-center">
-                                                        <p className="text-xs font-bold text-slate-700 mb-2">{t.rateOrder}</p>
-                                                        <div className="flex justify-center gap-2">
-                                                            {[1,2,3,4,5].map(star => (
-                                                                <button key={star} onClick={() => rateOrder(o.id, star)} className="text-slate-300 hover:text-yellow-400 hover:scale-110 transition-transform">
-                                                                    <Icon name="star" size={24} fill="currentColor"/>
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {o.rating && (
-                                                    <div className="mt-4 flex justify-center gap-1 text-yellow-500">
-                                                        {[1,2,3,4,5].map(star => (
-                                                            <Icon key={star} name="star" size={16} fill={o.rating >= star ? 'currentColor' : 'none'}/>
-                                                        ))}
-                                                    </div>
-                                                )}
                                             </div>
 
                                             <div className="px-4 pb-4 flex justify-between items-center pt-3 border-t border-white/40">
@@ -2777,8 +2965,10 @@
                                                         ))}
                                                     </ul>
                                                     {o.deliveryFee > 0 && <div className="flex justify-between text-slate-700 pt-2 border-t border-white/50 font-bold"><span>{t.deliveryFee}</span><span>{formatPrice(o.deliveryFee)} {t.currency}</span></div>}
-                                                    {o.walletUsed > 0 && <div className="flex justify-between text-blue-700 pt-2 border-t border-white/50 font-bold"><span>{t.useWallet}</span><span>- {formatPrice(o.walletUsed)} {t.currency}</span></div>}
                                                     <p className="mt-3 text-slate-600 italic bg-white/60 p-2.5 rounded-xl border border-white/50 shadow-inner">{o.orderDetails || "No additional notes."}</p>
+                                                    {o.items && o.items.some(i => i.selectedVariants?.find(v => v.id.includes('design_'))) && (
+                                                        <div className="mt-3 p-2 bg-blue-50/50 rounded border border-blue-100 text-blue-600">هذا الطلب يحتوي على تصميم مرفوع خاص بك.</div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -2789,12 +2979,13 @@
                         {view === 'notifications' && (
                             <div className="animate-fadeIn max-w-md mx-auto pb-10"><h2 className="font-bold text-2xl mb-4 text-slate-800">{t.notifications}</h2>{notifications.length === 0 ? <p className="text-center text-slate-400 py-20 ios-glass rounded-3xl border border-white/60"><Icon name="bell-off" size={48} className="mx-auto mb-4 opacity-40"/>{t.noNotifs}</p> : (<div className="space-y-3">{notifications.map(n => (<div key={n.id} onClick={()=>markRead(n.id)} className={`p-4 rounded-2xl border cursor-pointer transition backdrop-blur-md shadow-sm hover:shadow-md ${n.read ? 'bg-white/60 border-white/50' : 'bg-blue-50/80 border-blue-200 shadow-blue-500/10'}`}><div className="flex gap-3"><div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 shadow-sm ${n.read ? 'bg-slate-300' : 'bg-blue-500 animate-pulse'}`}></div><div><p className={`text-sm ${!n.read ? 'font-bold text-slate-900' : 'text-slate-600'}`}>{typeof n.message === 'object' ? n.message[lang] : n.message}</p><span className="text-[10px] text-slate-500 mt-1.5 block dir-ltr text-right bg-white/50 border border-white/60 w-max px-2 py-0.5 rounded-md font-mono">{n.date?.toDate ? n.date.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span></div></div></div>))}</div>)}</div>
                         )}
-                        {view === 'profile' && <ProfileScreen user={user} userData={userData} t={t} navigate={navigate} showToast={showToast} setView={setView} ADMIN_EMAIL={ADMIN_EMAIL} setUser={setUser} totalSpent={myOrders.filter(o => o.status === 'Prêt').reduce((sum, o) => sum + o.total, 0)} />}
-                        {view === 'admin' && <AdminDashboard db={db} appId={appId} updateOrderStatus={updateOrderStatus} lang={lang} t={t} showToast={showToast} user={user} ADMIN_EMAIL={ADMIN_EMAIL} />}
+                        {view === 'profile' && <ProfileScreen user={user} t={t} navigate={navigate} showToast={showToast} setView={setView} setUser={setUser} totalSpent={myOrders.filter(o => o.status === 'Prêt').reduce((sum, o) => sum + o.total, 0)} />}
+                        {view === 'admin' && <AdminDashboard db={db} appId={appId} updateOrderStatus={updateOrderStatus} lang={lang} t={t} onOpenChat={openChat} showToast={showToast} user={user} />}
                     </main>
 
                     {productModal && <ProductModal product={productModal} lang={lang} t={t} onAdd={addToCart} onClose={closeProductModal} />}
                     {showQrModal && <QrGeneratorModal t={t} lang={lang} onClose={()=>setShowQrModal(false)} />}
+                    {showAIGenerator && <AIGenerator product={selectedDesignProduct} t={t} lang={lang} onClose={()=>setShowAIGenerator(false)} onAddToCart={(p) => { addToCart(p); navigate('cart'); }} />}
 
                     <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto ios-glass rounded-3xl flex justify-between px-2 py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.1)] safe-bottom border-t border-white/80">
                         <button aria-label="Home" onClick={()=>navigate('home')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='home'?'active text-blue-600':'text-slate-400'}`}><Icon name="home" size={22}/><span className="text-[10px] font-bold">{t.home}</span></button>
@@ -2804,10 +2995,28 @@
                         {isAdmin && <button aria-label="Admin Panel" onClick={()=>navigate('admin')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='admin'?'active text-blue-600':'text-slate-400'}`}><Icon name="shield" size={22}/><span className="text-[10px] font-bold">{t.admin}</span></button>}
                     </div>
 
-                    {!isAdmin && view !== 'admin' && (
+                    {!isAdmin && !activeChat && view !== 'admin' && (
                         <div className="fixed bottom-[6.5rem] right-4 flex flex-col gap-3 z-40 max-w-md mx-auto w-full items-end pr-4 pointer-events-none">
-                            <a aria-label="WhatsApp" href={`https://wa.me/${uiConfig?.whatsappConfig || '213549179000'}`} target="_blank" className="pointer-events-auto bg-green-500/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-white/20"><Icon name="phone" size={24} fill="white" className="text-white"/></a>
+                            <a aria-label="WhatsApp" href={`https://wa.me/${uiConfig?.whatsappConfig || '213549179000'}`} target="_blank" className="pointer-events-auto bg-green-500/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-green-400">
+                                <Icon name="phone" size={24} />
+                            </a>
+                            <button aria-label="Live Chat" onClick={() => user.isAnonymous ? showToast(t.chatRegisterPrompt, 'info') : openChat({ userId: user.uid, userName: user.displayName || t.standardUser })} className="pointer-events-auto bg-blue-600/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-blue-500">
+                                <Icon name="message-square" size={24} />
+                            </button>
                         </div>
+                    )}
+
+                    {activeChat && (
+                        <ChatScreen 
+                            user={user} 
+                            db={db} 
+                            appId={appId} 
+                            targetUserId={activeChat.userId} 
+                            targetUserName={activeChat.userName} 
+                            lang={lang} 
+                            t={t} 
+                            onBack={closeChat} 
+                        />
                     )}
                 </div>
             );
