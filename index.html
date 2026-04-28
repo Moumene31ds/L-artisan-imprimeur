@@ -3002,41 +3002,41 @@
 
                     <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto ios-glass rounded-3xl flex justify-between px-2 py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.1)] safe-bottom border-t border-white/80">
                         <button aria-label="Home" onClick=${()=>navigate('home')} className=${`flex flex-col items-center gap-1.5 nav-btn ${view==='home'?'active text-blue-600':'text-slate-400'}`}><${Icon} name="home" size=${22}/><span className="text-[10px] font-bold">${t.home}</span></button>
-                         <button aria-label="Orders" onClick={()=>navigate('orders')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='orders'?'active text-blue-600':'text-slate-400'}`}><Icon name="list-checks" size={22}/><span className="text-[10px] font-bold">{t.orders}</span></button>
-                        <button aria-label="Cart" onClick={()=>navigate('cart')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='cart'?'active text-blue-600':'text-slate-400'}`}><div className="relative"><Icon name="shopping-cart" size={22}/>{cart.length > 0 && <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></span>}</div><span className="text-[10px] font-bold">{t.cart}</span></button>
-                        <button aria-label="Profile" onClick={()=>navigate('profile')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='profile'?'active text-blue-600':'text-slate-400'}`}><Icon name="user" size={22}/><span className="text-[10px] font-bold">{t.profile}</span></button>
-                        {isAdmin && <button aria-label="Admin Panel" onClick={()=>navigate('admin')} className={`flex flex-col items-center gap-1.5 nav-btn ${view==='admin'?'active text-blue-600':'text-slate-400'}`}><Icon name="shield" size={22}/><span className="text-[10px] font-bold">{t.admin}</span></button>}
+                         <button aria-label="Orders" onClick=${()=>navigate('orders')} className=${`flex flex-col items-center gap-1.5 nav-btn ${view==='orders'?'active text-blue-600':'text-slate-400'}`}><${Icon} name="list-checks" size=${22}/><span className="text-[10px] font-bold">${t.orders}</span></button>
+                        <button aria-label="Cart" onClick=${()=>navigate('cart')} className=${`flex flex-col items-center gap-1.5 nav-btn ${view==='cart'?'active text-blue-600':'text-slate-400'}`}><div className="relative"><${Icon} name="shopping-cart" size=${22}/>${cart.length > 0 && html`<span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></span>`}</div><span className="text-[10px] font-bold">${t.cart}</span></button>
+                        <button aria-label="Profile" onClick=${()=>navigate('profile')} className=${`flex flex-col items-center gap-1.5 nav-btn ${view==='profile'?'active text-blue-600':'text-slate-400'}`}><${Icon} name="user" size=${22}/><span className="text-[10px] font-bold">${t.profile}</span></button>
+                        ${isAdmin && html`<button aria-label="Admin Panel" onClick=${()=>navigate('admin')} className=${`flex flex-col items-center gap-1.5 nav-btn ${view==='admin'?'active text-blue-600':'text-slate-400'}`}><${Icon} name="shield" size=${22}/><span className="text-[10px] font-bold">${t.admin}</span></button>`}
                     </div>
 
-                    {!isAdmin && !activeChat && view !== 'admin' && (
+                    ${!isAdmin && !activeChat && view !== 'admin' && html`
                         <div className="fixed bottom-[6.5rem] right-4 flex flex-col gap-3 z-40 max-w-md mx-auto w-full items-end pr-4 pointer-events-none">
-                            <a aria-label="WhatsApp" href={`https://wa.me/${uiConfig?.whatsappConfig || '213549179000'}`} target="_blank" className="pointer-events-auto bg-green-500/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-green-400">
-                                <Icon name="phone" size={24} />
+                            <a aria-label="WhatsApp" href=${`https://wa.me/${uiConfig?.whatsappConfig || '213549179000'}`} target="_blank" className="pointer-events-auto bg-green-500/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-green-400">
+                                <${Icon} name="phone" size=${24} />
                             </a>
-                            <button aria-label="Live Chat" onClick={() => user.isAnonymous ? showToast(t.chatRegisterPrompt, 'info') : openChat({ userId: user.uid, userName: user.displayName || t.standardUser })} className="pointer-events-auto bg-blue-600/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-blue-500">
-                                <Icon name="message-square" size={24} />
+                            <button aria-label="Live Chat" onClick=${() => user.isAnonymous ? showToast(t.chatRegisterPrompt, 'info') : openChat({ userId: user.uid, userName: user.displayName || t.standardUser })} className="pointer-events-auto bg-blue-600/90 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center border border-blue-500">
+                                <${Icon} name="message-square" size=${24} />
                             </button>
                         </div>
-                    )}
+                    `}
 
-                    {activeChat && (
-                        <ChatScreen 
-                            user={user} 
-                            db={db} 
-                            appId={appId} 
-                            targetUserId={activeChat.userId} 
-                            targetUserName={activeChat.userName} 
-                            lang={lang} 
-                            t={t} 
-                            onBack={closeChat} 
+                    ${activeChat && html`
+                        <${ChatScreen} 
+                            user=${user} 
+                            db=${db} 
+                            appId=${appId} 
+                            targetUserId=${activeChat.userId} 
+                            targetUserName=${activeChat.userName} 
+                            lang=${lang} 
+                            t=${t} 
+                            onBack=${closeChat} 
                         />
-                    )}
+                    `}
                 </div>
-            );
+            `;
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
 </body>
-</html>
+    </html>
